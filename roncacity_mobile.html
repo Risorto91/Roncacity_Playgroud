@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ronca City Playground 2026 — Live</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
+:root{
+  --yellow:#F5C518; --purple:#7B2FBE; --purple-light:#9B59B6;
+  --black:#0A0A0A; --gray-dark:#141414; --gray-mid:#1E1E1E; --gray-light:#2A2A2A;
+  --border:rgba(255,255,255,0.08); --text:#FFF; --muted:rgba(255,255,255,0.45);
+  --success:#1DB97E; --danger:#E24B4A;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--black);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;}
+
+.header{position:sticky;top:0;z-index:100;background:var(--gray-dark);border-bottom:2px solid var(--yellow);padding:10px 16px 0;}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.logo{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:uppercase;line-height:1.1;}
+.logo .rc{color:var(--yellow);}
+.logo .pg{color:var(--purple-light);}
+.live-row{display:flex;align-items:center;gap:8px;}
+.live-dot{display:flex;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--danger);text-transform:uppercase;}
+.live-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--danger);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.clock{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--yellow);}
+.tabs{display:flex;gap:3px;overflow-x:auto;padding-bottom:0;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:7px 12px;border-radius:5px 5px 0 0;border:none;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;border-bottom:2px solid transparent;transition:all 0.2s;}
+.tab.active{color:var(--yellow);border-bottom-color:var(--yellow);}
+
+.content{padding:14px;}
+.section{display:none;}
+.section.active{display:block;}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:var(--yellow);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* PROSSIMA */
+.next-card-m{background:var(--gray-mid);border:1px solid rgba(245,197,24,0.25);border-radius:10px;padding:14px;margin-bottom:10px;}
+.next-card-label-m{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--yellow);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.next-card-label-m::after{content:'';flex:1;height:1px;background:rgba(245,197,24,0.15);}
+.next-orario-m{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--yellow);}
+.next-fase-m{font-size:10px;padding:2px 7px;border-radius:4px;background:var(--gray-light);color:var(--muted);}
+.next-teams-m{display:flex;align-items:center;gap:8px;margin-top:10px;}
+.next-team-m{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;text-transform:uppercase;flex:1;line-height:1.1;}
+.next-team-m:last-child{text-align:right;}
+.next-vs-m{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--purple-light);flex-shrink:0;}
+
+/* CLASSIFICHE */
+.girone-block{margin-bottom:14px;}
+.girone-label-m{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:1px;padding:7px 12px;border-radius:7px 7px 0 0;}
+.girone-label-m.A,.girone-label-m.B{background:var(--yellow);color:#000;}
+.girone-label-m.C,.girone-label-m.D{background:var(--purple);color:#fff;}
+.girone-table-m{width:100%;border-collapse:collapse;background:var(--gray-mid);border-radius:0 0 7px 7px;overflow:hidden;}
+.girone-table-m th{padding:6px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+.girone-table-m td{padding:8px 8px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.03);}
+.girone-table-m tr:last-child td{border-bottom:none;}
+.girone-table-m tbody tr:first-child td{background:rgba(245,197,24,0.05);}
+.pos-m{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:9px;font-weight:700;background:var(--gray-light);}
+.pos-m.g{background:#B8862A;color:#fff;}.pos-m.s{background:#6A6A6A;color:#fff;}
+.ww{color:var(--success);font-weight:700;}.ll{color:var(--muted);}
+
+/* CALENDARIO */
+.day-tabs-m{display:flex;gap:5px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;}
+.day-tabs-m::-webkit-scrollbar{display:none;}
+.day-tab-m{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;padding:5px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;}
+.day-tab-m.active{background:var(--yellow);border-color:var(--yellow);color:#000;}
+.day-tab-m.finale{border-color:var(--purple-light);color:var(--purple-light);}
+.day-tab-m.finale.active{background:var(--purple);border-color:var(--purple);color:#fff;}
+.cal-group-title-m{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:7px 0 3px;border-bottom:1px solid var(--border);margin-bottom:5px;}
+.cal-row-m{display:flex;align-items:center;gap:7px;background:var(--gray-mid);border:1px solid var(--border);border-radius:7px;padding:9px 10px;margin-bottom:4px;}
+.cal-row-m.played{opacity:0.5;}
+.cal-time-m{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--yellow);width:38px;flex-shrink:0;}
+.cal-campo-m{font-size:9px;color:var(--muted);width:28px;flex-shrink:0;}
+.cal-teams-m{flex:1;font-size:12px;}
+.vs-m{color:var(--muted);font-size:9px;display:block;}
+.cal-score-m{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-align:right;white-space:nowrap;}
+.win-m{color:var(--yellow);}
+
+/* TABELLONE */
+.bracket-fase-title-m{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--yellow);padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:6px;}
+.bracket-match-m{background:var(--gray-mid);border:1px solid var(--border);border-radius:7px;overflow:hidden;margin-bottom:5px;}
+.bracket-team-m{padding:8px 11px;font-size:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.bracket-team-m:last-child{border-bottom:none;}
+.bracket-team-m.winner{background:rgba(245,197,24,0.08);font-weight:700;color:var(--yellow);}
+.bscore-m{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--yellow);}
+.btbd-m{color:var(--muted);font-style:italic;font-size:10px;}
+.bracket-meta-m{font-size:10px;color:var(--muted);padding:4px 11px;background:rgba(255,255,255,0.02);border-top:1px solid var(--border);}
+
+/* SCORER */
+.scorer-row-m{display:flex;align-items:center;gap:10px;background:var(--gray-mid);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:7px;}
+.scorer-rank-m{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:var(--muted);width:24px;text-align:center;flex-shrink:0;}
+.scorer-rank-m.top{color:var(--yellow);}
+.scorer-info-m{flex:1;}
+.scorer-info-m strong{font-size:14px;display:block;}
+.scorer-info-m span{font-size:10px;color:var(--muted);}
+.scorer-bar-m{height:3px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;margin-top:4px;}
+.scorer-bar-fill-m{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--purple),var(--yellow));}
+.scorer-pts-m{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--yellow);}
+
+.refresh-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.refresh-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;padding:4px 10px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;}
+.last-update{font-size:10px;color:var(--muted);}
+.no-data-m{text-align:center;padding:36px 20px;color:var(--muted);}
+.no-data-m .ni{font-size:28px;opacity:0.3;display:block;margin-bottom:6px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo"><span class="rc">RONCA</span> <span class="pg">CITY</span> PLAYGROUND 2026</div>
+    <div class="live-row">
+      <div class="live-dot">Live</div>
+      <div class="clock" id="clock">--:--</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('prossima',this)">⏭ Prossima</button>
+    <button class="tab" onclick="showTab('classifiche',this)">🏆 Classifiche</button>
+    <button class="tab" onclick="showTab('calendario',this)">📅 Calendario</button>
+    <button class="tab" onclick="showTab('tabellone',this)">🎯 Tabellone</button>
+    <button class="tab" onclick="showTab('scorer',this)">🏀 Scorer</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="section active" id="tab-prossima">
+    <div class="refresh-row">
+      <div class="sec-title">Prossime partite</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="last-update" id="lastUpdate">—</span>
+        <button class="refresh-btn" onclick="fetchData()">↻</button>
+      </div>
+    </div>
+    <div id="nextMobile"><div class="no-data-m"><span class="ni">⏭</span>Caricamento...</div></div>
+  </div>
+
+  <div class="section" id="tab-classifiche">
+    <div class="refresh-row">
+      <div class="sec-title">Classifiche</div>
+      <button class="refresh-btn" onclick="fetchData()">↻</button>
+    </div>
+    <div id="classificheMobile"></div>
+  </div>
+
+  <div class="section" id="tab-calendario">
+    <div class="sec-title">Calendario</div>
+    <div class="day-tabs-m">
+      <button class="day-tab-m active" onclick="showDayM(1,this)">Lun 13</button>
+      <button class="day-tab-m" onclick="showDayM(2,this)">Mar 14</button>
+      <button class="day-tab-m" onclick="showDayM(3,this)">Mer 15</button>
+      <button class="day-tab-m" onclick="showDayM(4,this)">Gio 16</button>
+      <button class="day-tab-m finale" onclick="showDayM(5,this)">Ven 17 — Finale</button>
+    </div>
+    <div id="calendarioMobile"></div>
+  </div>
+
+  <div class="section" id="tab-tabellone">
+    <div class="sec-title">Tabellone Finale</div>
+    <div id="tabelloneMobile"><div class="no-data-m"><span class="ni">🎯</span>Il tabellone si compilerà il 17 luglio</div></div>
+  </div>
+
+  <div class="section" id="tab-scorer">
+    <div class="refresh-row">
+      <div class="sec-title">Top Scorer</div>
+      <button class="refresh-btn" onclick="fetchData()">↻</button>
+    </div>
+    <div id="scorerMobile"></div>
+  </div>
+
+</div>
+
+<script>
+// ================================================================
+const APPS_SCRIPT_URL = 'INCOLLA_QUI_IL_TUO_APPS_SCRIPT_RONCACITY_DASHBOARD_URL';
+// ================================================================
+
+let data = {};
+let currentDayM = 1;
+
+function updateClock() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+}
+setInterval(updateClock,1000); updateClock();
+
+function showTab(name, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+  renderMobile(name);
+}
+
+function showDayM(n, el) {
+  currentDayM = n;
+  document.querySelectorAll('.day-tab-m').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderCalendarioM();
+}
+
+function fetchData() {
+  if (!APPS_SCRIPT_URL||APPS_SCRIPT_URL.includes('INCOLLA_QUI')) { useDemoData(); return; }
+  fetch(APPS_SCRIPT_URL+'?action=all&t='+Date.now())
+    .then(r => r.json())
+    .then(d => {
+      data=d;
+      const now=new Date();
+      const upd=document.getElementById('lastUpdate');
+      if(upd) upd.textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+      renderMobile('prossima');
+    })
+    .catch(() => useDemoData());
+}
+setInterval(fetchData, 45000); fetchData();
+
+function useDemoData() {
+  data = {
+    classifiche:{
+      A:[{nome:'Team Alpha',g:4,v:4,s:0,pf:88,ps:60},{nome:'Street Kings',g:4,v:3,s:1,pf:80,ps:65},{nome:'Ballers FC',g:3,v:2,s:1,pf:60,ps:55},{nome:'Hoops Crew',g:3,v:1,s:2,pf:55,ps:70},{nome:'Fast Break',g:2,v:1,s:1,pf:40,ps:42},{nome:'Court Side',g:2,v:0,s:2,pf:35,ps:50},{nome:'Rim Rockers',g:1,v:0,s:1,pf:18,ps:22},{nome:'The Squad',g:0,v:0,s:0,pf:0,ps:0}],
+      B:[{nome:'Urban Legends',g:4,v:4,s:0,pf:90,ps:58},{nome:'Playground Pro',g:3,v:3,s:0,pf:78,ps:62},{nome:'Net Busters',g:3,v:2,s:1,pf:62,ps:58},{nome:'Slam Dunk',g:2,v:1,s:1,pf:52,ps:68},{nome:'Air Time',g:2,v:1,s:1,pf:38,ps:40},{nome:'Pick & Roll',g:1,v:0,s:1,pf:32,ps:48},{nome:'Triple Threat',g:1,v:0,s:1,pf:16,ps:20},{nome:'Full Court',g:0,v:0,s:0,pf:0,ps:0}],
+      C:[{nome:'West Side',g:2,v:2,s:0,pf:44,ps:30},{nome:'East End',g:2,v:1,s:1,pf:38,ps:36},{nome:'North Gate',g:1,v:1,s:0,pf:22,ps:18},{nome:'South Park',g:1,v:0,s:1,pf:16,ps:22},{nome:'Mid Town',g:0,v:0,s:0,pf:0,ps:0},{nome:'Downtown',g:0,v:0,s:0,pf:0,ps:0},{nome:'Uptown',g:0,v:0,s:0,pf:0,ps:0},{nome:'Cross Road',g:0,v:0,s:0,pf:0,ps:0}],
+      D:[{nome:'Red Bulls',g:0,v:0,s:0,pf:0,ps:0},{nome:'Blue Hawks',g:0,v:0,s:0,pf:0,ps:0},{nome:'Green Wave',g:0,v:0,s:0,pf:0,ps:0},{nome:'Black Cats',g:0,v:0,s:0,pf:0,ps:0},{nome:'White Tigers',g:0,v:0,s:0,pf:0,ps:0},{nome:'Gold Rush',g:0,v:0,s:0,pf:0,ps:0},{nome:'Purple Rain',g:0,v:0,s:0,pf:0,ps:0},{nome:'Silver Fox',g:0,v:0,s:0,pf:0,ps:0}]
+    },
+    calendario:[
+      {id:1,giorno:1,campo:1,orario:'20:00',fase:'Girone A',girone:'A',casa:'Team Alpha',trasferta:'Street Kings',risultato:{pCasa:21,pTras:18}},
+      {id:2,giorno:1,campo:2,orario:'20:00',fase:'Girone A',girone:'A',casa:'Ballers FC',trasferta:'Hoops Crew',risultato:null},
+      {id:3,giorno:1,campo:3,orario:'20:00',fase:'Girone B',girone:'B',casa:'Urban Legends',trasferta:'Playground Pro',risultato:null},
+      {id:4,giorno:1,campo:4,orario:'20:00',fase:'Girone B',girone:'B',casa:'Net Busters',trasferta:'Slam Dunk',risultato:null},
+      {id:5,giorno:2,campo:1,orario:'20:00',fase:'Girone C',girone:'C',casa:'West Side',trasferta:'East End',risultato:null},
+      {id:6,giorno:2,campo:2,orario:'20:00',fase:'Girone C',girone:'C',casa:'North Gate',trasferta:'South Park',risultato:null},
+    ],
+    scorer:[
+      {nome:'M. Rossi',squadra:'Team Alpha',pt:42},{nome:'L. Bianchi',squadra:'Urban Legends',pt:38},
+      {nome:'F. Verdi',squadra:'Playground Pro',pt:31},{nome:'G. Neri',squadra:'West Side',pt:28},
+    ],
+    tabellone:[
+      {fase:'Quarti',partita:'Quarto 1',sq1:'TBD',pt1:'',pt2:'',sq2:'TBD',campo:1,orario:'21:30'},
+      {fase:'Quarti',partita:'Quarto 2',sq1:'TBD',pt1:'',pt2:'',sq2:'TBD',campo:2,orario:'21:30'},
+      {fase:'Quarti',partita:'Quarto 3',sq1:'TBD',pt1:'',pt2:'',sq2:'TBD',campo:3,orario:'21:30'},
+      {fase:'Quarti',partita:'Quarto 4',sq1:'TBD',pt1:'',pt2:'',sq2:'TBD',campo:4,orario:'21:30'},
+      {fase:'Semifinali',partita:'Semifinale 1',sq1:'TBD',pt1:'',pt2:'',sq2:'TBD',campo:1,orario:'21:50'},
+      {fase:'Semifinali',partita:'Semifinale 2',sq1:'TBD',pt1:'',pt2:'',sq2:'TBD',campo:2,orario:'21:50'},
+      {fase:'Finale',partita:'Finale 1°/2°',sq1:'TBD',pt1:'',pt2:'',sq2:'TBD',campo:1,orario:'22:30'},
+    ],
+  };
+  renderMobile('prossima');
+}
+
+function renderMobile(name) {
+  if (name==='prossima') renderProssimaM();
+  if (name==='classifiche') renderClassificheM();
+  if (name==='calendario') renderCalendarioM();
+  if (name==='tabellone') renderTabelloneM();
+  if (name==='scorer') renderScorerM();
+}
+
+function renderProssimaM() {
+  const cal = data.calendario;
+  const wrap = document.getElementById('nextMobile');
+  if (!cal||!cal.length) { wrap.innerHTML='<div class="no-data-m"><span class="ni">⏭</span>Nessuna partita</div>'; return; }
+  const nonGiocate = cal.filter(p => !p.risultato||p.risultato===null||p.risultato.pCasa===''||p.risultato.pCasa===null||p.risultato.pCasa===undefined);
+  if (!nonGiocate.length) { wrap.innerHTML='<div class="no-data-m"><span class="ni">🏆</span>Tutte le partite terminate!</div>'; return; }
+  const prossimo_orario = nonGiocate[0].orario;
+  const slot = nonGiocate.filter(p => p.orario===prossimo_orario);
+  wrap.innerHTML = slot.map(p => `
+    <div class="next-card-m">
+      <div class="next-card-label-m">Campo ${p.campo}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <div class="next-orario-m">${p.orario}</div>
+        <div class="next-fase-m">${p.fase}</div>
+      </div>
+      <div class="next-teams-m">
+        <div class="next-team-m">${p.casa||'TBD'}</div>
+        <div class="next-vs-m">VS</div>
+        <div class="next-team-m">${p.trasferta||'TBD'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderClassificheM() {
+  const cl = data.classifiche;
+  const wrap = document.getElementById('classificheMobile');
+  if (!cl) return;
+  wrap.innerHTML = ['A','B','C','D'].map(g => {
+    const sq = cl[g]||[];
+    const rows = sq.map((s,i) => `<tr>
+      <td><span class="pos-m ${i===0?'g':i===1?'s':''}">${i+1}</span></td>
+      <td style="font-size:11px;"><strong>${s.nome}</strong></td>
+      <td style="text-align:center;font-size:11px;">${s.g}</td>
+      <td style="text-align:center"><span class="ww" style="font-size:11px;">${s.v}W</span></td>
+      <td style="text-align:center"><span class="ll" style="font-size:11px;">${s.s}L</span></td>
+      <td style="text-align:center;font-size:11px;color:${(s.pf-s.ps)>=0?'var(--success)':'var(--danger)'}">${s.pf-s.ps>=0?'+':''}${s.pf-s.ps}</td>
+    </tr>`).join('');
+    return `<div class="girone-block">
+      <div class="girone-label-m ${g}">Girone ${g}</div>
+      <table class="girone-table-m">
+        <thead><tr><th>#</th><th>Squadra</th><th>G</th><th>W</th><th>L</th><th>+/-</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+}
+
+function renderCalendarioM() {
+  const cal = data.calendario;
+  const wrap = document.getElementById('calendarioMobile');
+  if (!cal||!cal.length) { wrap.innerHTML='<div class="no-data-m"><span class="ni">📅</span>Nessun dato</div>'; return; }
+  const partite = cal.filter(p => p.giorno===currentDayM);
+  if (!partite.length) { wrap.innerHTML='<div class="no-data-m"><span class="ni">📅</span>Nessuna partita</div>'; return; }
+  const fasi = {};
+  partite.forEach(p => { if(!fasi[p.fase]) fasi[p.fase]=[]; fasi[p.fase].push(p); });
+  wrap.innerHTML = Object.entries(fasi).map(([fase,ps]) => {
+    const rows = ps.map(p => {
+      const r = p.risultato;
+      const played = r&&r.pCasa!==null&&r.pCasa!==''&&r.pCasa!==undefined;
+      return `<div class="cal-row-m ${played?'played':''}">
+        <div class="cal-time-m">${p.orario}</div>
+        <div class="cal-campo-m">C${p.campo}</div>
+        <div class="cal-teams-m">${p.casa||'TBD'}<span class="vs-m">vs</span>${p.trasferta||'TBD'}</div>
+        ${played?`<div class="cal-score-m"><span class="${r.pCasa>r.pTras?'win-m':''}">${r.pCasa}</span>—<span class="${r.pTras>r.pCasa?'win-m':''}">${r.pTras}</span></div>`:''}
+      </div>`;
+    }).join('');
+    return `<div class="cal-group-title-m">${fase}</div>${rows}`;
+  }).join('');
+}
+
+function renderTabelloneM() {
+  const tab = data.tabellone;
+  const wrap = document.getElementById('tabelloneMobile');
+  if (!tab||!tab.length) return;
+  const fasi = {};
+  tab.forEach(p => { if(!fasi[p.fase]) fasi[p.fase]=[]; fasi[p.fase].push(p); });
+  wrap.innerHTML = Object.entries(fasi).map(([fase,ps]) => {
+    const matches = ps.map(p => {
+      const w1=p.pt1!==''&&p.pt2!==''&&Number(p.pt1)>Number(p.pt2);
+      const w2=p.pt1!==''&&p.pt2!==''&&Number(p.pt2)>Number(p.pt1);
+      return `<div class="bracket-match-m">
+        <div class="bracket-team-m ${w1?'winner':''}"><span class="${!p.sq1||p.sq1==='TBD'?'btbd-m':''}">${p.sq1||'TBD'}</span>${p.pt1!==''?`<span class="bscore-m">${p.pt1}</span>`:''}</div>
+        <div class="bracket-team-m ${w2?'winner':''}"><span class="${!p.sq2||p.sq2==='TBD'?'btbd-m':''}">${p.sq2||'TBD'}</span>${p.pt2!==''?`<span class="bscore-m">${p.pt2}</span>`:''}</div>
+        <div class="bracket-meta-m">Campo ${p.campo} · ${p.orario} · ${p.partita}</div>
+      </div>`;
+    }).join('');
+    return `<div class="bracket-fase-title-m">${fase}</div>${matches}`;
+  }).join('');
+}
+
+function renderScorerM() {
+  const sc = data.scorer;
+  const wrap = document.getElementById('scorerMobile');
+  if (!sc||!sc.length) { wrap.innerHTML='<div class="no-data-m"><span class="ni">🏀</span>Nessun dato</div>'; return; }
+  const max = sc[0].pt||1;
+  wrap.innerHTML = sc.map((s,i) => `
+    <div class="scorer-row-m">
+      <div class="scorer-rank-m ${i<3?'top':''}">${i+1}</div>
+      <div class="scorer-info-m">
+        <strong>${s.nome}</strong><span>${s.squadra}</span>
+        <div class="scorer-bar-m"><div class="scorer-bar-fill-m" style="width:${(s.pt/max*100).toFixed(1)}%"></div></div>
+      </div>
+      <div class="scorer-pts-m">${s.pt}</div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
