@@ -247,7 +247,8 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--green);flex-shrin
       Benvenuti al <strong>Ronca City Playground 2026</strong>!<br>
       Riceverai una mail di conferma a breve.<br><br>
       Porta il <strong>13 luglio</strong>:<br>
-      📋 Liberatoria firmata da ogni giocatore<br><br>
+      📋 Liberatoria firmata da ogni giocatore<br>
+      💶 Quota d'iscrizione in contanti per tutta la squadra (circa <strong>100€</strong>, importo definitivo a breve)<br><br>
       <strong>#RoncaCity #GameOn</strong>
     </p>
     <div class="success-links">
@@ -296,13 +297,26 @@ function nextFromCat() {
   addPlayer(); addPlayer(); addPlayer(); addPlayer();
 }
 
+function savePlayersFromDOM() {
+  players.forEach(p => {
+    const nomeEl = document.getElementById('p'+p.id+'_nome');
+    if (!nomeEl) return; // card non ancora renderizzata, mantieni i dati già salvati
+    p.nome    = nomeEl.value;
+    p.cognome = document.getElementById('p'+p.id+'_cog').value;
+    p.dob     = document.getElementById('p'+p.id+'_dob').value;
+    p.taglia  = document.getElementById('p'+p.id+'_tag').value;
+  });
+}
+
 function addPlayer() {
   if (players.length >= 6) return;
+  savePlayersFromDOM();
   players.push({id: nextId++});
   renderPlayers();
 }
 
 function removePlayer(id) {
+  savePlayersFromDOM();
   players = players.filter(p => p.id !== id);
   renderPlayers();
 }
@@ -313,7 +327,7 @@ function renderPlayers() {
   players.forEach((p, i) => {
     const div = document.createElement('div');
     div.className = 'player-card';
-    const tagOpts = taglie.map(t => `<option value="${t}">${t||'—'}</option>`).join('');
+    const tagOpts = taglie.map(t => `<option value="${t}" ${p.taglia===t ? 'selected' : ''}>${t||'—'}</option>`).join('');
     const req = i < 4 ? '<span class="req">*</span>' : '';
     const badge = i === 0
       ? '<span class="captain-tag">Capitano</span>'
@@ -325,13 +339,13 @@ function renderPlayers() {
       </div>
       <div class="row row-2">
         <div class="field"><label>Nome ${req}</label>
-          <input type="text" id="p${p.id}_nome" placeholder="Nome"></div>
+          <input type="text" id="p${p.id}_nome" placeholder="Nome" value="${p.nome||''}"></div>
         <div class="field"><label>Cognome ${req}</label>
-          <input type="text" id="p${p.id}_cog" placeholder="Cognome"></div>
+          <input type="text" id="p${p.id}_cog" placeholder="Cognome" value="${p.cognome||''}"></div>
       </div>
       <div class="row row-2">
         <div class="field"><label>Data di nascita ${req}</label>
-          <input type="date" id="p${p.id}_dob"></div>
+          <input type="date" id="p${p.id}_dob" value="${p.dob||''}"></div>
         <div class="field"><label>Taglia maglia</label>
           <select id="p${p.id}_tag">${tagOpts}</select></div>
       </div>`;
