@@ -390,7 +390,9 @@ function nextFromSquadra() {
 }
 
 // Limite Over 40: nato il 31/12/1986 o prima (compie 40 anni nel 2026)
+// L'unica eccezione tollerata deve comunque avere almeno 35 anni (nato 1991 o prima)
 const OVER40_LIMIT_YEAR = 1986;
+const OVER40_ECCEZIONE_LIMIT_YEAR = 1991;
 const OVER40_MAX_ECCEZIONI = 1;
 
 function nextFromPlayers() {
@@ -407,15 +409,21 @@ function nextFromPlayers() {
   }
 
   if (categoria === 'over40') {
-    const fuoriEta = [];
+    const fuoriEta = [];      // tra 1987 e 1991: tollerati come eccezione (max 1)
+    const nonAmmessi = [];    // 1992 o dopo: mai ammessi, a prescindere dalla quota
     players.forEach((p, i) => {
       const dob = document.getElementById('p'+p.id+'_dob')?.value;
       if (!dob) return;
       const annoNascita = parseInt(dob.substring(0,4), 10);
-      if (annoNascita > OVER40_LIMIT_YEAR) fuoriEta.push(i+1);
+      if (annoNascita > OVER40_ECCEZIONE_LIMIT_YEAR) nonAmmessi.push(i+1);
+      else if (annoNascita > OVER40_LIMIT_YEAR) fuoriEta.push(i+1);
     });
+    if (nonAmmessi.length > 0) {
+      al.innerHTML = `<div class="alert alert-warn">La categoria <strong>Over 40</strong> non ammette giocatori nati dopo il <strong>${OVER40_ECCEZIONE_LIMIT_YEAR}</strong> (et\u00e0 minima 35 anni anche per l'eccezione). Controlla la data di nascita del <strong>Giocatore ${nonAmmessi.join(', ')}</strong>.</div>`;
+      return;
+    }
     if (fuoriEta.length > OVER40_MAX_ECCEZIONI) {
-      al.innerHTML = `<div class="alert alert-warn">La categoria <strong>Over 40</strong> richiede giocatori nati nel <strong>${OVER40_LIMIT_YEAR}</strong> o prima (massimo ${OVER40_MAX_ECCEZIONI} eccezione consentita). Controlla la data di nascita del <strong>Giocatore ${fuoriEta.join(', ')}</strong>.</div>`;
+      al.innerHTML = `<div class="alert alert-warn">La categoria <strong>Over 40</strong> richiede giocatori nati nel <strong>${OVER40_LIMIT_YEAR}</strong> o prima (massimo ${OVER40_MAX_ECCEZIONI} eccezione consentita, et\u00e0 minima 35 anni). Controlla la data di nascita del <strong>Giocatore ${fuoriEta.join(', ')}</strong>.</div>`;
       return;
     }
   }
