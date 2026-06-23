@@ -389,6 +389,10 @@ function nextFromSquadra() {
   goTo(1);
 }
 
+// Limite Over 40: nato il 31/12/1986 o prima (compie 40 anni nel 2026)
+const OVER40_LIMIT_YEAR = 1986;
+const OVER40_MAX_ECCEZIONI = 1;
+
 function nextFromPlayers() {
   const al = document.getElementById('alertPage1');
   if (players.length < 4) { al.innerHTML='<div class="alert alert-warn">Aggiungi almeno <strong>4 giocatori</strong>.</div>'; return; }
@@ -401,6 +405,21 @@ function nextFromPlayers() {
       al.innerHTML=`<div class="alert alert-warn">Completa tutti i campi del <strong>Giocatore ${i+1}</strong>.</div>`; return;
     }
   }
+
+  if (categoria === 'over40') {
+    const fuoriEta = [];
+    players.forEach((p, i) => {
+      const dob = document.getElementById('p'+p.id+'_dob')?.value;
+      if (!dob) return;
+      const annoNascita = parseInt(dob.substring(0,4), 10);
+      if (annoNascita > OVER40_LIMIT_YEAR) fuoriEta.push(i+1);
+    });
+    if (fuoriEta.length > OVER40_MAX_ECCEZIONI) {
+      al.innerHTML = `<div class="alert alert-warn">La categoria <strong>Over 40</strong> richiede giocatori nati nel <strong>${OVER40_LIMIT_YEAR}</strong> o prima (massimo ${OVER40_MAX_ECCEZIONI} eccezione consentita). Controlla la data di nascita del <strong>Giocatore ${fuoriEta.join(', ')}</strong>.</div>`;
+      return;
+    }
+  }
+
   al.innerHTML=''; goTo(2);
 }
 
