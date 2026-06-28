@@ -254,12 +254,12 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--green);flex-shrin
   <div class="success-msg" id="successMsg">
     <div class="icon">🏀</div>
     <h2>Iscrizione inviata!</h2>
-    <p>
+    <p id="successBody">
       Benvenuti al <strong>Ronca City Playground 2026</strong>!<br>
       Riceverai una mail di conferma a breve.<br><br>
       Porta il <strong>13 luglio</strong>:<br>
       📋 Liberatoria firmata da ogni giocatore<br>
-      💶 Quota d'iscrizione in contanti per tutta la squadra <strong>100€</strong>, <br><br>
+      💶 Quota d'iscrizione in contanti per tutta la squadra: <strong id="quotaTesto">100€</strong><br><br>
       <strong>#RoncaCityPlaygroud </strong>
     </p>
     <div class="success-links">
@@ -278,6 +278,14 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKPoIyUK9N1vD-
 const taglie = ['','M','L','XL','XXL','XXXL'];
 let players = [], nextId = 0;
 let categoria = '';
+
+// Quota d'iscrizione per atleta in base alla categoria
+const QUOTA_PER_ATLETA = {
+  senior: 25,
+  over40: 25,
+  u19: 20,
+  u15: 20
+};
 
 function selectCat(cat, el) {
   categoria = cat;
@@ -462,6 +470,13 @@ function submitForm() {
   al.innerHTML='<div class="alert alert-ok">⏳ Invio in corso...</div>';
 
   const data = collectData();
+
+  // Calcolo quota d'iscrizione in base a categoria e numero giocatori
+  const prezzoUnitario = QUOTA_PER_ATLETA[categoria] || 0;
+  const numGiocatori = players.length;
+  const totale = prezzoUnitario * numGiocatori;
+  document.getElementById('quotaTesto').textContent =
+    `${numGiocatori} giocatori x ${prezzoUnitario}€ = ${totale}€`;
 
   if (APPS_SCRIPT_URL !== 'INCOLLA_QUI_IL_TUO_APPS_SCRIPT_RONCACITY_URL') {
     fetch(APPS_SCRIPT_URL, {
