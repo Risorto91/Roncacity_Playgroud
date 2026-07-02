@@ -255,7 +255,16 @@
   .sponsor-tier-label .tt{ font-family:'Anton',sans-serif; font-size:13px; letter-spacing:0.08em; }
   .tier-title .tt{ color:var(--gold); font-size:16px; }
   .tier-main .tt{ color:var(--white); }
+  .tier-sponsor .tt{ color:var(--muted); }
   .tier-media .tt{ color:var(--muted); }
+
+  .sponsor-grid.dense{ grid-template-columns: repeat(3, 1fr); gap:8px; }
+  .sponsor-card.mini{ padding:10px 8px; gap:5px; }
+  .sponsor-card.mini .logo-slot{ height:38px; font-size:9px; }
+  .sponsor-card.mini .sponsor-name{ font-size:11px; }
+  @media (min-width: 480px){
+    .sponsor-grid.dense{ grid-template-columns: repeat(4, 1fr); }
+  }
   .sponsor-tier-label .line{ flex:1; height:1px; background: var(--line); }
 
   .sponsor-grid{ display:grid; grid-template-columns: 1fr; gap:10px; padding: 0 18px; }
@@ -547,32 +556,19 @@
     <div class="section-sub">Chi rende possibile il torneo</div>
 
     <div class="sponsor-tier-label tier-title"><span class="tt">Title Sponsor</span><span class="line"></span></div>
-    <div class="sponsor-grid">
-      <div class="sponsor-card title">
-        <div class="logo-slot">logo title sponsor</div>
-        <div class="sponsor-name">Nome Sponsor</div>
-        <div class="sponsor-caption">Breve descrizione dell'azienda e del legame con il torneo.</div>
-        <a class="sponsor-link" href="#">Visita il sito →</a>
-      </div>
-    </div>
+    <div class="sponsor-grid" id="tierTitle"></div>
 
     <div class="sponsor-tier-label tier-main"><span class="tt">Main Sponsor</span><span class="line"></span></div>
-    <div class="sponsor-grid two-col">
-      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Sponsor</div><a class="sponsor-link" href="#">Sito →</a></div>
-      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Sponsor</div><a class="sponsor-link" href="#">Sito →</a></div>
-      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Sponsor</div><a class="sponsor-link" href="#">Sito →</a></div>
-      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Sponsor</div><a class="sponsor-link" href="#">Sito →</a></div>
-    </div>
+    <div class="sponsor-grid two-col" id="tierMain"></div>
+
+    <div class="sponsor-tier-label tier-sponsor"><span class="tt">Sponsor</span><span class="line"></span></div>
+    <div class="sponsor-grid dense" id="tierSponsor"></div>
 
     <div class="sponsor-tier-label tier-media"><span class="tt">Media Partner</span><span class="line"></span></div>
-    <div class="sponsor-grid two-col">
-      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Media Partner</div></div>
-      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Media Partner</div></div>
-      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Media Partner</div></div>
-    </div>
+    <div class="sponsor-grid two-col" id="tierMedia"></div>
 
     <div class="note-box">
-      <b>Nota tecnica:</b> struttura pronta a 3 livelli (Title → Main → Media Partner), come nelle tue slide social. Quando hai i loghi in alta risoluzione, i link ai siti e una riga di caption per ciascuno, li carichiamo qui — bastano pochi minuti per sponsor.
+      <b>Nota tecnica:</b> struttura pronta a 4 livelli (Title → Main → Sponsor → Media Partner). Le card qui sopra sono generate dall'elenco <code>sponsorsData</code> nel codice: al momento ci sono solo segnaposto nel numero corretto (1 / 13 / 29 / 2). Quando hai loghi, link e nome di ciascuno, basta compilare quella lista — non serve toccare il resto della pagina.
     </div>
   </section>
 
@@ -694,6 +690,31 @@
 
   // ---- Link iscrizioni: da collegare al form esistente ----
   document.getElementById('iscrizioniLink').href = 'https://risorto91.github.io/Roncacity_Playground/';
+
+  // ---- SPONSOR: elenco dati da compilare man mano che arrivano loghi/link ----
+  // Per ogni sponsor: { name, logo (percorso file), link (url sito), caption (solo per Title) }
+  // Finché logo/link non ci sono, lascia stringa vuota "": la card mostra il segnaposto.
+  const sponsorsData = {
+    title: [
+      { name: "EFFEDI SALOTTI", logo: "", link: "https://www.effedisalotti.it/", caption: "Componenti in legno per mobili imbottiti, Da 40 anni artigianalmente produzione conto terzi con attrezzature all’avanguardia"}],
+    main: Array.from({length: 13}, () => ({ name: "", logo: "", link: "" })),
+    sponsor: Array.from({length: 29}, () => ({ name: "", logo: "", link: "" })),
+    media: Array.from({length: 2}, () => ({ name: "", logo: "", link: "" }))
+  };
+
+  function sponsorCard(s, variant){
+    const logoInner = s.logo ? `<img src="${s.logo}" alt="${s.name}" style="max-height:100%;max-width:100%;">` : (s.name || 'logo');
+    const nameLine = s.name ? `<div class="sponsor-name">${s.name}</div>` : `<div class="sponsor-name" style="color:var(--muted);">da assegnare</div>`;
+    const linkLine = s.link ? `<a class="sponsor-link" href="${s.link}" target="_blank" rel="noopener">Visita il sito →</a>` : '';
+    const captionLine = s.caption ? `<div class="sponsor-caption">${s.caption}</div>` : '';
+    const cls = variant === 'title' ? 'sponsor-card title' : (variant === 'mini' ? 'sponsor-card mini' : 'sponsor-card');
+    return `<div class="${cls}"><div class="logo-slot">${logoInner}</div>${nameLine}${captionLine}${linkLine}</div>`;
+  }
+
+  document.getElementById('tierTitle').innerHTML = sponsorsData.title.map(s => sponsorCard(s, 'title')).join('');
+  document.getElementById('tierMain').innerHTML = sponsorsData.main.map(s => sponsorCard(s, 'normal')).join('');
+  document.getElementById('tierSponsor').innerHTML = sponsorsData.sponsor.map(s => sponsorCard(s, 'mini')).join('');
+  document.getElementById('tierMedia').innerHTML = sponsorsData.media.map(s => sponsorCard(s, 'normal')).join('');
 </script>
 
 </body>
