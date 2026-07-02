@@ -405,7 +405,7 @@
   <!-- ============ RISULTATI E CALENDARIO ============ -->
   <section class="section" id="risultati">
     <div class="section-heading"><span class="num">02</span><h2>Risultati e Calendario</h2></div>
-    <div class="section-sub">Senior & Over40 — fase a gironi + gironcini finali</div>
+    <div class="section-sub">Senior & Over40 — fase a gironi + mini-gironi finali</div>
 
     <div class="tabs-inline">
       <div class="pill active" data-cat="senior">Senior</div>
@@ -427,25 +427,49 @@
     </div>
 
     <div class="card">
-      <div class="card-head">Prossime partite</div>
-      <div class="match-row">
-        <div class="match-teams">
-          <span>Squadra A vs Squadra B</span>
-          <span class="match-meta">Girone A · Campo 1</span>
-        </div>
-        <div class="match-score">18:30</div>
-      </div>
-      <div class="match-row">
-        <div class="match-teams">
-          <span>Squadra C vs Squadra D</span>
-          <span class="match-meta">Girone B · Campo 2</span>
-        </div>
-        <div class="match-score">19:00</div>
+      <div class="card-head">Girone B</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th><th>PF</th><th>PS</th></tr></thead>
+          <tbody>
+            <tr><td>—</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-head">Gironcini finali (9°-16° posto)</div>
+      <div class="card-head">Girone C</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th><th>PF</th><th>PS</th></tr></thead>
+          <tbody>
+            <tr><td>—</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">Prossime partite</div>
+      <div class="match-row">
+        <div class="match-teams">
+          <span>Squadra A vs Squadra B</span>
+          <span class="match-meta">Girone A · Campo 1 · Lun 13/07</span>
+        </div>
+        <div class="match-score">20:30</div>
+      </div>
+      <div class="match-row">
+        <div class="match-teams">
+          <span>Squadra C vs Squadra D</span>
+          <span class="match-meta">Girone B · Campo 2 · Lun 13/07</span>
+        </div>
+        <div class="match-score">20:30</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">Mini-gironi finali (FA · FB · FC) — Ven 17/07</div>
       <div class="table-scroll">
         <table>
           <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th></tr></thead>
@@ -457,7 +481,7 @@
     </div>
 
     <div class="note-box">
-      <b>Nota tecnica:</b> questa sezione andrà collegata al foglio Google Sheets (via pubblicazione CSV o Apps Script → JSON). Ogni girone, calendario e gironcino leggerà da un range dedicato, così si aggiorna da solo durante il torneo.
+      <b>Nota tecnica:</b> i mini-gironi finali FA/FB/FC determinano le 8 qualificate ai Quarti (le prime classificate + le 2 migliori terze) — non è una classifica 9°-16°, ma la vera semina della fase finale. Questa sezione andrà collegata al foglio Google Sheets: ogni girone, calendario e mini-girone leggerà da un range dedicato, così si aggiorna da solo durante il torneo.
     </div>
   </section>
 
@@ -475,37 +499,42 @@
     <div class="bracket-scroll">
       <div class="bracket">
         <div class="bracket-round">
-          <div class="rlabel">Ottavi</div>
-          <div class="bracket-match"><div class="t win">Squadra 1</div><div class="t">Squadra 2</div></div>
-          <div class="bracket-match"><div class="t win">Squadra 3</div><div class="t">Squadra 4</div></div>
-          <div class="bracket-match"><div class="t win">Squadra 5</div><div class="t">Squadra 6</div></div>
-          <div class="bracket-match"><div class="t win">Squadra 7</div><div class="t">Squadra 8</div></div>
-        </div>
-        <div class="bracket-round">
           <div class="rlabel">Quarti</div>
-          <div class="bracket-match"><div class="t win">Squadra 1</div><div class="t">Squadra 3</div></div>
-          <div class="bracket-match"><div class="t win">Squadra 5</div><div class="t">Squadra 7</div></div>
+          <div class="bracket-match"><div class="t">Qualificata 1</div><div class="t">Qualificata 2</div></div>
+          <div class="bracket-match"><div class="t">Qualificata 3</div><div class="t">Qualificata 4</div></div>
+          <div class="bracket-match"><div class="t">Qualificata 5</div><div class="t">Qualificata 6</div></div>
+          <div class="bracket-match"><div class="t">Qualificata 7</div><div class="t">Qualificata 8</div></div>
         </div>
         <div class="bracket-round">
-          <div class="rlabel">Semifinale</div>
-          <div class="bracket-match"><div class="t win">Squadra 1</div><div class="t">Squadra 5</div></div>
+          <div class="rlabel">Semifinali</div>
+          <div class="bracket-match"><div class="t">Vinc. Q1</div><div class="t">Vinc. Q2</div></div>
+          <div class="bracket-match"><div class="t">Vinc. Q3</div><div class="t">Vinc. Q4</div></div>
         </div>
         <div class="bracket-round">
-          <div class="rlabel">Finale</div>
-          <div class="bracket-match"><div class="t win">Squadra 1</div><div class="t">—</div></div>
+          <div class="rlabel">Finale 3°/4°</div>
+          <div class="bracket-match"><div class="t">Perd. SF1</div><div class="t">Perd. SF2</div></div>
+        </div>
+        <div class="bracket-round">
+          <div class="rlabel">Finale 1°/2°</div>
+          <div class="bracket-match"><div class="t">Vinc. SF1</div><div class="t">Vinc. SF2</div></div>
         </div>
       </div>
     </div>
 
-    <div class="note-box">
-      <b>Nota tecnica:</b> su mobile il bracket resta leggibile con scroll orizzontale. In alternativa, se durante il torneo preferisci una vista più rapida, possiamo aggiungere un elenco verticale "partita per partita" come vista alternativa.
+    <div class="note-box" id="tabelloneNote">
+      <b>Come si formano i Quarti (Senior):</b> le 8 qualificate arrivano dai mini-gironi finali FA/FB/FC del venerdì (le prime classificate + le 2 migliori terze). <b>Over40:</b> i Quarti sono direttamente le 8 squadre del girone O40. Il torneo Over40 si gioca tutto in sequenza su una metà campo, dalle 20:15 alle 22:15 di venerdì.
     </div>
   </section>
 
   <!-- ============ U19/U17 ============ -->
   <section class="section" id="u19">
     <div class="section-heading"><span class="num">04</span><h2>U19 / U17</h2></div>
-    <div class="section-sub">Calendario, risultati e classifica dedicati</div>
+    <div class="section-sub">Giovedì 16/07 (Campo 2) · Fase finale venerdì 17/07</div>
+
+    <div class="tabs-inline">
+      <div class="pill active" data-cat="g1">Girone G1</div>
+      <div class="pill" data-cat="g2">Girone G2</div>
+    </div>
 
     <div class="card">
       <div class="card-head">Classifica</div>
@@ -520,8 +549,28 @@
     <div class="card">
       <div class="card-head">Calendario</div>
       <div class="match-row">
-        <div class="match-teams"><span>Squadra A vs Squadra B</span><span class="match-meta">Campo 1</span></div>
-        <div class="match-score">17:00</div>
+        <div class="match-teams"><span>Squadra A vs Squadra B</span><span class="match-meta">Campo 2 · metà A</span></div>
+        <div class="match-score">16:00</div>
+      </div>
+    </div>
+
+    <div class="section-heading"><span class="num">—</span><h2 style="font-size:16px;">Fase Finale</h2></div>
+    <div class="section-sub">Venerdì 17/07 — 1°/2° di ogni girone si incrociano (1°G1-2°G2, 1°G2-2°G1)</div>
+    <div class="bracket-scroll">
+      <div class="bracket">
+        <div class="bracket-round">
+          <div class="rlabel">Semifinali</div>
+          <div class="bracket-match"><div class="t">1° G1</div><div class="t">2° G2</div></div>
+          <div class="bracket-match"><div class="t">1° G2</div><div class="t">2° G1</div></div>
+        </div>
+        <div class="bracket-round">
+          <div class="rlabel">Finale 3°/4°</div>
+          <div class="bracket-match"><div class="t">Perd. SF1</div><div class="t">Perd. SF2</div></div>
+        </div>
+        <div class="bracket-round">
+          <div class="rlabel">Finale 1°/2°</div>
+          <div class="bracket-match"><div class="t">Vinc. SF1</div><div class="t">Vinc. SF2</div></div>
+        </div>
       </div>
     </div>
   </section>
@@ -529,7 +578,12 @@
   <!-- ============ U15/U14 ============ -->
   <section class="section" id="u15">
     <div class="section-heading"><span class="num">05</span><h2>U15 / U14</h2></div>
-    <div class="section-sub">Calendario, risultati e classifica dedicati</div>
+    <div class="section-sub">Giovedì 16/07 (Campo 1) · Fase finale venerdì 17/07</div>
+
+    <div class="tabs-inline">
+      <div class="pill active" data-cat="g1">Girone G1</div>
+      <div class="pill" data-cat="g2">Girone G2</div>
+    </div>
 
     <div class="card">
       <div class="card-head">Classifica</div>
@@ -544,8 +598,28 @@
     <div class="card">
       <div class="card-head">Calendario</div>
       <div class="match-row">
-        <div class="match-teams"><span>Squadra A vs Squadra B</span><span class="match-meta">Campo 2</span></div>
-        <div class="match-score">17:30</div>
+        <div class="match-teams"><span>Squadra A vs Squadra B</span><span class="match-meta">Campo 1 · metà A</span></div>
+        <div class="match-score">16:00</div>
+      </div>
+    </div>
+
+    <div class="section-heading"><span class="num">—</span><h2 style="font-size:16px;">Fase Finale</h2></div>
+    <div class="section-sub">Venerdì 17/07 — 1°/2° di ogni girone si incrociano (1°G1-2°G2, 1°G2-2°G1)</div>
+    <div class="bracket-scroll">
+      <div class="bracket">
+        <div class="bracket-round">
+          <div class="rlabel">Semifinali</div>
+          <div class="bracket-match"><div class="t">1° G1</div><div class="t">2° G2</div></div>
+          <div class="bracket-match"><div class="t">1° G2</div><div class="t">2° G1</div></div>
+        </div>
+        <div class="bracket-round">
+          <div class="rlabel">Finale 3°/4°</div>
+          <div class="bracket-match"><div class="t">Perd. SF1</div><div class="t">Perd. SF2</div></div>
+        </div>
+        <div class="bracket-round">
+          <div class="rlabel">Finale 1°/2°</div>
+          <div class="bracket-match"><div class="t">Vinc. SF1</div><div class="t">Vinc. SF2</div></div>
+        </div>
       </div>
     </div>
   </section>
@@ -696,7 +770,7 @@
   // Finché logo/link non ci sono, lascia stringa vuota "": la card mostra il segnaposto.
   const sponsorsData = {
     title: [
-      { name: "EFFEDI SALOTTI", logo: "", link: "https://www.effedisalotti.it/", caption: "Componenti in legno per mobili imbottiti" }
+      { name: "Effedisalotti", logo: "", link: "", caption: "" }
     ],
     main: Array.from({length: 13}, () => ({ name: "", logo: "", link: "" })),
     sponsor: Array.from({length: 29}, () => ({ name: "", logo: "", link: "" })),
