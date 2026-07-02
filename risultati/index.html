@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ronca City Playground 2026 — Torneo 3v3</title>
+<meta name="description" content="Ronca City Playground 2026 — Torneo di basket 3v3, 13-17 luglio, Pol. Cimatti Roncadello, Forlì">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a0a0d;
+    --bg-alt: #141319;
+    --bg-card: #1b1a22;
+    --gold: #e3b23c;
+    --gold-dim: #a9812b;
+    --purple: #4a2384;
+    --purple-deep: #2a1250;
+    --white: #f6f3ec;
+    --muted: #9d97a3;
+    --line: #2c2a35;
+    --court: #1f1b2e;
+    --radius: 4px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(74,35,132,0.35), transparent 60%),
+      radial-gradient(ellipse 700px 400px at 100% 0%, rgba(227,178,60,0.10), transparent 55%),
+      var(--bg);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .display{
+    font-family: 'Anton', sans-serif;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    line-height: 0.95;
+  }
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+
+  /* ===== Court-line texture (signature motif) ===== */
+  .court-seam{
+    position:relative;
+  }
+  .court-seam::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: repeating-linear-gradient(
+      100deg,
+      transparent 0px, transparent 38px,
+      rgba(227,178,60,0.05) 38px, rgba(227,178,60,0.05) 40px
+    );
+    pointer-events:none;
+  }
+
+  /* ===== HEADER ===== */
+  header{
+    position: sticky; top:0; z-index: 50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 14px 18px;
+    background: rgba(10,10,13,0.88);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand{ display:flex; align-items:center; gap:10px; cursor:pointer; }
+  .brand-mark{
+    width:40px; height:40px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .brand-mark img{ width:100%; height:100%; object-fit:contain; }
+  .brand-text{ display:flex; flex-direction:column; line-height:1; }
+  .brand-text .l1{ font-family:'Anton',sans-serif; font-size:15px; letter-spacing:0.03em; }
+  .brand-text .l2{ font-size:10px; color:var(--gold); letter-spacing:0.15em; margin-top:2px; }
+
+  .menu-btn{
+    width:40px; height:40px; border-radius:50%;
+    background: var(--bg-card); border:1px solid var(--line);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+    cursor:pointer;
+  }
+  .menu-btn span{ width:16px; height:2px; background:var(--gold); border-radius:2px; }
+
+  /* ===== NAV DRAWER ===== */
+  .drawer-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.6);
+    opacity:0; pointer-events:none; transition: opacity .25s ease; z-index:60;
+  }
+  .drawer-overlay.open{ opacity:1; pointer-events:auto; }
+  .drawer{
+    position:fixed; top:0; right:0; height:100%; width:78%; max-width:320px;
+    background: var(--bg-alt); border-left:1px solid var(--line);
+    transform: translateX(100%); transition: transform .3s cubic-bezier(.4,0,.2,1);
+    z-index:70; padding: 20px 0; overflow-y:auto;
+  }
+  .drawer.open{ transform: translateX(0); }
+  .drawer-close{
+    margin: 0 18px 18px auto; width:34px; height:34px; border-radius:50%;
+    background:var(--bg-card); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; color:var(--muted); cursor:pointer;
+  }
+  .drawer nav a{
+    display:flex; align-items:center; gap:12px;
+    padding: 15px 22px; font-size:15px; font-weight:600;
+    border-bottom:1px solid var(--line); color:var(--white);
+    transition: background .15s, color .15s;
+  }
+  .drawer nav a .idx{ font-family:'Anton',sans-serif; color:var(--gold-dim); font-size:13px; width:20px; }
+  .drawer nav a.active{ background: rgba(227,178,60,0.08); color:var(--gold); }
+  .drawer nav a.active .idx{ color:var(--gold); }
+
+  /* ===== SECTIONS ===== */
+  main{ max-width: 720px; margin: 0 auto; padding-bottom: 60px; }
+  .section{ display:none; animation: fadeIn .3s ease; }
+  .section.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ---- HOME / HERO ---- */
+  .hero{
+    padding: 40px 20px 30px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; top:-60px; left:50%; transform:translateX(-50%);
+    width:340px; height:340px; border-radius:50%;
+    background: radial-gradient(circle, rgba(106,54,190,0.45), rgba(106,54,190,0) 70%);
+    filter: blur(10px);
+    pointer-events:none;
+  }
+  .hero > *{ position:relative; z-index:1; }
+  .hero .tag{
+    display:inline-block; color:var(--gold); font-size:12px; letter-spacing:0.2em;
+    border:1px solid var(--gold-dim); border-radius: 20px; padding:5px 14px; margin-bottom:18px;
+    background: rgba(74,35,132,0.18);
+  }
+  .hero h1{
+    font-size: clamp(2.4rem, 12vw, 3.6rem);
+    color:var(--white);
+    -webkit-text-stroke: 1px var(--gold-dim);
+  }
+  .hero h1 .accent{ color:var(--gold); -webkit-text-stroke:0; }
+  .hero .loc{ margin-top:14px; color:var(--muted); font-size:14px; }
+  .hero .loc b{ color:var(--white); }
+
+  .countdown{
+    display:flex; justify-content:center; gap:10px; margin: 26px 0 8px;
+  }
+  .cd-box{
+    background: linear-gradient(160deg, rgba(74,35,132,0.35), var(--bg-card));
+    border:1px solid var(--purple); border-radius: var(--radius);
+    width: 68px; padding: 10px 0; text-align:center;
+  }
+  .cd-box .n{ font-family:'Anton',sans-serif; font-size:26px; color:var(--gold); }
+  .cd-box .u{ font-size:9px; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; margin-top:2px; }
+
+  .cta-row{ display:flex; gap:10px; padding: 22px 20px 6px; }
+  .btn{
+    flex:1; text-align:center; padding: 14px 10px; border-radius: var(--radius);
+    font-weight:700; font-size:14px; cursor:pointer; border:1px solid transparent;
+  }
+  .btn-gold{ background: linear-gradient(135deg, var(--gold), #b8872c); color:#1a1408; }
+  .btn-outline{ border-color: var(--line); color:var(--white); background:var(--bg-card); }
+
+  .quick-grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap:12px; padding: 26px 18px 10px;
+  }
+  .quick-card{
+    background: var(--bg-card); border:1px solid var(--line); border-radius: var(--radius);
+    padding: 16px 14px; position:relative; overflow:hidden;
+  }
+  .quick-card::after{
+    content:""; position:absolute; top:0; right:0; width:40px; height:40px;
+    background: var(--purple); opacity:0.25; filter: blur(18px);
+  }
+  .quick-card .qt{ font-family:'Anton',sans-serif; font-size:16px; margin-bottom:4px; }
+  .quick-card .qd{ font-size:12px; color:var(--muted); }
+
+  .section-heading{
+    padding: 30px 20px 4px; display:flex; align-items:baseline; gap:10px;
+  }
+  .section-heading .num{ font-family:'Anton',sans-serif; color:var(--gold-dim); font-size:14px; }
+  .section-heading h2{ font-family:'Anton',sans-serif; font-size:22px; letter-spacing:0.02em; }
+  .section-sub{ padding: 0 20px; color:var(--muted); font-size:13px; margin-top:2px; }
+
+  .gallery-grid{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; padding: 16px 18px;
+  }
+  .gallery-item{
+    aspect-ratio: 4/5; background: var(--bg-card); border:1px dashed var(--line);
+    border-radius: 3px; display:flex; align-items:center; justify-content:center;
+    color: var(--muted); font-size:10px; text-align:center; padding:6px;
+  }
+
+  /* ---- TABLES (Risultati/Calendario/Categorie giovanili) ---- */
+  .card{
+    margin: 14px 18px; background: var(--bg-card); border:1px solid var(--line);
+    border-radius: var(--radius); overflow:hidden;
+  }
+  .card-head{
+    padding: 12px 16px; background: rgba(227,178,60,0.06);
+    border-bottom:1px solid var(--line);
+    font-family:'Anton',sans-serif; font-size:14px; color:var(--gold);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .card-head .live{
+    font-size:9px; color:#ff5c5c; border:1px solid #ff5c5c; border-radius:10px;
+    padding:2px 8px; letter-spacing:0.1em; display:none; /* attivare durante il torneo */
+  }
+  table{ width:100%; border-collapse: collapse; font-size:13px; }
+  th{ text-align:left; padding:10px 12px; color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--line); }
+  td{ padding:10px 12px; border-bottom:1px solid var(--line); }
+  tr:last-child td{ border-bottom:none; }
+  .table-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .table-scroll table{ min-width: 480px; }
+
+  .match-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 12px 16px; border-bottom:1px solid var(--line); font-size:13px;
+  }
+  .match-row:last-child{ border-bottom:none; }
+  .match-teams{ display:flex; flex-direction:column; gap:4px; }
+  .match-score{ font-family:'Anton',sans-serif; font-size:18px; color:var(--gold); min-width:56px; text-align:center; }
+  .match-meta{ font-size:11px; color:var(--muted); }
+
+  .tabs-inline{ display:flex; gap:8px; padding: 4px 18px 4px; flex-wrap:wrap; }
+  .pill{
+    font-size:12px; padding:7px 14px; border-radius:20px; border:1px solid var(--line);
+    background: var(--bg-card); color:var(--muted); cursor:pointer;
+  }
+  .pill.active{ border-color:var(--gold-dim); color:var(--gold); background: rgba(227,178,60,0.08); }
+
+  /* ---- BRACKET ---- */
+  .bracket-scroll{ overflow-x:auto; padding: 10px 18px 30px; -webkit-overflow-scrolling:touch; }
+  .bracket-hint{ padding: 4px 20px 0; font-size:11px; color:var(--gold-dim); }
+  .bracket{ display:flex; gap: 34px; min-width: 760px; }
+  .bracket-round{ display:flex; flex-direction:column; justify-content:space-around; gap:18px; min-width:160px; }
+  .bracket-round .rlabel{ font-size:10px; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:4px; text-align:center; }
+  .bracket-match{
+    background: var(--bg-card); border:1px solid var(--line); border-radius:4px; padding:8px 10px; font-size:12px;
+  }
+  .bracket-match .t{ display:flex; justify-content:space-between; padding:3px 0; }
+  .bracket-match .t.win{ color:var(--gold); font-weight:700; }
+
+  /* ---- SPONSOR ---- */
+  .sponsor-tier-label{
+    padding: 22px 18px 6px; display:flex; align-items:center; gap:8px;
+  }
+  .sponsor-tier-label .tt{ font-family:'Anton',sans-serif; font-size:13px; letter-spacing:0.08em; }
+  .tier-title .tt{ color:var(--gold); font-size:16px; }
+  .tier-main .tt{ color:var(--white); }
+  .tier-media .tt{ color:var(--muted); }
+  .sponsor-tier-label .line{ flex:1; height:1px; background: var(--line); }
+
+  .sponsor-grid{ display:grid; grid-template-columns: 1fr; gap:10px; padding: 0 18px; }
+  .sponsor-grid.two-col{ grid-template-columns: 1fr 1fr; }
+  .sponsor-card{
+    background: var(--bg-card); border:1px solid var(--line); border-radius: var(--radius);
+    padding: 16px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center;
+  }
+  .sponsor-card.title{ border-color: var(--gold-dim); background: linear-gradient(180deg, rgba(227,178,60,0.08), var(--bg-card)); padding: 22px 16px; }
+  .logo-slot{
+    width:100%; height:56px; display:flex; align-items:center; justify-content:center;
+    color:var(--muted); font-size:10px; border:1px dashed var(--line); border-radius:3px;
+  }
+  .tier-title .logo-slot{ height:72px; }
+  .sponsor-name{ font-weight:700; font-size:13px; }
+  .sponsor-caption{ font-size:11px; color:var(--muted); line-height:1.4; }
+  .sponsor-link{ font-size:11px; color:var(--gold); text-decoration:underline; }
+
+  /* ---- STORICO ---- */
+  .archive-card{
+    display:flex; gap:14px; margin: 14px 18px; background: var(--bg-card);
+    border:1px solid var(--line); border-radius: var(--radius); padding:14px; align-items:center;
+  }
+  .archive-thumb{
+    width:64px; height:64px; flex-shrink:0; border-radius:4px; background: var(--court);
+    border:1px dashed var(--line); display:flex; align-items:center; justify-content:center;
+    font-family:'Anton',sans-serif; color:var(--gold-dim); font-size:11px; text-align:center;
+  }
+  .archive-info .at{ font-family:'Anton',sans-serif; font-size:15px; }
+  .archive-info .ad{ font-size:12px; color:var(--muted); margin-top:2px; }
+  .archive-info .aa{ font-size:11px; color:var(--gold); margin-top:6px; }
+
+  .note-box{
+    margin: 16px 18px 28px; padding: 14px 16px; border-radius: var(--radius);
+    background: rgba(74,35,132,0.15); border:1px solid var(--purple);
+    font-size:12px; color:var(--muted); line-height:1.5;
+  }
+  .note-box b{ color:var(--white); }
+
+  footer{
+    text-align:center; padding: 30px 20px 40px; color:var(--muted); font-size:11px; border-top:1px solid var(--line); margin-top:20px;
+  }
+  footer .fmark{ color:var(--gold); font-family:'Anton',sans-serif; font-size:14px; margin-bottom:6px; }
+
+  @media (min-width: 480px){
+    .gallery-grid{ grid-template-columns: repeat(4,1fr); }
+    .sponsor-grid.two-col{ grid-template-columns: 1fr 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand" id="brandHome" data-target="home">
+    <div class="brand-mark"><img src="assets/logo.png" alt="Ronca City Playground"></div>
+    <div class="brand-text">
+      <span class="l1">Ronca City Playground</span>
+      <span class="l2">3v3 · 2026</span>
+    </div>
+  </div>
+  <div class="menu-btn" id="menuBtn"><span></span><span></span><span></span></div>
+</header>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-close" id="drawerClose">✕</div>
+  <nav id="navLinks">
+    <a href="#" data-target="home" class="active"><span class="idx">01</span> Home</a>
+    <a href="#" data-target="risultati"><span class="idx">02</span> Risultati e Calendario</a>
+    <a href="#" data-target="tabellone"><span class="idx">03</span> Tabellone Finale</a>
+    <a href="#" data-target="u19"><span class="idx">04</span> U19 / U17</a>
+    <a href="#" data-target="u15"><span class="idx">05</span> U15 / U14</a>
+    <a href="#" data-target="sponsor"><span class="idx">06</span> Sponsor</a>
+    <a href="#" data-target="galleria"><span class="idx">07</span> Galleria</a>
+    <a href="#" data-target="storico"><span class="idx">08</span> Storico</a>
+  </nav>
+</div>
+
+<main>
+
+  <!-- ============ HOME ============ -->
+  <section class="section active" id="home">
+    <div class="hero court-seam">
+      <span class="tag">13 – 17 LUGLIO 2026</span>
+      <h1 class="display">RONCA CITY<br><span class="accent">PLAYGROUND</span></h1>
+      <p class="loc">📍 Pol. Cimatti, <b>Roncadello — Forlì</b></p>
+
+      <div class="countdown" id="countdown">
+        <div class="cd-box"><div class="n" id="cd-d">--</div><div class="u">Giorni</div></div>
+        <div class="cd-box"><div class="n" id="cd-h">--</div><div class="u">Ore</div></div>
+        <div class="cd-box"><div class="n" id="cd-m">--</div><div class="u">Min</div></div>
+      </div>
+
+      <div class="cta-row">
+        <a class="btn btn-gold" href="#" id="iscrizioniLink">Iscriviti</a>
+        <a class="btn btn-outline" data-target="risultati">Vai ai risultati</a>
+      </div>
+    </div>
+
+    <div class="quick-grid">
+      <a class="quick-card" data-target="risultati">
+        <div class="qt">Gironi</div>
+        <div class="qd">Calendario e classifiche live</div>
+      </a>
+      <a class="quick-card" data-target="tabellone">
+        <div class="qt">Tabellone</div>
+        <div class="qd">Fase finale Senior & Over40</div>
+      </a>
+      <a class="quick-card" data-target="sponsor">
+        <div class="qt">Sponsor</div>
+        <div class="qd">Chi sostiene il torneo</div>
+      </a>
+      <a class="quick-card" data-target="galleria">
+        <div class="qt">Galleria</div>
+        <div class="qd">Tutte le foto e i video</div>
+      </a>
+      <a class="quick-card" data-target="storico">
+        <div class="qt">Storico</div>
+        <div class="qd">Edizioni precedenti</div>
+      </a>
+    </div>
+
+    <div class="section-heading"><span class="num">—</span><h2>Dal campo</h2></div>
+    <div class="section-sub">Foto e video dai nostri social — <a data-target="galleria" style="color:var(--gold); text-decoration:underline;">vedi tutta la galleria →</a></div>
+    <div class="gallery-grid">
+      <div class="gallery-item">foto/video 1</div>
+      <div class="gallery-item">foto/video 2</div>
+      <div class="gallery-item">foto/video 3</div>
+      <div class="gallery-item">foto/video 4</div>
+      <div class="gallery-item">foto/video 5</div>
+      <div class="gallery-item">foto/video 6</div>
+    </div>
+    <div class="note-box">
+      <b>Nota tecnica:</b> qui andranno gli embed dei post/reel Instagram migliori (o clip caricate direttamente). Quando hai selezionato i contenuti, li inseriamo al posto dei placeholder.
+    </div>
+  </section>
+
+  <!-- ============ RISULTATI E CALENDARIO ============ -->
+  <section class="section" id="risultati">
+    <div class="section-heading"><span class="num">02</span><h2>Risultati e Calendario</h2></div>
+    <div class="section-sub">Senior & Over40 — fase a gironi + gironcini finali</div>
+
+    <div class="tabs-inline">
+      <div class="pill active" data-cat="senior">Senior</div>
+      <div class="pill" data-cat="over40">Over40</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">Girone A <span class="live">LIVE</span></div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th><th>PF</th><th>PS</th></tr></thead>
+          <tbody>
+            <tr><td>—</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>—</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>—</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">Prossime partite</div>
+      <div class="match-row">
+        <div class="match-teams">
+          <span>Squadra A vs Squadra B</span>
+          <span class="match-meta">Girone A · Campo 1</span>
+        </div>
+        <div class="match-score">18:30</div>
+      </div>
+      <div class="match-row">
+        <div class="match-teams">
+          <span>Squadra C vs Squadra D</span>
+          <span class="match-meta">Girone B · Campo 2</span>
+        </div>
+        <div class="match-score">19:00</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">Gironcini finali (9°-16° posto)</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th></tr></thead>
+          <tbody>
+            <tr><td>—</td><td>0</td><td>0</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <b>Nota tecnica:</b> questa sezione andrà collegata al foglio Google Sheets (via pubblicazione CSV o Apps Script → JSON). Ogni girone, calendario e gironcino leggerà da un range dedicato, così si aggiorna da solo durante il torneo.
+    </div>
+  </section>
+
+  <!-- ============ TABELLONE FINALE ============ -->
+  <section class="section" id="tabellone">
+    <div class="section-heading"><span class="num">03</span><h2>Tabellone Finale</h2></div>
+    <div class="section-sub">Fase a eliminazione diretta</div>
+
+    <div class="tabs-inline">
+      <div class="pill active" data-cat="senior">Senior</div>
+      <div class="pill" data-cat="over40">Over40</div>
+    </div>
+
+    <div class="bracket-hint">👉 scorri lateralmente per vedere tutto il tabellone</div>
+    <div class="bracket-scroll">
+      <div class="bracket">
+        <div class="bracket-round">
+          <div class="rlabel">Ottavi</div>
+          <div class="bracket-match"><div class="t win">Squadra 1</div><div class="t">Squadra 2</div></div>
+          <div class="bracket-match"><div class="t win">Squadra 3</div><div class="t">Squadra 4</div></div>
+          <div class="bracket-match"><div class="t win">Squadra 5</div><div class="t">Squadra 6</div></div>
+          <div class="bracket-match"><div class="t win">Squadra 7</div><div class="t">Squadra 8</div></div>
+        </div>
+        <div class="bracket-round">
+          <div class="rlabel">Quarti</div>
+          <div class="bracket-match"><div class="t win">Squadra 1</div><div class="t">Squadra 3</div></div>
+          <div class="bracket-match"><div class="t win">Squadra 5</div><div class="t">Squadra 7</div></div>
+        </div>
+        <div class="bracket-round">
+          <div class="rlabel">Semifinale</div>
+          <div class="bracket-match"><div class="t win">Squadra 1</div><div class="t">Squadra 5</div></div>
+        </div>
+        <div class="bracket-round">
+          <div class="rlabel">Finale</div>
+          <div class="bracket-match"><div class="t win">Squadra 1</div><div class="t">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <b>Nota tecnica:</b> su mobile il bracket resta leggibile con scroll orizzontale. In alternativa, se durante il torneo preferisci una vista più rapida, possiamo aggiungere un elenco verticale "partita per partita" come vista alternativa.
+    </div>
+  </section>
+
+  <!-- ============ U19/U17 ============ -->
+  <section class="section" id="u19">
+    <div class="section-heading"><span class="num">04</span><h2>U19 / U17</h2></div>
+    <div class="section-sub">Calendario, risultati e classifica dedicati</div>
+
+    <div class="card">
+      <div class="card-head">Classifica</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th></tr></thead>
+          <tbody><tr><td>—</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">Calendario</div>
+      <div class="match-row">
+        <div class="match-teams"><span>Squadra A vs Squadra B</span><span class="match-meta">Campo 1</span></div>
+        <div class="match-score">17:00</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ U15/U14 ============ -->
+  <section class="section" id="u15">
+    <div class="section-heading"><span class="num">05</span><h2>U15 / U14</h2></div>
+    <div class="section-sub">Calendario, risultati e classifica dedicati</div>
+
+    <div class="card">
+      <div class="card-head">Classifica</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th></tr></thead>
+          <tbody><tr><td>—</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">Calendario</div>
+      <div class="match-row">
+        <div class="match-teams"><span>Squadra A vs Squadra B</span><span class="match-meta">Campo 2</span></div>
+        <div class="match-score">17:30</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SPONSOR ============ -->
+  <section class="section" id="sponsor">
+    <div class="section-heading"><span class="num">06</span><h2>Sponsor</h2></div>
+    <div class="section-sub">Chi rende possibile il torneo</div>
+
+    <div class="sponsor-tier-label tier-title"><span class="tt">Title Sponsor</span><span class="line"></span></div>
+    <div class="sponsor-grid">
+      <div class="sponsor-card title">
+        <div class="logo-slot">logo title sponsor</div>
+        <div class="sponsor-name">Nome Sponsor</div>
+        <div class="sponsor-caption">Breve descrizione dell'azienda e del legame con il torneo.</div>
+        <a class="sponsor-link" href="#">Visita il sito →</a>
+      </div>
+    </div>
+
+    <div class="sponsor-tier-label tier-main"><span class="tt">Main Sponsor</span><span class="line"></span></div>
+    <div class="sponsor-grid two-col">
+      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Sponsor</div><a class="sponsor-link" href="#">Sito →</a></div>
+      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Sponsor</div><a class="sponsor-link" href="#">Sito →</a></div>
+      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Sponsor</div><a class="sponsor-link" href="#">Sito →</a></div>
+      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Sponsor</div><a class="sponsor-link" href="#">Sito →</a></div>
+    </div>
+
+    <div class="sponsor-tier-label tier-media"><span class="tt">Media Partner</span><span class="line"></span></div>
+    <div class="sponsor-grid two-col">
+      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Media Partner</div></div>
+      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Media Partner</div></div>
+      <div class="sponsor-card"><div class="logo-slot">logo</div><div class="sponsor-name">Media Partner</div></div>
+    </div>
+
+    <div class="note-box">
+      <b>Nota tecnica:</b> struttura pronta a 3 livelli (Title → Main → Media Partner), come nelle tue slide social. Quando hai i loghi in alta risoluzione, i link ai siti e una riga di caption per ciascuno, li carichiamo qui — bastano pochi minuti per sponsor.
+    </div>
+  </section>
+
+  <!-- ============ GALLERIA ============ -->
+  <section class="section" id="galleria">
+    <div class="section-heading"><span class="num">07</span><h2>Galleria</h2></div>
+    <div class="section-sub">Tutte le foto e i video del torneo</div>
+
+    <div class="tabs-inline">
+      <div class="pill active" data-cat="tutti">Tutti</div>
+      <div class="pill" data-cat="g1">Giorno 1</div>
+      <div class="pill" data-cat="g2">Giorno 2</div>
+      <div class="pill" data-cat="g3">Giorno 3</div>
+      <div class="pill" data-cat="g4">Giorno 4</div>
+      <div class="pill" data-cat="g5">Giorno 5</div>
+    </div>
+
+    <div class="gallery-grid" style="grid-template-columns: repeat(3,1fr);">
+      <div class="gallery-item">foto/video</div>
+      <div class="gallery-item">foto/video</div>
+      <div class="gallery-item">foto/video</div>
+      <div class="gallery-item">foto/video</div>
+      <div class="gallery-item">foto/video</div>
+      <div class="gallery-item">foto/video</div>
+      <div class="gallery-item">foto/video</div>
+      <div class="gallery-item">foto/video</div>
+      <div class="gallery-item">foto/video</div>
+    </div>
+
+    <div class="note-box">
+      <b>Nota tecnica:</b> filtro per giornata pronto (da collegare quando carichiamo il materiale). Le immagini verranno ottimizzate e caricate direttamente nel repository del sito, non collegate da Google Drive, per garantire caricamento veloce e stabile.
+    </div>
+  </section>
+
+  <!-- ============ STORICO ============ -->
+  <section class="section" id="storico">
+    <div class="section-heading"><span class="num">08</span><h2>Storico</h2></div>
+    <div class="section-sub">Le edizioni passate del torneo</div>
+
+    <div class="archive-card">
+      <div class="archive-thumb">2025</div>
+      <div class="archive-info">
+        <div class="at">Ronca City Playground 2025</div>
+        <div class="ad">14-18 Luglio 2025 · Pol. Cimatti</div>
+        <div class="aa">Risultati e galleria →</div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <b>Nota tecnica:</b> hai detto di avere già foto e risultati dell'anno scorso pronti — appena li carichi costruiamo la pagina di dettaglio 2025 (stesso schema di questa home, ma "congelato"). Ogni anno futuro si aggiunge come nuova card qui, senza toccare il resto del sito.
+    </div>
+  </section>
+
+  <footer>
+    <div class="fmark">RONCA CITY PLAYGROUND</div>
+    Torneo 3v3 · Pol. Cimatti, Roncadello — Forlì
+  </footer>
+
+</main>
+
+<script>
+  // ---- Navigazione tra sezioni ----
+  const links = document.querySelectorAll('[data-target]');
+  const sections = document.querySelectorAll('.section');
+  const drawer = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  const navLinks = document.querySelectorAll('#navLinks a');
+
+  function showSection(id){
+    sections.forEach(s => s.classList.toggle('active', s.id === id));
+    navLinks.forEach(a => a.classList.toggle('active', a.dataset.target === id));
+    window.scrollTo({top:0, behavior:'instant'});
+    closeDrawer();
+  }
+  links.forEach(el => {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      showSection(el.dataset.target);
+    });
+  });
+
+  function openDrawer(){ drawer.classList.add('open'); overlay.classList.add('open'); }
+  function closeDrawer(){ drawer.classList.remove('open'); overlay.classList.remove('open'); }
+  document.getElementById('menuBtn').addEventListener('click', openDrawer);
+  document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+  overlay.addEventListener('click', closeDrawer);
+
+  // ---- Pillole categoria (Senior / Over40) — placeholder di interazione ----
+  document.querySelectorAll('.tabs-inline').forEach(group => {
+    group.querySelectorAll('.pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        group.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        // TODO: quando colleghiamo i dati, qui si farà il fetch/filtro per categoria (Senior vs Over40)
+      });
+    });
+  });
+
+  // ---- Countdown al 13 luglio 2026, ore 18:00 ----
+  const targetDate = new Date('2026-07-13T18:00:00+02:00');
+  function updateCountdown(){
+    const now = new Date();
+    const diff = targetDate - now;
+    if (diff <= 0){
+      document.getElementById('cd-d').textContent = '0';
+      document.getElementById('cd-h').textContent = '0';
+      document.getElementById('cd-m').textContent = '0';
+      return;
+    }
+    const d = Math.floor(diff / (1000*60*60*24));
+    const h = Math.floor((diff / (1000*60*60)) % 24);
+    const m = Math.floor((diff / (1000*60)) % 60);
+    document.getElementById('cd-d').textContent = d;
+    document.getElementById('cd-h').textContent = h;
+    document.getElementById('cd-m').textContent = m;
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 60000);
+
+  // ---- Link iscrizioni: da collegare al form esistente ----
+  document.getElementById('iscrizioniLink').href = 'https://risorto91.github.io/Roncacity_Playground/';
+</script>
+
+</body>
+</html>
