@@ -208,6 +208,15 @@
     color: var(--muted); font-size:10px; text-align:center; padding:6px;
   }
 
+  .insta-scroll{
+    display:flex; gap:14px; overflow-x:auto; padding: 16px 18px 8px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .insta-item{
+    flex: 0 0 auto; width: 300px;
+  }
+  .insta-item iframe{ border-radius: 6px !important; }
+
   /* ---- TABLES (Risultati/Calendario/Categorie giovanili) ---- */
   .card{
     margin: 14px 18px; background: var(--bg-card); border:1px solid var(--line);
@@ -407,16 +416,22 @@
 
     <div class="section-heading"><span class="num">—</span><h2>Dal campo</h2></div>
     <div class="section-sub">Foto e video dai nostri social — <a data-target="galleria" style="color:var(--gold); text-decoration:underline;">vedi tutta la galleria →</a></div>
-    <div class="gallery-grid">
-      <div class="gallery-item">foto/video 1</div>
-      <div class="gallery-item">foto/video 2</div>
-      <div class="gallery-item">foto/video 3</div>
-      <div class="gallery-item">foto/video 4</div>
-      <div class="gallery-item">foto/video 5</div>
-      <div class="gallery-item">foto/video 6</div>
+    <div class="insta-scroll">
+      <div class="insta-item">
+        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DaS4rpGIVZZ/" data-instgrm-version="14"></blockquote>
+      </div>
+      <div class="insta-item">
+        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DaPyippIiZw/" data-instgrm-version="14"></blockquote>
+      </div>
+      <div class="insta-item">
+        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DaHu5krIhOL/" data-instgrm-version="14"></blockquote>
+      </div>
+      <div class="insta-item">
+        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DZVLJJBCKAG/" data-instgrm-version="14"></blockquote>
+      </div>
     </div>
     <div class="note-box">
-      <b>Nota tecnica:</b> qui andranno gli embed dei post/reel Instagram migliori (o clip caricate direttamente). Quando hai selezionato i contenuti, li inseriamo al posto dei placeholder.
+      <b>Nota tecnica:</b> questi sono embed ufficiali Instagram (si aggiornano da soli se cambiano like/commenti sul post originale). Per aggiungerne altri, basta un nuovo blocco con lo stesso schema e il link del post/reel — non serve toccare altro.
     </div>
   </section>
 
@@ -872,6 +887,8 @@
     banner.addEventListener('click', () => window.open(homeTitle.link, '_blank', 'noopener'));
   }
 </script>
+
+<script async src="//www.instagram.com/embed.js"></script>
 
 </body>
 </html>
