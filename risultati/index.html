@@ -213,10 +213,11 @@
     display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; padding: 16px 18px;
   }
   .gallery-item{
-    aspect-ratio: 4/5; background: var(--bg-card); border:1px dashed var(--line);
+    width:100%; aspect-ratio: 4/5; background: var(--bg-card); border:1px dashed var(--line);
     border-radius: 3px; display:flex; align-items:center; justify-content:center;
     color: var(--muted); font-size:10px; text-align:center; padding:6px;
   }
+  img.gallery-item{ display:block; object-fit:cover; }
 
   .insta-scroll{
     display:flex; gap:12px; overflow-x:auto; padding: 16px 18px 8px;
