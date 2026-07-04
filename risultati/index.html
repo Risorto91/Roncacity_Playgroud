@@ -775,18 +775,32 @@
     title: [
       { name: "Effedi Salotti", logo: "assets/sponsor/effedi-salotti.png", link: "https://www.effedisalotti.it/", caption: "" }
     ],
-    main: Array.from({length: 13}, () => ({ name: "", logo: "", link: "" })),
+    main: [
+      { name: "Erlux", logo: "assets/sponsor/erlux.png", link: "https://www.erlux.it/" },
+      { name: "Fideuram Private Banker", logo: "assets/sponsor/fideuram.png", link: "https://alfabeto.fideuram.it/alfabeto-vetrina/webapp/vetrinapb-v1/giuseppe.fabbri" },
+      { name: "Locanda Appennino", logo: "assets/sponsor/locanda-appennino.png", link: "https://www.locandaappennino.com/", noPlate: true },
+      { name: "Lynk & Co Romagnauto", logo: "assets/sponsor/lynk-co.png", link: "https://www.romagnauto.it/lynkco/" },
+      { name: "Olitalia", logo: "assets/sponsor/olitalia.png", link: "https://www.olitalia.com/it-it/" },
+      { name: "Sport Service", logo: "assets/sponsor/sport-service.png", link: "https://www.sportserviceminoia.com/" },
+      { name: "Stargrafic", logo: "assets/sponsor/stargrafic.png", link: "https://stargrafic.com/" },
+      { name: "Unieuro", logo: "assets/sponsor/unieuro.png", link: "https://www.unieuro.it/online/" },
+      { name: "Adjutor", logo: "assets/sponsor/adjutor.png", link: "https://www.adjutor.it/" },
+      { name: "Brains", logo: "assets/sponsor/brains.png", link: "https://www.brainsidee.it/", noPlate: true },
+      { name: "Brico Ok", logo: "assets/sponsor/brico-ok.png", link: "https://www.bricook.it/" },
+      { name: "Emmeci", logo: "assets/sponsor/emmeci.png", link: "https://emmecisistemi.it/" }
+    ],
     sponsor: Array.from({length: 29}, () => ({ name: "", logo: "", link: "" })),
     media: Array.from({length: 2}, () => ({ name: "", logo: "", link: "" }))
   };
 
   function sponsorCard(s, variant){
     const hasLogo = !!s.logo;
+    const usePlate = hasLogo && !s.noPlate;
     const logoInner = hasLogo ? `<img src="${s.logo}" alt="${s.name}" style="max-height:100%;max-width:100%;">` : (s.name || 'logo');
     const nameLine = s.name ? `<div class="sponsor-name">${s.name}</div>` : `<div class="sponsor-name" style="color:var(--muted);">da assegnare</div>`;
     const captionLine = s.caption ? `<div class="sponsor-caption">${s.caption}</div>` : '';
     const cls = variant === 'title' ? 'sponsor-card title' : (variant === 'mini' ? 'sponsor-card mini' : 'sponsor-card');
-    const inner = `<div class="logo-slot${hasLogo ? ' filled' : ''}">${logoInner}</div>${nameLine}${captionLine}`;
+    const inner = `<div class="logo-slot${usePlate ? ' filled' : ''}">${logoInner}</div>${nameLine}${captionLine}`;
     if (s.link){
       return `<a class="${cls}" href="${s.link}" target="_blank" rel="noopener" style="display:flex;">${inner}<span class="sponsor-link">Visita il sito →</span></a>`;
     }
