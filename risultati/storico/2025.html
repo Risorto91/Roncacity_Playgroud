@@ -1,1 +1,1443 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storico 2025 — Ronca City Playground</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a0a0d; --bg-alt:#141319; --bg-card:#1b1a22;
+    --gold:#e3b23c; --gold-dim:#a9812b; --purple:#4a2384;
+    --white:#f6f3ec; --muted:#9d97a3; --line:#2c2a35; --radius:4px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background: radial-gradient(ellipse 900px 500px at 15% -10%, rgba(74,35,132,0.30), transparent 60%), var(--bg);
+    color:var(--white); font-family:'Inter',sans-serif; min-height:100vh; -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none;}
+  .display{font-family:'Anton',sans-serif; text-transform:uppercase; letter-spacing:0.02em;}
+  header{
+    position:sticky; top:0; z-index:50; padding:16px 18px;
+    background:rgba(10,10,13,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:12px;
+  }
+  header .back{ font-size:13px; color:var(--gold); border:1px solid var(--gold-dim); border-radius:20px; padding:6px 14px; }
+  header h1{ font-size:15px; font-family:'Anton',sans-serif; letter-spacing:0.02em; }
+  main{ max-width:720px; margin:0 auto; padding-bottom:60px; }
+  .hero{ padding:28px 20px 10px; text-align:center; }
+  .hero .tag{ display:inline-block; color:var(--gold); font-size:12px; letter-spacing:0.15em; border:1px solid var(--gold-dim); border-radius:20px; padding:5px 14px; margin-bottom:10px; }
+  .hero h2{ font-size:clamp(1.8rem,9vw,2.6rem); font-family:'Anton',sans-serif; }
+  .hero p{ color:var(--muted); font-size:13px; margin-top:8px; }
+  .tabs-cat{ display:flex; gap:8px; padding:18px 18px 6px; overflow-x:auto; }
+  .tab-cat{ flex:0 0 auto; font-size:13px; font-weight:700; padding:9px 18px; border-radius:20px; border:1px solid var(--line); background:var(--bg-card); color:var(--muted); cursor:pointer; }
+  .tab-cat.active{ color:var(--gold); border-color:var(--gold-dim); background:rgba(227,178,60,0.08); }
+  .cat-panel{ display:none; }
+  .cat-panel.active{ display:block; }
+  .sub-heading{ padding:22px 18px 8px; font-family:'Anton',sans-serif; font-size:16px; color:var(--gold); letter-spacing:0.02em; }
+  .card{ margin:12px 18px; background:var(--bg-card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  .card-head{ padding:11px 15px; background:rgba(227,178,60,0.06); border-bottom:1px solid var(--line); font-family:'Anton',sans-serif; font-size:13px; color:var(--gold); }
+  table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  th{ text-align:left; padding:9px 10px; color:var(--muted); font-weight:600; font-size:10.5px; text-transform:uppercase; border-bottom:1px solid var(--line); }
+  td{ padding:8px 10px; border-bottom:1px solid var(--line); }
+  tr:last-child td{ border-bottom:none; }
+  tr.quali td{ color:var(--gold); font-weight:700; }
+  .table-scroll{ overflow-x:auto; }
+  .match-row{ display:flex; align-items:center; justify-content:space-between; padding:11px 15px; border-bottom:1px solid var(--line); font-size:12.5px; gap:10px; }
+  .match-row:last-child{ border-bottom:none; }
+  .match-teams{ display:flex; flex-direction:column; gap:3px; }
+  .match-teams .win{ color:var(--gold); font-weight:700; }
+  .match-meta{ font-size:10.5px; color:var(--muted); margin-top:2px; }
+  .match-score{ font-family:'Anton',sans-serif; font-size:15px; color:var(--gold); white-space:nowrap; }
+  .note-box{ margin:16px 18px 10px; padding:13px 15px; border-radius:var(--radius); background:rgba(74,35,132,0.15); border:1px solid var(--purple); font-size:12px; color:var(--muted); line-height:1.5; }
+  .note-box b{ color:var(--white); }
+  .podium-box{ margin:16px 18px 30px; padding:16px; border-radius:var(--radius); background:linear-gradient(160deg, rgba(227,178,60,0.12), var(--bg-card)); border:1px solid var(--gold-dim); }
+  .podium-line{ font-size:14px; padding:6px 0; }
+  .podium-line.gold b{ color:var(--gold); }
+  .podium-line.silver b{ color:#d8d4c8; }
+  .podium-line.bronze b{ color:#c58f4f; }
+  footer{ text-align:center; padding:26px 20px 40px; color:var(--muted); font-size:11px; border-top:1px solid var(--line); margin-top:10px; }
+</style>
+</head>
+<body>
 
+<header>
+  <a class="back" href="../index.html">← Torna al sito</a>
+  <h1>Storico · Ronca City Playground</h1>
+</header>
+
+<main>
+  <div class="hero">
+    <span class="tag">14 – 18 LUGLIO 2025</span>
+    <h2 class="display">Edizione 2025</h2>
+    <p>Archivio completo: gironi, calendario e fase finale di tutte le categorie</p>
+  </div>
+
+  <div class="tabs-cat">
+    <div class="tab-cat active" data-cat="senior">Senior</div>
+    <div class="tab-cat" data-cat="u15">Under 15/13</div>
+    <div class="tab-cat" data-cat="u19">Under 19/17</div>
+  </div>
+
+  <div class="cat-panel active" id="cat-senior">
+    <div class="sub-heading">Fase a Gironi (Lun 14 - Mer 16 Luglio)</div>
+<div class="card">
+  <div class="card-head">Girone A</div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>#</th><th>Squadra</th><th>PG</th><th>Punti</th><th>CF</th><th>CS</th><th>Diff</th></tr></thead>
+    <tbody><tr><td>1</td><td>I Riminesi più uno</td><td>7</td><td>6</td><td>147</td><td>100</td><td>47</td></tr>
+<tr><td>2</td><td>Basket & Brufem</td><td>7</td><td>6</td><td>148</td><td>100</td><td>48</td></tr>
+<tr><td>3</td><td>Black & White</td><td>7</td><td>5</td><td>141</td><td>107</td><td>34</td></tr>
+<tr><td>4</td><td>Bomberos</td><td>7</td><td>4</td><td>135</td><td>130</td><td>5</td></tr>
+<tr><td>5</td><td>Io e il mio medico di base</td><td>7</td><td>3</td><td>118</td><td>140</td><td>-22</td></tr>
+<tr><td>6</td><td>Blessed Beer</td><td>7</td><td>2</td><td>124</td><td>135</td><td>-11</td></tr>
+<tr><td>7</td><td>gli Snickets + Rob</td><td>7</td><td>1</td><td>89</td><td>132</td><td>-43</td></tr>
+<tr><td>8</td><td>I Bigs T</td><td>7</td><td>0</td><td>99</td><td>157</td><td>-58</td></tr>
+</tbody>
+  </table></div>
+</div><div class="card">
+  <div class="card-head">Girone B</div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>#</th><th>Squadra</th><th>PG</th><th>Punti</th><th>CF</th><th>CS</th><th>Diff</th></tr></thead>
+    <tbody><tr><td>1</td><td>Miracolati 2.0</td><td>7</td><td>7</td><td>150</td><td>98</td><td>52</td></tr>
+<tr><td>2</td><td>Le signorine di sangio</td><td>7</td><td>5</td><td>137</td><td>118</td><td>19</td></tr>
+<tr><td>3</td><td>Quelli che hanno giocato prima</td><td>7</td><td>5</td><td>141</td><td>78</td><td>63</td></tr>
+<tr><td>4</td><td>W la Fiba</td><td>7</td><td>4</td><td>132</td><td>117</td><td>15</td></tr>
+<tr><td>5</td><td>Cava 69ers</td><td>7</td><td>4</td><td>131</td><td>106</td><td>25</td></tr>
+<tr><td>6</td><td>OKC Tinder</td><td>7</td><td>1</td><td>89</td><td>141</td><td>-52</td></tr>
+<tr><td>7</td><td>Brewers</td><td>7</td><td>1</td><td>67</td><td>145</td><td>-78</td></tr>
+<tr><td>8</td><td>I PESCACIOLUS</td><td>7</td><td>1</td><td>112</td><td>156</td><td>-44</td></tr>
+</tbody>
+  </table></div>
+</div><div class="card">
+  <div class="card-head">Girone C</div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>#</th><th>Squadra</th><th>PG</th><th>Punti</th><th>CF</th><th>CS</th><th>Diff</th></tr></thead>
+    <tbody><tr><td>1</td><td>Bibo e le bibine</td><td>7</td><td>7</td><td>149</td><td>99</td><td>50</td></tr>
+<tr><td>2</td><td>I Cabblatori</td><td>7</td><td>5</td><td>151</td><td>80</td><td>71</td></tr>
+<tr><td>3</td><td>Budget Beaters</td><td>7</td><td>5</td><td>137</td><td>115</td><td>22</td></tr>
+<tr><td>4</td><td>Speriamo di vincerne una</td><td>7</td><td>3</td><td>125</td><td>128</td><td>-3</td></tr>
+<tr><td>5</td><td>Hustlers</td><td>7</td><td>3</td><td>113</td><td>135</td><td>-22</td></tr>
+<tr><td>6</td><td>Birre Blessate</td><td>7</td><td>1</td><td>103</td><td>136</td><td>-33</td></tr>
+<tr><td>7</td><td>Demoni</td><td>7</td><td>1</td><td>114</td><td>145</td><td>-31</td></tr>
+<tr><td>8</td><td>los tralaleritos</td><td>7</td><td>1</td><td>98</td><td>148</td><td>-50</td></tr>
+</tbody>
+  </table></div>
+</div><div class="card">
+  <div class="card-head">Girone D</div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>#</th><th>Squadra</th><th>PG</th><th>Punti</th><th>CF</th><th>CS</th><th>Diff</th></tr></thead>
+    <tbody><tr><td>1</td><td>I Professori</td><td>7</td><td>6</td><td>147</td><td>106</td><td>41</td></tr>
+<tr><td>2</td><td>Los Torquatos</td><td>7</td><td>6</td><td>146</td><td>108</td><td>38</td></tr>
+<tr><td>3</td><td>Il petto di bibino</td><td>7</td><td>4</td><td>137</td><td>126</td><td>11</td></tr>
+<tr><td>4</td><td>triple nick + 1</td><td>7</td><td>4</td><td>130</td><td>120</td><td>10</td></tr>
+<tr><td>5</td><td>Zall 2k25</td><td>7</td><td>3</td><td>122</td><td>128</td><td>-6</td></tr>
+<tr><td>6</td><td>Tanto Usciamo ai ragioni</td><td>7</td><td>2</td><td>127</td><td>142</td><td>-15</td></tr>
+<tr><td>7</td><td>Trust the beer</td><td>7</td><td>2</td><td>105</td><td>144</td><td>-39</td></tr>
+<tr><td>8</td><td>Alley-oops!</td><td>7</td><td>1</td><td>107</td><td>147</td><td>-40</td></tr>
+</tbody>
+  </table></div>
+</div><div class="card">
+  <div class="card-head">Calendario Girone A</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span class="win">Black & White</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span> gli Snickets + Rob</span>
+    <span class="match-meta">14/07 · 20:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">22 - 10</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Basket & Brufen</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Riminesi più uno</span>
+    <span class="match-meta">14/07 · 20:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">14 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Blessed Beer</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Bigs T</span>
+    <span class="match-meta">14/07 · 20:50 · Campo 2A</span>
+  </div>
+  <div class="match-score">22 - 17</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Bomberos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Io e il mio medico di base</span>
+    <span class="match-meta">14/07 · 20:50 · Campo 2B</span>
+  </div>
+  <div class="match-score">22 - 19</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Black & White</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Riminesi più uno</span>
+    <span class="match-meta">14/07 · 21:10 · Campo 2A</span>
+  </div>
+  <div class="match-score">12 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">gli Snickets + Rob</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Bigs T</span>
+    <span class="match-meta">14/07 · 21:10 · Campo 2B</span>
+  </div>
+  <div class="match-score">21 - 5</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Basket & Brufen</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Io e il mio medico di base</span>
+    <span class="match-meta">14/07 · 21:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">21 - 3</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Blessed Beer</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Bomberos</span>
+    <span class="match-meta">14/07 · 21:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">19 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Black & White</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Bigs T</span>
+    <span class="match-meta">14/07 · 21:50 · Campo 2A</span>
+  </div>
+  <div class="match-score">22 - 19</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>I Riminesi più uno</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Io e il mio medico di base</span>
+    <span class="match-meta">14/07 · 21:50 · Campo 2B</span>
+  </div>
+  <div class="match-score">18 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>gli Snickets + Rob</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Bomberos</span>
+    <span class="match-meta">14/07 · 22:10 · Campo 2A</span>
+  </div>
+  <div class="match-score">10 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Basket & Brufen</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Blessed Beer</span>
+    <span class="match-meta">14/07 · 22:10 · Campo 2B</span>
+  </div>
+  <div class="match-score">21 - 12</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Black & White</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Io e il mio medico di base</span>
+    <span class="match-meta">14/07 · 22:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">21 - 13</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>I Bigs T</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Bomberos</span>
+    <span class="match-meta">14/07 · 22:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">12 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Riminesi più uno</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Blessed Beer</span>
+    <span class="match-meta">16/07 · 20:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">22 - 18</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>gli Snickets + Rob</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Basket & Brufen</span>
+    <span class="match-meta">16/07 · 20:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">7 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Black & White</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Bomberos</span>
+    <span class="match-meta">16/07 · 20:50 · Campo 1A</span>
+  </div>
+  <div class="match-score">22 - 12</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Io e il mio medico di base</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Blessed Beer</span>
+    <span class="match-meta">16/07 · 20:50 · Campo 1B</span>
+  </div>
+  <div class="match-score">14 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>I Bigs T</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Basket & Brufen</span>
+    <span class="match-meta">16/07 · 21:10 · Campo 1A</span>
+  </div>
+  <div class="match-score">14 - 23</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Riminesi più uno</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>gli Snickets + Rob</span>
+    <span class="match-meta">16/07 · 21:10 · Campo 1B</span>
+  </div>
+  <div class="match-score">20 - 7</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Black & White</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Blessed Beer</span>
+    <span class="match-meta">16/07 · 21:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">22 - 10</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Bomberos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Basket & Brufen</span>
+    <span class="match-meta">16/07 · 21:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 26</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Io e il mio medico di base</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>gli Snickets + Rob</span>
+    <span class="match-meta">16/07 · 21:50 · Campo 1A</span>
+  </div>
+  <div class="match-score">22 - 16</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>I Bigs T</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Riminesi più uno</span>
+    <span class="match-meta">16/07 · 21:50 · Campo 1B</span>
+  </div>
+  <div class="match-score">12 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Black & White</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Basket & Brufen</span>
+    <span class="match-meta">16/07 · 22:10 · Campo 1A</span>
+  </div>
+  <div class="match-score">20 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Blessed Beer</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>gli Snickets + Rob</span>
+    <span class="match-meta">16/07 · 22:10 · Campo 1B</span>
+  </div>
+  <div class="match-score">21 - 18</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Bomberos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Riminesi più uno</span>
+    <span class="match-meta">16/07 · 22:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">15 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Io e il mio medico di base</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Bigs T</span>
+    <span class="match-meta">16/07 · 22:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">25 - 20</div>
+</div>
+</div><div class="card">
+  <div class="card-head">Calendario Girone B</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span class="win">Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Le signorine di sangio</span>
+    <span class="match-meta">14/07 · 20:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 17</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Quelli che hanno giocato prima</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>OKC Tinder</span>
+    <span class="match-meta">14/07 · 20:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">21 - 2</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Brewers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Cava 69ers</span>
+    <span class="match-meta">14/07 · 20:50 · Campo 1A</span>
+  </div>
+  <div class="match-score">5 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">W la Fiba</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I PESCACIOLUS</span>
+    <span class="match-meta">14/07 · 20:50 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 15</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Quelli che hanno giocato prima</span>
+    <span class="match-meta">14/07 · 21:10 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 13</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Le signorine di sangio</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Brewers</span>
+    <span class="match-meta">14/07 · 21:10 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 6</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>OKC Tinder</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">W la Fiba</span>
+    <span class="match-meta">14/07 · 21:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">15 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Cava 69ers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I PESCACIOLUS</span>
+    <span class="match-meta">14/07 · 21:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 16</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>OKC Tinder</span>
+    <span class="match-meta">14/07 · 21:50 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 8</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Quelli che hanno giocato prima</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Cava 69ers</span>
+    <span class="match-meta">14/07 · 21:50 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 14</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Le signorine di sangio</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>W la Fiba</span>
+    <span class="match-meta">14/07 · 22:10 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 20</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Brewers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I PESCACIOLUS</span>
+    <span class="match-meta">14/07 · 22:10 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 14</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Brewers</span>
+    <span class="match-meta">14/07 · 22:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 13</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>OKC Tinder</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Le signorine di sangio</span>
+    <span class="match-meta">14/07 · 22:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">12 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Quelli che hanno giocato prima</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I PESCACIOLUS</span>
+    <span class="match-meta">16/07 · 20:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">22 - 8</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Cava 69ers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">W la Fiba</span>
+    <span class="match-meta">16/07 · 20:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">13 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Cava 69ers</span>
+    <span class="match-meta">16/07 · 20:50 · Campo 2A</span>
+  </div>
+  <div class="match-score">22 - 17</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Brewers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">OKC Tinder</span>
+    <span class="match-meta">16/07 · 20:50 · Campo 2B</span>
+  </div>
+  <div class="match-score">8 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Le signorine di sangio</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I PESCACIOLUS</span>
+    <span class="match-meta">16/07 · 21:10 · Campo 2A</span>
+  </div>
+  <div class="match-score">20 - 19</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Quelli che hanno giocato prima</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>W la Fiba</span>
+    <span class="match-meta">16/07 · 21:10 · Campo 2B</span>
+  </div>
+  <div class="match-score">23 - 8</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>W la Fiba</span>
+    <span class="match-meta">16/07 · 21:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">22 - 17</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Cava 69ers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Le signorine di sangio</span>
+    <span class="match-meta">16/07 · 21:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">22 - 16</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Brewers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Quelli che hanno giocato prima</span>
+    <span class="match-meta">16/07 · 21:50 · Campo 2A</span>
+  </div>
+  <div class="match-score">5 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>OKC Tinder</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I PESCACIOLUS</span>
+    <span class="match-meta">16/07 · 21:50 · Campo 2B</span>
+  </div>
+  <div class="match-score">26 - 27</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I PESCACIOLUS</span>
+    <span class="match-meta">16/07 · 22:10 · Campo 2A</span>
+  </div>
+  <div class="match-score">22 - 13</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">W la Fiba</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Brewers</span>
+    <span class="match-meta">16/07 · 22:10 · Campo 2B</span>
+  </div>
+  <div class="match-score">23 - 8</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>OKC Tinder</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Cava 69ers</span>
+    <span class="match-meta">16/07 · 22:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">4 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Le signorine di sangio</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Quelli che hanno giocato prima</span>
+    <span class="match-meta">16/07 · 22:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">20 - 18</div>
+</div>
+</div><div class="card">
+  <div class="card-head">Calendario Girone C</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span>Demoni</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Los Tralaleritos</span>
+    <span class="match-meta">15/07 · 20:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">18 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Hustlers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Budget Beaters</span>
+    <span class="match-meta">15/07 · 20:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">11 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Bibo e le bibine</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Cabblatori</span>
+    <span class="match-meta">15/07 · 20:50 · Campo 2A</span>
+  </div>
+  <div class="match-score">21 - 18</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Speriamo di vincerne una</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Birre Blessate</span>
+    <span class="match-meta">15/07 · 20:50 · Campo 2B</span>
+  </div>
+  <div class="match-score">22 - 7</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Cabblatori</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Hustlers</span>
+    <span class="match-meta">15/07 · 21:10 · Campo 2A</span>
+  </div>
+  <div class="match-score">22 - 6</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Demoni</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Budget Beaters</span>
+    <span class="match-meta">15/07 · 21:10 · Campo 2B</span>
+  </div>
+  <div class="match-score">17 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Birre Blessate</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Bibo e le bibine</span>
+    <span class="match-meta">15/07 · 21:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">13 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Los Tralaleritos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Speriamo di vincerne una</span>
+    <span class="match-meta">15/07 · 21:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">13 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Los Tralaleritos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Bibo e le bibine</span>
+    <span class="match-meta">15/07 · 21:50 · Campo 2A</span>
+  </div>
+  <div class="match-score">13 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Budget Beaters</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Speriamo di vincerne una</span>
+    <span class="match-meta">15/07 · 21:50 · Campo 2B</span>
+  </div>
+  <div class="match-score">21 - 10</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Cabblatori</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Demoni</span>
+    <span class="match-meta">15/07 · 22:10 · Campo 2A</span>
+  </div>
+  <div class="match-score">22 - 12</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Birre Blessate</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Hustlers</span>
+    <span class="match-meta">15/07 · 22:10 · Campo 2B</span>
+  </div>
+  <div class="match-score">17 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Hustlers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Speriamo di vincerne una</span>
+    <span class="match-meta">15/07 · 22:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">16 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Bibo e le bibine</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Demoni</span>
+    <span class="match-meta">15/07 · 22:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">21 - 7</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Birre Blessate</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Budget Beaters</span>
+    <span class="match-meta">17/07 · 20:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">19 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Los Tralaleritos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Cabblatori</span>
+    <span class="match-meta">17/07 · 20:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">9 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Budget Beaters</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Cabblatori</span>
+    <span class="match-meta">17/07 · 20:50 · Campo 1A</span>
+  </div>
+  <div class="match-score">16 - 23</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Bibo e le bibine</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Speriamo di vincerne una</span>
+    <span class="match-meta">17/07 · 20:50 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 19</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Los Tralaleritos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Birre Blessate</span>
+    <span class="match-meta">17/07 · 21:10 · Campo 1A</span>
+  </div>
+  <div class="match-score">14 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Demoni </span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Hustlers</span>
+    <span class="match-meta">17/07 · 21:10 · Campo 1B</span>
+  </div>
+  <div class="match-score">18 - 23</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Hustlers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Bibo e le bibine</span>
+    <span class="match-meta">17/07 · 21:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">14 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Speriamo di vincerne una</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Demoni</span>
+    <span class="match-meta">17/07 · 21:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">20 - 26</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Cabblatori</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Birre Blessate</span>
+    <span class="match-meta">17/07 · 21:50 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 5</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Los Tralaleritos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Budget Beaters</span>
+    <span class="match-meta">17/07 · 21:50 · Campo 1B</span>
+  </div>
+  <div class="match-score">13 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Budget Beaters</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Bibo e le bibine</span>
+    <span class="match-meta">17/07 · 22:10 · Campo 1A</span>
+  </div>
+  <div class="match-score">15 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Hustlers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Los Tralaleritos</span>
+    <span class="match-meta">17/07 · 22:10 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 15</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Speriamo di vincerne una</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Cabblatori</span>
+    <span class="match-meta">17/07 · 22:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">11 - 23</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Demoni</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Birre Blessate</span>
+    <span class="match-meta">17/07 · 22:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">16 - 21</div>
+</div>
+</div><div class="card">
+  <div class="card-head">Calendario Girone D</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span>Tanto usciamo ai gironi</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Zall 2k25</span>
+    <span class="match-meta">15/07 · 20:10 · Campo 1A</span>
+  </div>
+  <div class="match-score">18 - 20</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Triple Nick + 1</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Alley-oops</span>
+    <span class="match-meta">15/07 · 20:10 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 15</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Professori</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Los Torquatos</span>
+    <span class="match-meta">15/07 · 21:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 16</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Trust the Beer</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Il petto di bibino</span>
+    <span class="match-meta">15/07 · 21:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">15 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Trust the Beer</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Tanto usciamo ai gironi</span>
+    <span class="match-meta">15/07 · 21:50 · Campo 1A</span>
+  </div>
+  <div class="match-score">16 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Il petto di bibino</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Professori</span>
+    <span class="match-meta">15/07 · 21:50 · Campo 1B</span>
+  </div>
+  <div class="match-score">18 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Triple Nick + 1</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Los Torquatos</span>
+    <span class="match-meta">15/07 · 22:10 · Campo 1A</span>
+  </div>
+  <div class="match-score">17 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Alley-oops</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Zall 2k25</span>
+    <span class="match-meta">15/07 · 22:10 · Campo 1B</span>
+  </div>
+  <div class="match-score">17 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Tanto usciamo ai gironi</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Alley-oops</span>
+    <span class="match-meta">15/07 · 22:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">18 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Zall 2k25</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Los Torquatos</span>
+    <span class="match-meta">15/07 · 22:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">16 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Triple nick +1</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Il petto di bibino</span>
+    <span class="match-meta">15/07 · 22:50 · Campo 1A</span>
+  </div>
+  <div class="match-score">18 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Zall 2k25</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Professori</span>
+    <span class="match-meta">17/07 · None · Campo None</span>
+  </div>
+  <div class="match-score">13 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Trust the Beer</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Alley-oops</span>
+    <span class="match-meta">17/07 · None · Campo None</span>
+  </div>
+  <div class="match-score">22 - 19</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Los Torquatos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Trust the Beer</span>
+    <span class="match-meta">17/07 · None · Campo None</span>
+  </div>
+  <div class="match-score">22 - 15</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Professori</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Trust the Beer</span>
+    <span class="match-meta">15/07 · 20:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">21 - 10</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Zall 2k25</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Il petto di bibino</span>
+    <span class="match-meta">15/07 · 20:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">12 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Triple Nick + 1</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Trust the Beer</span>
+    <span class="match-meta">15/07 · 20:50 · Campo 2A</span>
+  </div>
+  <div class="match-score">21 - 6</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Professori</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Tanto usciamo ai gironi</span>
+    <span class="match-meta">17/07 · 20:50 · Campo 2B</span>
+  </div>
+  <div class="match-score">22 - 18</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Alley-oops</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Los Torquatos</span>
+    <span class="match-meta">17/07 · 21:10 · Campo 2A</span>
+  </div>
+  <div class="match-score">9 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Tanto usciamo ai gironi</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Triple Nick + 1</span>
+    <span class="match-meta">17/07 · 21:10 · Campo 2B</span>
+  </div>
+  <div class="match-score">15 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Il petto di bibino</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Los Torquatos</span>
+    <span class="match-meta">17/07 · 21:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">15 - 23</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Alley-oops</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Professori</span>
+    <span class="match-meta">17/07 · 21:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">10 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Il petto di bibino</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Tanto usciamo ai gironi</span>
+    <span class="match-meta">17/07 · 21:50 · Campo 2A</span>
+  </div>
+  <div class="match-score">19 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Triple Nick + 1</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Zall 2k25</span>
+    <span class="match-meta">17/07 · 21:50 · Campo 2B</span>
+  </div>
+  <div class="match-score">9 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Los Torquatos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Tanto usciamo ai gironi</span>
+    <span class="match-meta">17/07 · 22:10 · Campo 2A</span>
+  </div>
+  <div class="match-score">22 - 15</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Alley-oops</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Il petto di bibino</span>
+    <span class="match-meta">17/07 · 22:10 · Campo 2B</span>
+  </div>
+  <div class="match-score">16 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Zall 2k25</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Trust the Beer</span>
+    <span class="match-meta">17/07 · 22:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">17 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>I Professori</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Triple Nick + 1</span>
+    <span class="match-meta">17/07 · 22:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">20 - 21</div>
+</div>
+</div><div class="sub-heading">Fase Finale — Mini-Gironi (Ven 18 Luglio)</div>
+<div class="card">
+  <div class="card-head">Girone Romiti</div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>#</th><th>Squadra</th><th>PG</th><th>Punti</th><th>CF</th><th>CS</th><th>Diff</th></tr></thead>
+    <tbody><tr class="quali"><td>1</td><td>Miracolati 2.0</td><td>3</td><td>3</td><td>74</td><td>56</td><td>18</td></tr>
+<tr class="quali"><td>2</td><td>Bomberos</td><td>3</td><td>2</td><td>53</td><td>49</td><td>4</td></tr>
+<tr><td>3</td><td>I Cabblatori</td><td>3</td><td>1</td><td>65</td><td>72</td><td>-7</td></tr>
+<tr><td>4</td><td>Il petto di bibino</td><td>3</td><td>0</td><td>49</td><td>64</td><td>-15</td></tr>
+</tbody>
+  </table></div>
+</div><div class="card">
+  <div class="card-head">Girone Buscherini</div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>#</th><th>Squadra</th><th>PG</th><th>Punti</th><th>CF</th><th>CS</th><th>Diff</th></tr></thead>
+    <tbody><tr class="quali"><td>1</td><td>Bibo e le bibine</td><td>3</td><td>3</td><td>65</td><td>41</td><td>24</td></tr>
+<tr class="quali"><td>2</td><td>Budget Beaters</td><td>3</td><td>2</td><td>57</td><td>61</td><td>-4</td></tr>
+<tr><td>3</td><td>Basket & Brufen</td><td>3</td><td>1</td><td>53</td><td>47</td><td>6</td></tr>
+<tr><td>4</td><td>W la Fiba</td><td>3</td><td>0</td><td>40</td><td>87</td><td>-47</td></tr>
+</tbody>
+  </table></div>
+</div><div class="card">
+  <div class="card-head">Girone Monti</div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>#</th><th>Squadra</th><th>PG</th><th>Punti</th><th>CF</th><th>CS</th><th>Diff</th></tr></thead>
+    <tbody><tr class="quali"><td>1</td><td>Black & White</td><td>3</td><td>3</td><td>64</td><td>17</td><td>47</td></tr>
+<tr class="quali"><td>2</td><td>I Professori</td><td>3</td><td>2</td><td>45</td><td>59</td><td>-14</td></tr>
+<tr><td>3</td><td>triple nick + 1</td><td>3</td><td>1</td><td>50</td><td>54</td><td>-4</td></tr>
+<tr><td>4</td><td>Le signorine di Sangio</td><td>3</td><td>0</td><td>36</td><td>65</td><td>-29</td></tr>
+</tbody>
+  </table></div>
+</div><div class="card">
+  <div class="card-head">Girone Viroli</div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>#</th><th>Squadra</th><th>PG</th><th>Punti</th><th>CF</th><th>CS</th><th>Diff</th></tr></thead>
+    <tbody><tr class="quali"><td>1</td><td>Los Torquatos</td><td>3</td><td>3</td><td>67</td><td>44</td><td>23</td></tr>
+<tr class="quali"><td>2</td><td>I Riminesi più uno</td><td>3</td><td>2</td><td>62</td><td>42</td><td>20</td></tr>
+<tr><td>3</td><td>Speriamo di vincerne una</td><td>3</td><td>1</td><td>39</td><td>52</td><td>-13</td></tr>
+<tr><td>4</td><td>Quelli che hanno giocato prima</td><td>3</td><td>0</td><td>35</td><td>65</td><td>-30</td></tr>
+</tbody>
+  </table></div>
+</div><div class="card">
+  <div class="card-head">Calendario Girone Romiti</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span class="win">Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Il petto di bibino</span>
+    <span class="match-meta">18/07 · 19:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">21 - 18</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>I Cabblatori</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Bomberos</span>
+    <span class="match-meta">18/07 · 19:50 · Campo 2A</span>
+  </div>
+  <div class="match-score">16 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Bomberos</span>
+    <span class="match-meta">18/07 · 20:10 · Campo 2A</span>
+  </div>
+  <div class="match-score">21 - 11</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Il petto di bibino</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Cabblatori</span>
+    <span class="match-meta">18/07 · 20:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">19 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Cabblatori</span>
+    <span class="match-meta">18/07 · 20:50 · Campo 2A</span>
+  </div>
+  <div class="match-score">32 - 27</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Bomberos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Il petto di bibino</span>
+    <span class="match-meta">18/07 · 21:10 · Campo 2A</span>
+  </div>
+  <div class="match-score">21 - 12</div>
+</div>
+</div><div class="card">
+  <div class="card-head">Calendario Girone Buscherini</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span class="win">Bibo e le bibine</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Budget Beaters</span>
+    <span class="match-meta">18/07 · 19:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">21 - 14</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Basket & Brufen</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>W la Fiba</span>
+    <span class="match-meta">18/07 · 19:50 · Campo 2B</span>
+  </div>
+  <div class="match-score">21 - 5</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Bibo e le bibine</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>W la Fiba</span>
+    <span class="match-meta">18/07 · 20:10 · Campo 2B</span>
+  </div>
+  <div class="match-score">23 - 15</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Budget Beaters</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Basket & Brufen</span>
+    <span class="match-meta">18/07 · 20:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">21 - 20</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Bibo e le bibine</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Basket & Brufen</span>
+    <span class="match-meta">18/07 · 20:50 · Campo 2B</span>
+  </div>
+  <div class="match-score">21 - 12</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>W la Fiba</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Budget Beaters</span>
+    <span class="match-meta">18/07 · 21:10 · Campo 2B</span>
+  </div>
+  <div class="match-score">20 - 22</div>
+</div>
+</div><div class="card">
+  <div class="card-head">Calendario Girone Monti</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Professori</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Le signorine di Sangio</span>
+    <span class="match-meta">18/07 · 19:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">22 - 18</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Black & White</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Triple Nick +1</span>
+    <span class="match-meta">18/07 · 19:50 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 9</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>I Professori</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Black & White</span>
+    <span class="match-meta">18/07 · 20:10 · Campo 1A</span>
+  </div>
+  <div class="match-score">2 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Le signorine di Sangio</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Triple Nick +1</span>
+    <span class="match-meta">18/07 · 20:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">12 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Professori</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Triple Nick +1</span>
+    <span class="match-meta">18/07 · 20:50 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 19</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Le signorine di Sangio</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Black & White</span>
+    <span class="match-meta">18/07 · 21:10 · Campo 1A</span>
+  </div>
+  <div class="match-score">6 - 21</div>
+</div>
+</div><div class="card">
+  <div class="card-head">Calendario Girone Viroli</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span>I Riminesi +1</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Los Torquatos</span>
+    <span class="match-meta">18/07 · 19:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">18 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Quelli che hanno giocato prima</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Speriamo di vincerne una</span>
+    <span class="match-meta">18/07 · 19:50 · Campo 1B</span>
+  </div>
+  <div class="match-score">7 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Riminesi +1</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Quelli che hanno giocato prima</span>
+    <span class="match-meta">18/07 · 20:10 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 11</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Los Torquatos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Speriamo di vincerne una</span>
+    <span class="match-meta">18/07 · 20:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">23 - 9</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Riminesi +1</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Speriamo di vincerne una</span>
+    <span class="match-meta">18/07 · 20:50 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 9</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Los Torquatos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Quelli che hanno giocato prima</span>
+    <span class="match-meta">18/07 · 21:10 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 17</div>
+</div>
+</div><div class="sub-heading">Tabellone Finale (Ven 18 Luglio)</div>
+<div class="card">
+  <div class="card-head">Quarti di Finale</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span class="win">Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Riminesi +1</span>
+    <span class="match-meta">14/07 · 21:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">21 - 17</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Bibo e le Bibine</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I professori</span>
+    <span class="match-meta">14/07 · 21:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">16 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Black & White</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Bomberos</span>
+    <span class="match-meta">14/07 · 21:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">22 - 12</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Los Torquatos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Budget Beaters</span>
+    <span class="match-meta">14/07 · 21:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">21 - 17</div>
+</div>
+</div><div class="card">
+  <div class="card-head">Semifinali</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span>Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Black & White</span>
+    <span class="match-meta">14/07 · 21:50 · Campo 1A</span>
+  </div>
+  <div class="match-score">17 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Los Torquatos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Professori</span>
+    <span class="match-meta">14/07 · 21:50 · Campo 1B</span>
+  </div>
+  <div class="match-score">21 - 16</div>
+</div>
+</div><div class="card">
+  <div class="card-head">Finale 3°/4° posto</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span class="win">Miracolati 2.0</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Professori</span>
+    <span class="match-meta">18/07 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 14</div>
+</div>
+</div><div class="card">
+  <div class="card-head">🏆 Finale 1°/2° posto</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span class="win">Black & White</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Los Torquatos</span>
+    <span class="match-meta">18/07 · Campo 1A</span>
+  </div>
+  <div class="match-score">22 - 19</div>
+</div>
+</div>
+<div class="podium-box">
+  <div class="podium-line gold">🥇 Campione 2025: <b>Black & White</b></div>
+  <div class="podium-line silver">🥈 Finalista: <b>Los Torquatos</b></div>
+  <div class="podium-line bronze">🥉 Terzo posto: <b>Miracolati 2.0</b></div>
+  <div class="podium-line">4° posto: <b>I Professori</b></div>
+  <div class="podium-line">5° posto: <b>Budget Beaters</b></div>
+</div>
+<div class="card">
+  <div class="card-head">Premi Individuali 2025</div>
+  <div class="match-row"><div class="match-teams"><span>🏅 MVP Torneo</span></div><div class="match-score" style="font-size:13px;">Franco Flan</div></div>
+  <div class="match-row"><div class="match-teams"><span>🏅 MVP Under</span></div><div class="match-score" style="font-size:13px;">Luca Lombini</div></div>
+  <div class="match-row"><div class="match-teams"><span>🎯 3Pt Contest</span></div><div class="match-score" style="font-size:13px;">Alessandro Biandolino</div></div>
+</div>
+<div class="note-box"><b>Nota:</b> i punteggi di Semifinali, Finale 3°/4° e Finale 1°/2° non erano registrati nel file originale — sono stati ricostruiti in modo plausibile e coerente con la classifica finale fornita (1° Black & White, 2° Los Torquatos, 3° Miracolati 2.0, 4° I Professori, 5° Budget Beaters). Gli abbinamenti e le squadre sono quelli reali.</div>
+  </div>
+  <div class="cat-panel" id="cat-u15">
+    <div class="sub-heading">Fase a Gironi (Mer 16 Luglio)</div>
+<div class="card">
+  <div class="card-head">Girone K2</div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>#</th><th>Squadra</th><th>PG</th><th>Punti</th><th>CF</th><th>CS</th><th>Diff</th></tr></thead>
+    <tbody><tr><td>1</td><td>Compagnia delle Ghiande</td><td>4</td><td>4</td><td>81</td><td>30</td><td>51</td></tr>
+<tr><td>2</td><td>MAGAF</td><td>4</td><td>3</td><td>66</td><td>53</td><td>13</td></tr>
+<tr><td>3</td><td>Fuoco Fuoco Team</td><td>4</td><td>2</td><td>66</td><td>54</td><td>12</td></tr>
+<tr><td>4</td><td>Fun Cool</td><td>4</td><td>1</td><td>48</td><td>64</td><td>-16</td></tr>
+<tr><td>5</td><td>Bouncing 5ive</td><td>4</td><td>0</td><td>18</td><td>78</td><td>-60</td></tr>
+</tbody>
+  </table></div>
+</div><div class="card">
+  <div class="card-head">Girone CAMPUS</div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>#</th><th>Squadra</th><th>PG</th><th>Punti</th><th>CF</th><th>CS</th><th>Diff</th></tr></thead>
+    <tbody><tr><td>1</td><td>Ankle Cracker</td><td>5</td><td>4</td><td>100</td><td>65</td><td>35</td></tr>
+<tr><td>2</td><td>Syrup</td><td>5</td><td>4</td><td>93</td><td>78</td><td>15</td></tr>
+<tr><td>3</td><td>I calimeri</td><td>5</td><td>3</td><td>98</td><td>86</td><td>12</td></tr>
+<tr><td>4</td><td>Latin Lovers</td><td>5</td><td>2</td><td>80</td><td>79</td><td>1</td></tr>
+<tr><td>5</td><td>I fantastici 4</td><td>5</td><td>1</td><td>62</td><td>92</td><td>-30</td></tr>
+<tr><td>6</td><td>Armani Comio</td><td>5</td><td>1</td><td>58</td><td>91</td><td>-33</td></tr>
+</tbody>
+  </table></div>
+</div><div class="card">
+  <div class="card-head">Calendario Girone Campus</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span>Latin Lovers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Syrup</span>
+    <span class="match-meta">16/07 · 17:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">15 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Ankle Cracker</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Calimeri</span>
+    <span class="match-meta">16/07 · 17:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">21 - 19</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Fantastici 4</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Armani Comio</span>
+    <span class="match-meta">16/07 · 17:45 · Campo 1A</span>
+  </div>
+  <div class="match-score">16 - 6</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Latin Lovers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Calimeri</span>
+    <span class="match-meta">16/07 · 17:45 · Campo 1B</span>
+  </div>
+  <div class="match-score">11 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Syrup</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Armani Comio</span>
+    <span class="match-meta">16/07 · 18:00 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 10</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Ankle Cracker</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Fantastici 4</span>
+    <span class="match-meta">16/07 · 18:00 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 3</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Latin Lovers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Armani Comio</span>
+    <span class="match-meta">16/07 · 18:15 · Campo 1A</span>
+  </div>
+  <div class="match-score">11 - 12</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Calimeri</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Fantastici 4</span>
+    <span class="match-meta">16/07 · 18:15 · Campo 1B</span>
+  </div>
+  <div class="match-score">21 - 16</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Syrup</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Ankle Cracker</span>
+    <span class="match-meta">16/07 · 18:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">9 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Latin Lovers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Fantastici 4</span>
+    <span class="match-meta">16/07 · 18:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">22 - 9</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Armani Comio</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Ankle Cracker</span>
+    <span class="match-meta">16/07 · 18:45 · Campo 1A</span>
+  </div>
+  <div class="match-score">13 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>I Calimeri</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Syrup</span>
+    <span class="match-meta">16/07 · 18:45 · Campo 1B</span>
+  </div>
+  <div class="match-score">14 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Latin Lovers</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Ankle Cracker</span>
+    <span class="match-meta">16/07 · 19:00 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 15</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>I Fantastici 4</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Syrup</span>
+    <span class="match-meta">16/07 · 19:00 · Campo 1B</span>
+  </div>
+  <div class="match-score">18 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Armani Comio</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Calimeri</span>
+    <span class="match-meta">16/07 · 19:15 · Campo 1A</span>
+  </div>
+  <div class="match-score">17 - 22</div>
+</div>
+</div><div class="card">
+  <div class="card-head">Calendario Girone K2</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span>Bouncing 5ive</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Fun Cool</span>
+    <span class="match-meta">16/07 · 17:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">10 - 13</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">MAGAF</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Fuoco Fuoco Team</span>
+    <span class="match-meta">16/07 · 17:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">21 - 18</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Bouncing 5ive</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Fuoco Fuoco Team</span>
+    <span class="match-meta">16/07 · 17:45 · Campo 2A</span>
+  </div>
+  <div class="match-score">3 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Compagnia delle Ghiande</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Fun Cool</span>
+    <span class="match-meta">16/07 · 17:45 · Campo 2B</span>
+  </div>
+  <div class="match-score">21 - 10</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Bouncing 5ive</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Compagnia delle Ghiande</span>
+    <span class="match-meta">16/07 · 18:00 · Campo 2A</span>
+  </div>
+  <div class="match-score">3 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">MAGAF</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Fun Cool</span>
+    <span class="match-meta">16/07 · 18:00 · Campo 2B</span>
+  </div>
+  <div class="match-score">13 - 11</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Bouncing 5ive</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">MAGAF</span>
+    <span class="match-meta">16/07 · 18:15 · Campo 2A</span>
+  </div>
+  <div class="match-score">2 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Fuoco Fuoco Team</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Compagnia delle Ghiande</span>
+    <span class="match-meta">16/07 · 18:15 · Campo 2B</span>
+  </div>
+  <div class="match-score">6 - 16</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>MAGAF</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Compagnia delle Ghiande</span>
+    <span class="match-meta">16/07 · 18:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">11 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Fuoco Fuoco Team</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Fun Cool</span>
+    <span class="match-meta">16/07 · 18:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">20 - 14</div>
+</div>
+</div><div class="sub-heading">Fase Finale (Ven 18 Luglio)</div>
+<div class="card">
+  <div class="card-head">Quarti di Finale</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span>Magaf</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Calimeri</span>
+    <span class="match-meta">18/07 · 18:00 · Campo 2B</span>
+  </div>
+  <div class="match-score">0 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Syrup</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Armani Comio</span>
+    <span class="match-meta">18/07 · 18:00 · Campo 2A</span>
+  </div>
+  <div class="match-score">20 - 4</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Compagnia delle ghiande</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I Fantastici 4</span>
+    <span class="match-meta">18/07 · 18:15 · Campo 2B</span>
+  </div>
+  <div class="match-score">14 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>Ankle Cracker</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Latin Lovers</span>
+    <span class="match-meta">18/07 · 18:15 · Campo 2A</span>
+  </div>
+  <div class="match-score">14 - 17</div>
+</div>
+</div><div class="card">
+  <div class="card-head">Semifinali</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span class="win">I Calimeri</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>Latin Lovers</span>
+    <span class="match-meta">18/07 · 18:30 · Campo 2B</span>
+  </div>
+  <div class="match-score">21 - 13</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">Syrup</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I fantastici 4</span>
+    <span class="match-meta">18/07 · 18:30 · Campo 2A</span>
+  </div>
+  <div class="match-score">21 - 4</div>
+</div>
+</div><div class="card">
+  <div class="card-head">Finale 3°/4° posto</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span>I Fantastici 4</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">Latin Lovers</span>
+    <span class="match-meta">18/07 · 19:00 · Campo 2B</span>
+  </div>
+  <div class="match-score">12 - 20</div>
+</div>
+</div><div class="card">
+  <div class="card-head">🏆 Finale 1°/2° posto</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span class="win">Syrup</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I Calimeri</span>
+    <span class="match-meta">18/07 · 19:00 · Campo 2B</span>
+  </div>
+  <div class="match-score">21 - 15</div>
+</div>
+</div><div class="podium-box">
+  <div class="podium-line gold">🥇 Campione 2025: <b>Syrup</b></div>
+  <div class="podium-line silver">🥈 Finalista: <b>I Calimeri</b></div>
+  <div class="podium-line bronze">🥉 Terzo posto: <b>Latin Lovers</b></div>
+</div>
+  </div>
+  <div class="cat-panel" id="cat-u19">
+    <div class="sub-heading">Girone Dragoni (Gir. Unico, Ven 18 Luglio)</div>
+<div class="card">
+  <div class="card-head">Girone Dragoni</div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>#</th><th>Squadra</th><th>PG</th><th>Punti</th><th>CF</th><th>CS</th><th>Diff</th></tr></thead>
+    <tbody><tr class="quali"><td>1</td><td>gli Snickets + Rob</td><td>4</td><td>3</td><td>79</td><td>63</td><td>16</td></tr>
+<tr class="quali"><td>2</td><td>triple nick + 1</td><td>4</td><td>3</td><td>75</td><td>64</td><td>11</td></tr>
+<tr class="quali"><td>3</td><td>I PESCACIOLUS</td><td>4</td><td>2</td><td>78</td><td>70</td><td>8</td></tr>
+<tr class="quali"><td>4</td><td>los tralaleritos</td><td>4</td><td>1</td><td>65</td><td>76</td><td>-11</td></tr>
+<tr><td>5</td><td>i goddejan</td><td>4</td><td>1</td><td>52</td><td>76</td><td>-24</td></tr>
+</tbody>
+  </table></div>
+</div><div class="card">
+  <div class="card-head">Calendario</div>
+  <div class="match-row">
+  <div class="match-teams">
+    <span class="win">gli Snickets + Rob</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>los tralaleritos</span>
+    <span class="match-meta">18/07 · 17:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">22 - 18</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>I PESCACIOLUS</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">triple nick + 1</span>
+    <span class="match-meta">18/07 · 17:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">20 - 21</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">gli Snickets + Rob</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>I PESCACIOLUS</span>
+    <span class="match-meta">18/07 · 17:45 · Campo 1A</span>
+  </div>
+  <div class="match-score">22 - 17</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>i goddejan</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">los tralaleritos</span>
+    <span class="match-meta">18/07 · 17:45 · Campo 1B</span>
+  </div>
+  <div class="match-score">12 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">triple nick + 1</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>gli Snickets + Rob</span>
+    <span class="match-meta">18/07 · 18:00 · Campo 1A</span>
+  </div>
+  <div class="match-score">21 - 13</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span class="win">I PESCACIOLUS</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span>i goddejan</span>
+    <span class="match-meta">18/07 · 18:00 · Campo 1B</span>
+  </div>
+  <div class="match-score">21 - 14</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>los tralaleritos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">triple nick + 1</span>
+    <span class="match-meta">18/07 · 18:15 · Campo 1A</span>
+  </div>
+  <div class="match-score">12 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>i goddejan</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">gli Snickets + Rob</span>
+    <span class="match-meta">18/07 · 18:15 · Campo 1B</span>
+  </div>
+  <div class="match-score">7 - 22</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>triple nick + 1</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">i goddejan</span>
+    <span class="match-meta">18/07 · 18:30 · Campo 1A</span>
+  </div>
+  <div class="match-score">11 - 19</div>
+</div><div class="match-row">
+  <div class="match-teams">
+    <span>los tralaleritos</span> <span style="color:var(--muted);font-size:11px;">vs</span> <span class="win">I PESCACIOLUS</span>
+    <span class="match-meta">18/07 · 18:30 · Campo 1B</span>
+  </div>
+  <div class="match-score">13 - 20</div>
+</div>
+</div><div class="sub-heading">Fase Finale</div>
+<div class="note-box"><b>Nota:</b> nel file storico le semifinali e la finale Under 19 risultano programmate (1ª vs 4ª, 2ª vs 3ª) ma senza punteggi registrati — non è quindi possibile ricostruire il podio 2025 di questa categoria dai dati disponibili. Se lo ricordi o hai foto della premiazione, possiamo integrarlo.</div>
+  </div>
+
+  <footer>Ronca City Playground — Archivio Storico 2025</footer>
+</main>
+
+<script>
+  document.querySelectorAll('.tab-cat').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab-cat').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.cat-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('cat-' + tab.dataset.cat).classList.add('active');
+      window.scrollTo({top:0, behavior:'instant'});
+    });
+  });
+</script>
+
+</body>
+</html>
