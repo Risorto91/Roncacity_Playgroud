@@ -784,10 +784,13 @@
     const hasLogo = !!s.logo;
     const logoInner = hasLogo ? `<img src="${s.logo}" alt="${s.name}" style="max-height:100%;max-width:100%;">` : (s.name || 'logo');
     const nameLine = s.name ? `<div class="sponsor-name">${s.name}</div>` : `<div class="sponsor-name" style="color:var(--muted);">da assegnare</div>`;
-    const linkLine = s.link ? `<a class="sponsor-link" href="${s.link}" target="_blank" rel="noopener">Visita il sito →</a>` : '';
     const captionLine = s.caption ? `<div class="sponsor-caption">${s.caption}</div>` : '';
     const cls = variant === 'title' ? 'sponsor-card title' : (variant === 'mini' ? 'sponsor-card mini' : 'sponsor-card');
-    return `<div class="${cls}"><div class="logo-slot${hasLogo ? ' filled' : ''}">${logoInner}</div>${nameLine}${captionLine}${linkLine}</div>`;
+    const inner = `<div class="logo-slot${hasLogo ? ' filled' : ''}">${logoInner}</div>${nameLine}${captionLine}`;
+    if (s.link){
+      return `<a class="${cls}" href="${s.link}" target="_blank" rel="noopener" style="display:flex;">${inner}<span class="sponsor-link">Visita il sito →</span></a>`;
+    }
+    return `<div class="${cls}">${inner}</div>`;
   }
 
   document.getElementById('tierTitle').innerHTML = sponsorsData.title.map(s => sponsorCard(s, 'title')).join('');
