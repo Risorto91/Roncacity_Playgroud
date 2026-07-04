@@ -192,6 +192,16 @@
   .quick-card .qt{ font-family:'Anton',sans-serif; font-size:16px; margin-bottom:4px; }
   .quick-card .qd{ font-size:12px; color:var(--muted); }
 
+  .sponsor-strip-wrap{ padding: 14px 18px 4px; }
+  .sponsor-strip-label{ font-size:9px; letter-spacing:0.12em; color:var(--muted); text-transform:uppercase; margin-bottom:7px; text-align:center; }
+  .sponsor-strip{ display:flex; gap:8px; }
+  .sponsor-strip a{
+    flex:1; height:42px; border-radius:4px; display:flex; align-items:center; justify-content:center;
+    padding:6px 8px; background:#f4f2ec;
+  }
+  .sponsor-strip a.noplate{ background:transparent; border:1px solid var(--line); }
+  .sponsor-strip img{ max-height:100%; max-width:100%; }
+
   .section-heading{
     padding: 30px 20px 4px; display:flex; align-items:baseline; gap:10px;
   }
@@ -405,6 +415,14 @@
         <div class="qt">Tabellone</div>
         <div class="qd">Fase finale Senior & Over40</div>
       </a>
+      <a class="quick-card" data-target="u19">
+        <div class="qt">U19 / U17</div>
+        <div class="qd">Gironi e fase finale</div>
+      </a>
+      <a class="quick-card" data-target="u15">
+        <div class="qt">U15 / U14</div>
+        <div class="qd">Gironi e fase finale</div>
+      </a>
       <a class="quick-card" data-target="sponsor">
         <div class="qt">Sponsor</div>
         <div class="qd">Chi sostiene il torneo</div>
@@ -454,6 +472,7 @@
   <section class="section" id="risultati">
     <div class="section-heading"><span class="num">02</span><h2>Risultati e Calendario</h2></div>
     <div class="section-sub">Senior & Over40 — fase a gironi + mini-gironi finali</div>
+    <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripRisultati"></div></div>
 
     <div class="tabs-inline">
       <div class="pill active" data-cat="senior">Senior</div>
@@ -538,6 +557,7 @@
   <section class="section" id="tabellone">
     <div class="section-heading"><span class="num">03</span><h2>Tabellone Finale</h2></div>
     <div class="section-sub">Fase a eliminazione diretta</div>
+    <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripTabellone"></div></div>
 
     <div class="tabs-inline">
       <div class="pill active" data-cat="senior">Senior</div>
@@ -579,6 +599,7 @@
   <section class="section" id="u19">
     <div class="section-heading"><span class="num">04</span><h2>U19 / U17</h2></div>
     <div class="section-sub">Giovedì 16/07 (Campo 2) · Fase finale venerdì 17/07</div>
+    <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripU19"></div></div>
 
     <div class="tabs-inline">
       <div class="pill active" data-cat="g1">Girone G1</div>
@@ -628,6 +649,7 @@
   <section class="section" id="u15">
     <div class="section-heading"><span class="num">05</span><h2>U15 / U14</h2></div>
     <div class="section-sub">Giovedì 16/07 (Campo 1) · Fase finale venerdì 17/07</div>
+    <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripU15"></div></div>
 
     <div class="tabs-inline">
       <div class="pill active" data-cat="g1">Girone G1</div>
@@ -697,6 +719,7 @@
   <section class="section" id="galleria">
     <div class="section-heading"><span class="num">07</span><h2>Galleria</h2></div>
     <div class="section-sub">Foto e video del torneo 2026 — in aggiornamento durante l'evento</div>
+    <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripGalleria"></div></div>
 
     <div class="gallery-grid" style="grid-template-columns: repeat(3,1fr);">
       <div class="gallery-item">foto/video</div>
@@ -893,6 +916,25 @@
     banner.style.cursor = 'pointer';
     banner.addEventListener('click', () => window.open(homeTitle.link, '_blank', 'noopener'));
   }
+  // ---- Strisce Main Sponsor distribuite tra le sezioni ----
+  function renderSponsorStrip(containerId, indices){
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = indices.map(i => {
+      const s = sponsorsData.main[i];
+      if (!s) return '';
+      const cls = s.noPlate ? 'noplate' : '';
+      const img = s.logo ? `<img src="${s.logo}" alt="${s.name}">` : s.name;
+      return s.link
+        ? `<a class="${cls}" href="${s.link}" target="_blank" rel="noopener">${img}</a>`
+        : `<div class="${cls}" style="flex:1; height:42px; border-radius:4px; display:flex; align-items:center; justify-content:center; padding:6px 8px; background:${s.noPlate?'transparent':'#f4f2ec'};">${img}</div>`;
+    }).join('');
+  }
+  renderSponsorStrip('stripRisultati', [0,1,2]);
+  renderSponsorStrip('stripTabellone', [3,4,5]);
+  renderSponsorStrip('stripU19', [6,7,8]);
+  renderSponsorStrip('stripU15', [9,10,11]);
+  renderSponsorStrip('stripGalleria', [12,13,0]);
 </script>
 
 </body>
