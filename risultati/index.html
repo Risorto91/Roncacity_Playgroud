@@ -209,13 +209,18 @@
   }
 
   .insta-scroll{
-    display:flex; gap:14px; overflow-x:auto; padding: 16px 18px 8px;
+    display:flex; gap:12px; overflow-x:auto; padding: 16px 18px 8px;
     -webkit-overflow-scrolling:touch;
   }
-  .insta-item{
-    flex: 0 0 auto; width: 300px;
+  .insta-card{
+    flex: 0 0 auto; width: 130px; aspect-ratio: 4/5;
+    background: linear-gradient(160deg, rgba(74,35,132,0.35), var(--bg-card));
+    border: 1px solid var(--line); border-radius: 8px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    text-align:center; padding: 10px;
   }
-  .insta-item iframe{ border-radius: 6px !important; }
+  .insta-card .insta-icon{ font-size:28px; }
+  .insta-card .insta-label{ font-size:11px; color:var(--gold); font-weight:600; }
 
   /* ---- TABLES (Risultati/Calendario/Categorie giovanili) ---- */
   .card{
@@ -417,27 +422,33 @@
     <div class="section-heading"><span class="num">—</span><h2>Dal campo</h2></div>
     <div class="section-sub">Foto e video dai nostri social — <a data-target="galleria" style="color:var(--gold); text-decoration:underline;">vedi tutta la galleria →</a></div>
     <div class="insta-scroll">
-      <div class="insta-item">
-        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DaS4rpGIVZZ/" data-instgrm-version="14"></blockquote>
-      </div>
-      <div class="insta-item">
-        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DaPyippIiZw/" data-instgrm-version="14"></blockquote>
-      </div>
-      <div class="insta-item">
-        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DaHu5krIhOL/" data-instgrm-version="14"></blockquote>
-      </div>
-      <div class="insta-item">
-        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DZVLJJBCKAG/" data-instgrm-version="14"></blockquote>
-      </div>
-      <div class="insta-item">
-        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DM0UawKIUg9/" data-instgrm-version="14"></blockquote>
-      </div>
-      <div class="insta-item">
-        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DMQ09WqoSC_/" data-instgrm-version="14"></blockquote>
-      </div>
+      <a class="insta-card" href="https://www.instagram.com/p/DaS4rpGIVZZ/" target="_blank" rel="noopener">
+        <div class="insta-icon">📷</div>
+        <div class="insta-label">Guarda su Instagram</div>
+      </a>
+      <a class="insta-card" href="https://www.instagram.com/reel/DaPyippIiZw/" target="_blank" rel="noopener">
+        <div class="insta-icon">▶</div>
+        <div class="insta-label">Guarda il Reel</div>
+      </a>
+      <a class="insta-card" href="https://www.instagram.com/reel/DaHu5krIhOL/" target="_blank" rel="noopener">
+        <div class="insta-icon">▶</div>
+        <div class="insta-label">Guarda il Reel</div>
+      </a>
+      <a class="insta-card" href="https://www.instagram.com/p/DZVLJJBCKAG/" target="_blank" rel="noopener">
+        <div class="insta-icon">📷</div>
+        <div class="insta-label">Guarda su Instagram</div>
+      </a>
+      <a class="insta-card" href="https://www.instagram.com/reel/DM0UawKIUg9/" target="_blank" rel="noopener">
+        <div class="insta-icon">▶</div>
+        <div class="insta-label">Guarda il Reel</div>
+      </a>
+      <a class="insta-card" href="https://www.instagram.com/reel/DMQ09WqoSC_/" target="_blank" rel="noopener">
+        <div class="insta-icon">▶</div>
+        <div class="insta-label">Guarda il Reel</div>
+      </a>
     </div>
     <div class="note-box">
-      <b>Nota tecnica:</b> questi sono embed ufficiali Instagram (si aggiornano da soli se cambiano like/commenti sul post originale). Per aggiungerne altri, basta un nuovo blocco con lo stesso schema e il link del post/reel — non serve toccare altro.
+      <b>Nota tecnica:</b> ogni card apre il post/reel direttamente su Instagram in una nuova scheda. Per aggiungerne altri, basta una nuova card con lo stesso schema e il link — non serve toccare altro.
     </div>
   </section>
 
@@ -893,8 +904,6 @@
     banner.addEventListener('click', () => window.open(homeTitle.link, '_blank', 'noopener'));
   }
 </script>
-
-<script async src="//www.instagram.com/embed.js"></script>
 
 </body>
 </html>
