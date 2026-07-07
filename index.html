@@ -46,6 +46,8 @@ body{background:var(--black);color:var(--text);font-family:'Barlow',sans-serif;f
 .cat-btn .cat-icon{font-size:22px;display:block;margin-bottom:6px;}
 .cat-btn .cat-sub{font-size:11px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;display:block;margin-top:3px;}
 .cat-btn.active .cat-sub{color:rgba(46,204,113,0.7);}
+.cat-btn-disabled{opacity:0.45;cursor:not-allowed;pointer-events:none;}
+.cat-btn-disabled .cat-icon{filter:grayscale(1);}
 
 .steps{display:flex;gap:6px;margin-bottom:28px;flex-wrap:wrap;}
 .step-btn{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:var(--gray-dark);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;}
@@ -140,14 +142,18 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--green);flex-shrin
     </a>
   </div>
 
+  <div class="alert alert-warn">
+    ⚠️ <strong>Categoria Senior:</strong> iscrizioni chiuse, raggiunto il numero massimo di 24 squadre.
+  </div>
+
   <!-- SELEZIONE CATEGORIA -->
   <div class="cat-selector" id="catSelector">
     <div class="cat-title">Seleziona la categoria della tua squadra</div>
     <div class="cat-grid cat-grid-4">
-      <button class="cat-btn" onclick="selectCat('senior',this)">
+      <button class="cat-btn cat-btn-disabled" id="btnSenior" onclick="return false;">
         <span class="cat-icon">🏀</span>
         Senior
-        <span class="cat-sub">Campionato adulti</span>
+        <span class="cat-sub" style="color:var(--danger);font-weight:600;">Iscrizioni chiuse (24/24)</span>
       </button>
       <button class="cat-btn" onclick="selectCat('over40',this)">
         <span class="cat-icon">🏆</span>
@@ -278,6 +284,7 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKPoIyUK9N1vD-
 const taglie = ['','M','L','XL','XXL','XXXL'];
 let players = [], nextId = 0;
 let categoria = '';
+const SENIOR_CHIUSO = true; // 24/24 squadre raggiunte
 
 // Quota d'iscrizione per atleta in base alla categoria
 const QUOTA_PER_ATLETA = {
@@ -288,6 +295,7 @@ const QUOTA_PER_ATLETA = {
 };
 
 function selectCat(cat, el) {
+  if (cat === 'senior' && SENIOR_CHIUSO) return;
   categoria = cat;
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
