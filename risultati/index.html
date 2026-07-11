@@ -280,8 +280,11 @@
   .bracket-match{
     background: var(--bg-card); border:1px solid var(--line); border-radius:4px; padding:8px 10px; font-size:12px;
   }
-  .bracket-match .t{ display:flex; justify-content:space-between; padding:3px 0; }
+  .bracket-match .t{ display:flex; justify-content:space-between; padding:3px 0; gap:8px; }
   .bracket-match .t.win{ color:var(--gold); font-weight:700; }
+  .bracket-match .t .tn{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bracket-match .t .ts{ flex-shrink:0; color:var(--muted); }
+  .bracket-match .t.win .ts{ color:var(--gold); }
 
   /* ---- SPONSOR ---- */
   .sponsor-tier-label{
@@ -341,6 +344,13 @@
     font-size:12px; color:var(--muted); line-height:1.5;
   }
   .note-box b{ color:var(--white); }
+
+  .data-status{
+    margin: 10px 18px 0; font-size:10px; color:var(--muted); text-align:right;
+    display:flex; align-items:center; justify-content:flex-end; gap:6px;
+  }
+  .data-status .dot{ width:6px; height:6px; border-radius:50%; background:#4caf50; }
+  .data-status.err .dot{ background:#ff5c5c; }
 
   footer{
     text-align:center; padding: 30px 20px 40px; color:var(--muted); font-size:11px; border-top:1px solid var(--line); margin-top:20px;
@@ -472,86 +482,50 @@
   <!-- ============ RISULTATI E CALENDARIO ============ -->
   <section class="section" id="risultati">
     <div class="section-heading"><span class="num">02</span><h2>Risultati e Calendario</h2></div>
-    <div class="section-sub">Senior & Over40 — fase a gironi + mini-gironi finali</div>
+    <div class="section-sub">Senior & Over40 — fase a gironi + fase finale del venerdì</div>
     <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripRisultati"></div></div>
 
-    <div class="tabs-inline">
+    <div class="tabs-inline" id="catPillsRisultati">
       <div class="pill active" data-cat="senior">Senior</div>
       <div class="pill" data-cat="over40">Over40</div>
     </div>
 
-    <div class="card">
-      <div class="card-head">Girone A <span class="live">LIVE</span></div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th><th>PF</th><th>PS</th></tr></thead>
-          <tbody>
-            <tr><td>—</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
-            <tr><td>—</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
-            <tr><td>—</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="tabs-inline" id="dayPillsRisultati">
+      <div class="pill active" data-day="lunedi">Lun 13/07</div>
+      <div class="pill" data-day="martedi">Mar 14/07</div>
+      <div class="pill" data-day="mercoledi">Mer 15/07</div>
+      <div class="pill" data-day="giovedi">Gio 16/07</div>
+    </div>
+
+    <div id="gironiContainer">
+      <!-- Le card dei gironi (A/B/C per Senior, A/B/generale per Over40) vengono generate da JS -->
     </div>
 
     <div class="card">
-      <div class="card-head">Girone B</div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th><th>PF</th><th>PS</th></tr></thead>
-          <tbody>
-            <tr><td>—</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-head">Girone C</div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th><th>PF</th><th>PS</th></tr></thead>
-          <tbody>
-            <tr><td>—</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
-          </tbody>
-        </table>
+      <div class="card-head">Calendario del giorno</div>
+      <div id="calendarioGiornoBody">
+        <div class="match-row"><div class="match-teams"><span>Caricamento calendario…</span></div></div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-head">Prossime partite</div>
-      <div class="match-row">
-        <div class="match-teams">
-          <span>Squadra A vs Squadra B</span>
-          <span class="match-meta">Girone A · Campo 1 · Lun 13/07</span>
-        </div>
-        <div class="match-score">20:30</div>
-      </div>
-      <div class="match-row">
-        <div class="match-teams">
-          <span>Squadra C vs Squadra D</span>
-          <span class="match-meta">Girone B · Campo 2 · Lun 13/07</span>
-        </div>
-        <div class="match-score">20:30</div>
+      <div id="prossimePartiteBody">
+        <div class="match-row"><div class="match-teams"><span>Caricamento…</span></div></div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-head">Mini-gironi finali (FA · FB · FC) — Ven 17/07</div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th></tr></thead>
-          <tbody>
-            <tr><td>—</td><td>0</td><td>0</td><td>0</td></tr>
-          </tbody>
-        </table>
+    <div class="card" id="triangolariCard">
+      <div class="card-head">Triangolari finali (Ven 17/07)</div>
+      <div class="table-scroll" id="triangolariBody">
+        <div class="match-row"><div class="match-teams"><span>Disponibili da venerdì 17/07</span></div></div>
       </div>
     </div>
 
     <div class="note-box">
-      I mini-gironi finali FA/FB/FC determinano le 8 qualificate ai Quarti (le prime classificate + le 2 migliori terze) — non una classifica 9°-16°, ma la vera semina della fase finale.
+      I 5 triangolari del venerdì (migliori 5 di ogni girone A/B/C) determinano le 8 qualificate ai Quarti Senior: le 5 vincenti + le 3 migliori seconde in classifica avulsa.
     </div>
-    <!-- Nota tecnica: questa sezione andrà collegata al foglio Google Sheets, ogni girone/calendario/mini-girone leggerà da un range dedicato. -->
+    <div class="data-status" id="statusRisultati"><span class="dot"></span><span class="txt">In attesa di connessione ai dati…</span></div>
   </section>
 
   <!-- ============ TABELLONE FINALE ============ -->
@@ -560,40 +534,63 @@
     <div class="section-sub">Fase a eliminazione diretta</div>
     <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripTabellone"></div></div>
 
-    <div class="tabs-inline">
+    <div class="tabs-inline" id="catPillsTabellone">
       <div class="pill active" data-cat="senior">Senior</div>
       <div class="pill" data-cat="over40">Over40</div>
     </div>
 
     <div class="bracket-hint">👉 scorri lateralmente per vedere tutto il tabellone</div>
-    <div class="bracket-scroll">
+
+    <!-- Bracket SENIOR -->
+    <div class="bracket-scroll" id="bracketSenior">
       <div class="bracket">
         <div class="bracket-round">
           <div class="rlabel">Quarti</div>
-          <div class="bracket-match"><div class="t">Qualificata 1</div><div class="t">Qualificata 2</div></div>
-          <div class="bracket-match"><div class="t">Qualificata 3</div><div class="t">Qualificata 4</div></div>
-          <div class="bracket-match"><div class="t">Qualificata 5</div><div class="t">Qualificata 6</div></div>
-          <div class="bracket-match"><div class="t">Qualificata 7</div><div class="t">Qualificata 8</div></div>
+          <div class="bracket-match" data-partita="Quarto 1"><div class="t"><span class="tn">Qualificata 1</span></div><div class="t"><span class="tn">Qualificata 2</span></div></div>
+          <div class="bracket-match" data-partita="Quarto 2"><div class="t"><span class="tn">Qualificata 3</span></div><div class="t"><span class="tn">Qualificata 4</span></div></div>
+          <div class="bracket-match" data-partita="Quarto 3"><div class="t"><span class="tn">Qualificata 5</span></div><div class="t"><span class="tn">Qualificata 6</span></div></div>
+          <div class="bracket-match" data-partita="Quarto 4"><div class="t"><span class="tn">Qualificata 7</span></div><div class="t"><span class="tn">Qualificata 8</span></div></div>
         </div>
         <div class="bracket-round">
           <div class="rlabel">Semifinali</div>
-          <div class="bracket-match"><div class="t">Vinc. Q1</div><div class="t">Vinc. Q2</div></div>
-          <div class="bracket-match"><div class="t">Vinc. Q3</div><div class="t">Vinc. Q4</div></div>
+          <div class="bracket-match" data-partita="Semifinale 1"><div class="t"><span class="tn">Vinc. Q1</span></div><div class="t"><span class="tn">Vinc. Q2</span></div></div>
+          <div class="bracket-match" data-partita="Semifinale 2"><div class="t"><span class="tn">Vinc. Q3</span></div><div class="t"><span class="tn">Vinc. Q4</span></div></div>
         </div>
         <div class="bracket-round">
           <div class="rlabel">Finale 3°/4°</div>
-          <div class="bracket-match"><div class="t">Perd. SF1</div><div class="t">Perd. SF2</div></div>
+          <div class="bracket-match" data-partita="Finale 3°/4°"><div class="t"><span class="tn">Perd. SF1</span></div><div class="t"><span class="tn">Perd. SF2</span></div></div>
         </div>
         <div class="bracket-round">
           <div class="rlabel">Finale 1°/2°</div>
-          <div class="bracket-match"><div class="t">Vinc. SF1</div><div class="t">Vinc. SF2</div></div>
+          <div class="bracket-match" data-partita="Finale 1°/2°"><div class="t"><span class="tn">Vinc. SF1</span></div><div class="t"><span class="tn">Vinc. SF2</span></div></div>
         </div>
       </div>
     </div>
 
-    <div class="note-box">
-      <b>Come si formano i Quarti (Senior):</b> le 8 qualificate arrivano dai mini-gironi finali FA/FB/FC del venerdì (le prime classificate + le 2 migliori terze). <b>Over40:</b> i Quarti sono direttamente le 8 squadre del girone O40, con torneo giocato tutto in sequenza su una metà campo, dalle 20:15 alle 22:15.
+    <!-- Bracket OVER40 -->
+    <div class="bracket-scroll" id="bracketOver40" style="display:none;">
+      <div class="bracket">
+        <div class="bracket-round">
+          <div class="rlabel">Incroci</div>
+          <div class="bracket-match" data-partita="Incrocio 1 (1 vs 4)"><div class="t"><span class="tn">1° O40</span></div><div class="t"><span class="tn">4° O40</span></div></div>
+          <div class="bracket-match" data-partita="Incrocio 2 (2 vs 3)"><div class="t"><span class="tn">2° O40</span></div><div class="t"><span class="tn">3° O40</span></div></div>
+          <div class="bracket-match" data-partita="Incrocio 3 (5 vs 8)"><div class="t"><span class="tn">5° O40</span></div><div class="t"><span class="tn">8° O40</span></div></div>
+          <div class="bracket-match" data-partita="Incrocio 4 (6 vs 7)"><div class="t"><span class="tn">6° O40</span></div><div class="t"><span class="tn">7° O40</span></div></div>
+        </div>
+        <div class="bracket-round">
+          <div class="rlabel">Finali</div>
+          <div class="bracket-match" data-partita="Finale 7°/8°"><div class="t"><span class="tn">Perd. Inc.1</span></div><div class="t"><span class="tn">Perd. Inc.2</span></div></div>
+          <div class="bracket-match" data-partita="Finale 5°/6°"><div class="t"><span class="tn">Perd. Inc.3</span></div><div class="t"><span class="tn">Perd. Inc.4</span></div></div>
+          <div class="bracket-match" data-partita="Finale 3°/4°"><div class="t"><span class="tn">?</span></div><div class="t"><span class="tn">?</span></div></div>
+          <div class="bracket-match" data-partita="Finale 1°/2°"><div class="t"><span class="tn">?</span></div><div class="t"><span class="tn">?</span></div></div>
+        </div>
+      </div>
     </div>
+
+    <div class="note-box" id="tabelloneNote">
+      <b>Come si formano i Quarti (Senior):</b> le 8 qualificate arrivano dai 5 triangolari del venerdì (le 5 vincenti + le 3 migliori seconde). <b>Over40:</b> i Quarti sono direttamente le 8 squadre del girone O40, con torneo giocato tutto in sequenza su una metà campo, dalle 20:15 alle 22:15.
+    </div>
+    <div class="data-status" id="statusTabellone"><span class="dot"></span><span class="txt">In attesa di connessione ai dati…</span></div>
   </section>
 
   <!-- ============ U19/U17 ============ -->
@@ -601,6 +598,10 @@
     <div class="section-heading"><span class="num">04</span><h2>U19 / U17</h2></div>
     <div class="section-sub">Giovedì 16/07 (Campo 2) · Fase finale venerdì 17/07</div>
     <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripU19"></div></div>
+
+    <div class="note-box">
+      Questa categoria non è ancora collegata al foglio dati: appena i gironi U19/U17 saranno definiti nel Google Sheet, questa sezione si popolerà automaticamente allo stesso modo di Senior/Over40.
+    </div>
 
     <div class="tabs-inline">
       <div class="pill active" data-cat="g1">Girone G1</div>
@@ -651,6 +652,10 @@
     <div class="section-heading"><span class="num">05</span><h2>U15 / U14</h2></div>
     <div class="section-sub">Giovedì 16/07 (Campo 1) · Fase finale venerdì 17/07</div>
     <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripU15"></div></div>
+
+    <div class="note-box">
+      Questa categoria non è ancora collegata al foglio dati: appena i gironi U15/U14 saranno definiti nel Google Sheet, questa sezione si popolerà automaticamente allo stesso modo di Senior/Over40.
+    </div>
 
     <div class="tabs-inline">
       <div class="pill active" data-cat="g1">Girone G1</div>
@@ -768,6 +773,19 @@
 </main>
 
 <script>
+  // ==========================================================================
+  // CONFIGURAZIONE DATI TORNEO — Apps Script Web App collegato al Google Sheet
+  // ==========================================================================
+  // 1. Deploya Code.gs come App Web (accesso "Chiunque"), copia l'URL /exec
+  // 2. Incollalo qui sotto tra le virgolette.
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAaaihsO4LC32UWxnSYPbQ5goR2FmYuPIPef-YdWKew4enJFm4QuOZ4bEQAejGqOby/exec";
+  const REFRESH_MS = 60000; // ogni 60 secondi
+
+  let TORNEO_DATA = null;
+  let currentCatRisultati = 'senior';
+  let currentDayRisultati = 'lunedi';
+  let currentCatTabellone = 'senior';
+
   // ---- Navigazione tra sezioni ----
   const links = document.querySelectorAll('[data-target]');
   const sections = document.querySelectorAll('.section');
@@ -794,14 +812,36 @@
   document.getElementById('drawerClose').addEventListener('click', closeDrawer);
   overlay.addEventListener('click', closeDrawer);
 
-  // ---- Pillole categoria (Senior / Over40) — placeholder di interazione ----
-  document.querySelectorAll('.tabs-inline').forEach(group => {
-    group.querySelectorAll('.pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        group.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        // TODO: quando colleghiamo i dati, qui si farà il fetch/filtro per categoria (Senior vs Over40)
-      });
+  // ---- Pillole categoria Risultati (Senior / Over40) ----
+  document.getElementById('catPillsRisultati').querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.getElementById('catPillsRisultati').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentCatRisultati = pill.dataset.cat;
+      renderGironi();
+      renderTriangolari();
+    });
+  });
+
+  // ---- Pillole giorno (Lun/Mar/Mer/Gio) ----
+  document.getElementById('dayPillsRisultati').querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.getElementById('dayPillsRisultati').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentDayRisultati = pill.dataset.day;
+      renderCalendarioGiorno();
+    });
+  });
+
+  // ---- Pillole categoria Tabellone (Senior / Over40) ----
+  document.getElementById('catPillsTabellone').querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.getElementById('catPillsTabellone').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentCatTabellone = pill.dataset.cat;
+      document.getElementById('bracketSenior').style.display = currentCatTabellone === 'senior' ? '' : 'none';
+      document.getElementById('bracketOver40').style.display = currentCatTabellone === 'over40' ? '' : 'none';
+      document.getElementById('tabelloneNote').style.display = currentCatTabellone === 'senior' ? '' : 'none';
     });
   });
 
@@ -828,6 +868,184 @@
 
   // ---- Link iscrizioni: da collegare al form esistente ----
   document.getElementById('iscrizioniLink').href = 'https://risorto91.github.io/Roncacity_Playgroud/';
+
+  // ==========================================================================
+  // FETCH DATI TORNEO DAL GOOGLE SHEET (via Apps Script)
+  // ==========================================================================
+  async function fetchTorneoData(){
+    const statusEls = [document.getElementById('statusRisultati'), document.getElementById('statusTabellone')];
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('INCOLLA_QUI') !== -1){
+      statusEls.forEach(el => {
+        el.classList.add('err');
+        el.querySelector('.txt').textContent = 'Collegamento dati non configurato (APPS_SCRIPT_URL)';
+      });
+      return;
+    }
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, { cache: 'no-store' });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || 'Errore sconosciuto');
+      TORNEO_DATA = json;
+      const stamp = new Date(json.generatedAt).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+      statusEls.forEach(el => {
+        el.classList.remove('err');
+        el.querySelector('.txt').textContent = 'Dati aggiornati alle ' + stamp;
+      });
+      renderAll();
+    } catch (err) {
+      statusEls.forEach(el => {
+        el.classList.add('err');
+        el.querySelector('.txt').textContent = 'Errore nel caricamento dati: ' + err.message;
+      });
+      console.error('Errore fetch dati torneo:', err);
+    }
+  }
+
+  function renderAll(){
+    renderGironi();
+    renderCalendarioGiorno();
+    renderProssimePartite();
+    renderTriangolari();
+    renderTabellone();
+  }
+
+  // ---- Trova un blocco "Classifiche" per titolo (match parziale, case-insensitive) ----
+  function findBlocco(titoloParziale){
+    if (!TORNEO_DATA) return null;
+    const t = titoloParziale.toLowerCase();
+    return (TORNEO_DATA.classifiche || []).find(b => b.titolo.toLowerCase().indexOf(t) !== -1) || null;
+  }
+
+  function classificaTableHTML(righe, extraCols){
+    extraCols = extraCols || [];
+    let head = '<tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th><th>PF</th><th>PS</th><th>Diff</th></tr>';
+    let body = righe.map(r => {
+      const squadra = r['Squadra'] || '—';
+      return `<tr><td>${squadra}</td><td>${r['PG'] ?? 0}</td><td>${r['V'] ?? 0}</td><td>${r['S'] ?? 0}</td><td>${r['PF'] ?? 0}</td><td>${r['PS'] ?? 0}</td><td>${r['DIFF'] ?? 0}</td></tr>`;
+    }).join('');
+    return `<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
+  }
+
+  function renderGironi(){
+    const container = document.getElementById('gironiContainer');
+    if (!TORNEO_DATA){ container.innerHTML = ''; return; }
+
+    let cards = [];
+    if (currentCatRisultati === 'senior'){
+      ['GIRONE A — Main', 'GIRONE B — Main', 'GIRONE C — Main'].forEach(titolo => {
+        const b = findBlocco(titolo);
+        if (b) cards.push({ head: titolo.replace(' — Main',''), html: classificaTableHTML(b.righe) });
+      });
+    } else {
+      const a = findBlocco('OVER40 — GIRONE A');
+      const bb = findBlocco('OVER40 — GIRONE B');
+      const gen = findBlocco('OVER40 — CLASSIFICA GENERALE');
+      if (a) cards.push({ head: 'Over40 · Girone A', html: classificaTableHTML(a.righe) });
+      if (bb) cards.push({ head: 'Over40 · Girone B', html: classificaTableHTML(bb.righe) });
+      if (gen){
+        const rows = gen.righe.map(r => `<tr><td>${r['Posizione']}</td><td>${r['Squadra'] || '—'}</td><td>${r['Incrocio di riferimento'] || ''}</td></tr>`).join('');
+        cards.push({ head: 'Over40 · Classifica generale (post incroci)', html: `<table><thead><tr><th>Pos</th><th>Squadra</th><th>Incrocio</th></tr></thead><tbody>${rows}</tbody></table>` });
+      }
+    }
+
+    container.innerHTML = cards.map(c => `
+      <div class="card">
+        <div class="card-head">${c.head}</div>
+        <div class="table-scroll">${c.html}</div>
+      </div>
+    `).join('') || '<div class="note-box">Nessun dato disponibile per questa categoria.</div>';
+  }
+
+  function matchRowHTML(m){
+    const casa = m['Squadra Casa'] || m['Squadra/Slot Casa'] || '—';
+    const trasferta = m['Squadra Trasferta'] || m['Squadra/Slot Trasferta'] || '—';
+    const campo = m['Campo'] ? `Campo ${m['Campo']}` : '';
+    const meta = m['Meta'] ? ` · metà ${m['Meta']}` : '';
+    const girone = m['Girone'] ? `Girone ${m['Girone']} · ` : '';
+    const scoreOrTime = m.giocata
+      ? `${m['Punti Casa']} - ${m['Punti Trasferta']}`
+      : (m['Orario'] || '');
+    return `
+      <div class="match-row">
+        <div class="match-teams">
+          <span>${casa} vs ${trasferta}</span>
+          <span class="match-meta">${girone}${campo}${meta}</span>
+        </div>
+        <div class="match-score">${scoreOrTime}</div>
+      </div>`;
+  }
+
+  function renderCalendarioGiorno(){
+    const el = document.getElementById('calendarioGiornoBody');
+    if (!TORNEO_DATA){ return; }
+    const giorno = TORNEO_DATA.calendario ? TORNEO_DATA.calendario[currentDayRisultati] : null;
+    if (!giorno || !giorno.length){
+      el.innerHTML = '<div class="match-row"><div class="match-teams"><span>Nessuna partita in programma per questo giorno.</span></div></div>';
+      return;
+    }
+    const filtro = currentCatRisultati === 'senior' ? 'Main' : 'Over40';
+    const rows = giorno.filter(m => (m['Torneo'] || '').indexOf(filtro) !== -1);
+    el.innerHTML = (rows.length ? rows : giorno).map(matchRowHTML).join('');
+  }
+
+  function renderProssimePartite(){
+    const el = document.getElementById('prossimePartiteBody');
+    if (!TORNEO_DATA){ return; }
+    const giorni = ['lunedi','martedi','mercoledi','giovedi'];
+    let tutte = [];
+    giorni.forEach(g => {
+      const arr = TORNEO_DATA.calendario[g] || [];
+      arr.forEach(m => tutte.push(Object.assign({ giorno: g }, m)));
+    });
+    const daGiocare = tutte.filter(m => !m.giocata);
+    const prossime = daGiocare.slice(0, 6);
+    if (!prossime.length){
+      el.innerHTML = '<div class="match-row"><div class="match-teams"><span>Tutte le partite dei gironi sono state giocate.</span></div></div>';
+      return;
+    }
+    el.innerHTML = prossime.map(matchRowHTML).join('');
+  }
+
+  function renderTriangolari(){
+    const wrap = document.getElementById('triangolariCard');
+    const body = document.getElementById('triangolariBody');
+    if (currentCatRisultati !== 'senior'){ wrap.style.display = 'none'; return; }
+    wrap.style.display = '';
+    if (!TORNEO_DATA){ return; }
+    const blocchi = (TORNEO_DATA.classifiche || []).filter(b => b.titolo.toUpperCase().indexOf('TRIANGOLARE') === 0);
+    if (!blocchi.length){
+      body.innerHTML = '<div class="match-row"><div class="match-teams"><span>Disponibili da venerdì 17/07</span></div></div>';
+      return;
+    }
+    body.innerHTML = blocchi.map(b => {
+      const rows = b.righe.map(r => `<tr><td>${r['Squadra'] || '—'}</td><td>${r['V'] ?? 0}</td><td>${r['DIFF'] ?? 0}</td><td>${r['PF'] ?? 0}</td></tr>`).join('');
+      return `<div style="padding:10px 16px; font-size:12px; color:var(--gold); font-weight:700;">${b.titolo}</div>
+        <table><thead><tr><th>Squadra</th><th>V</th><th>Diff</th><th>PF</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }).join('');
+  }
+
+  // ---- Tabellone finale (Senior + Over40) ----
+  function renderTabellone(){
+    if (!TORNEO_DATA || !TORNEO_DATA.tabellone) return;
+    TORNEO_DATA.tabellone.forEach(riga => {
+      const partita = riga['Partita'];
+      if (!partita) return;
+      const box = document.querySelector(`.bracket-match[data-partita="${CSS.escape(partita)}"]`);
+      if (!box) return;
+      const s1 = riga['Squadra 1'], s2 = riga['Squadra 2'];
+      const p1 = riga['Punti 1'], p2 = riga['Punti 2'];
+      const vincitore = riga['Vincitore'];
+      const hasScore = (p1 !== null && p1 !== '' && p1 !== undefined) && (p2 !== null && p2 !== '' && p2 !== undefined);
+      const nome1 = (s1 && s1 !== 'TBD') ? s1 : box.children[0].querySelector('.tn').textContent;
+      const nome2 = (s2 && s2 !== 'TBD') ? s2 : box.children[1].querySelector('.tn').textContent;
+      const win1 = vincitore && s1 && vincitore === s1;
+      const win2 = vincitore && s2 && vincitore === s2;
+      box.innerHTML = `
+        <div class="t${win1 ? ' win' : ''}"><span class="tn">${nome1}</span>${hasScore ? `<span class="ts">${p1}</span>` : ''}</div>
+        <div class="t${win2 ? ' win' : ''}"><span class="tn">${nome2}</span>${hasScore ? `<span class="ts">${p2}</span>` : ''}</div>
+      `;
+    });
+  }
 
   // ---- SPONSOR: elenco dati da compilare man mano che arrivano loghi/link ----
   // Per ogni sponsor: { name, logo (percorso file), link (url sito), caption (solo per Title) }
@@ -935,6 +1153,12 @@
   renderSponsorStrip('stripU19', [6,7,8]);
   renderSponsorStrip('stripU15', [9,10,11]);
   renderSponsorStrip('stripGalleria', [12,13,0]);
+
+  // ==========================================================================
+  // AVVIO: primo caricamento dati + refresh periodico
+  // ==========================================================================
+  fetchTorneoData();
+  setInterval(fetchTorneoData, REFRESH_MS);
 </script>
 
 </body>
