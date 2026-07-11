@@ -64,8 +64,15 @@
   .panel-title h1{ font-family:'Anton',sans-serif; font-size:clamp(22px,3vw,42px); }
   .panel-title .sub{ font-size:clamp(11px,1.2vw,15px); color:var(--muted); margin-left:auto; }
 
+  /* ---- Corpo scrollabile del pannello (scroll automatico gestito da JS) ---- */
+  .panel-body{
+    flex:1; overflow-y:auto; overflow-x:hidden; display:flex; flex-direction:column;
+    scrollbar-width:none; -ms-overflow-style:none;
+  }
+  .panel-body::-webkit-scrollbar{ width:0; height:0; }
+
   /* ---- Match list ---- */
-  .match-grid{ flex:1; display:grid; grid-template-columns: 1fr 1fr; gap: clamp(8px,1vw,16px); align-content:start; overflow:hidden; }
+  .match-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: clamp(8px,1vw,16px); align-content:start; }
   .match-card{
     background: var(--bg-card); border:1px solid var(--line); border-radius:8px;
     padding: clamp(10px,1.2vw,18px) clamp(14px,1.6vw,24px);
@@ -85,23 +92,26 @@
   .empty-msg{ flex:1; display:flex; align-items:center; justify-content:center; font-family:'Anton',sans-serif; font-size:clamp(18px,2.4vw,30px); color:var(--muted); text-align:center; }
 
   /* ---- Classifiche (una tabella grande a pannello) ---- */
-  .class-wrap{ flex:1; display:flex; flex-direction:column; overflow:hidden; }
-  .class-block{ background: var(--bg-card); border:1px solid var(--line); border-radius:8px; overflow:hidden; display:flex; flex-direction:column; flex:1; }
+  .class-block{ background: var(--bg-card); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
   .class-block table{ width:100%; border-collapse:collapse; }
   .class-block th{
-    text-align:left; padding: clamp(8px,1vw,14px) clamp(14px,1.6vw,22px);
-    font-size:clamp(11px,1.1vw,14px); color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;
+    text-align:left; padding: clamp(6px,0.8vw,11px) clamp(12px,1.4vw,20px);
+    font-size:clamp(10px,1vw,13px); color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;
     border-bottom:1px solid var(--line);
   }
-  .class-block td{ padding: clamp(9px,1.1vw,16px) clamp(14px,1.6vw,22px); font-size:clamp(15px,1.7vw,22px); border-bottom:1px solid var(--line); }
+  .class-block td{ padding: clamp(7px,0.9vw,13px) clamp(12px,1.4vw,20px); font-size:clamp(13px,1.4vw,18px); border-bottom:1px solid var(--line); }
   .class-block td.num{ text-align:center; color:var(--muted); }
   .class-block tr:last-child td{ border-bottom:none; }
   .class-block td.squadra{ font-weight:700; }
-  .class-block tr.qualified{ background: rgba(95,211,141,0.10); }
-  .class-block tr.qualified td.num.pos{ color:var(--qual); font-weight:800; }
-  .class-block tr.qualified td.squadra::after{ content:' ✓'; color:var(--qual); }
-  .class-legend{ margin-top: clamp(6px,0.8vw,12px); font-size:clamp(10px,1vw,13px); color:var(--muted); display:flex; align-items:center; gap:8px; }
-  .class-legend .sw{ width:12px; height:12px; border-radius:3px; background: rgba(95,211,141,0.35); border:1px solid var(--qual); }
+  .class-block table.dense th{ padding: clamp(5px,0.6vw,9px) clamp(10px,1.1vw,16px); font-size:clamp(9px,0.9vw,12px); }
+  .class-block table.dense td{ padding: clamp(5px,0.6vw,9px) clamp(10px,1.1vw,16px); font-size:clamp(11px,1.2vw,15px); }
+  /* Evidenziazione qualificate — tema Lakers (oro/viola), leggera, nessuna spunta */
+  .class-block tr.qualified{
+    background: linear-gradient(90deg, rgba(227,178,60,0.10), rgba(74,35,132,0.10));
+    border-left: 3px solid var(--gold-dim);
+  }
+  .class-legend{ margin-top: clamp(6px,0.8vw,12px); font-size:clamp(10px,1vw,13px); color:var(--muted); display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .class-legend .sw{ width:14px; height:14px; border-radius:3px; background: linear-gradient(135deg, var(--gold), var(--purple)); }
 
   /* ---- Nav bar (selezione manuale) ---- */
   .tv-nav{
@@ -149,22 +159,20 @@
   @keyframes sponsorScroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
   /* ---- Programma di giornata (agenda per fasi, venerdì) ---- */
-  .agenda-scroll{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap: clamp(10px,1.2vw,18px); }
-  .agenda-scroll::-webkit-scrollbar{ width:5px; }
-  .agenda-scroll::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
   .agenda-fase{
     font-family:'Anton',sans-serif; color:var(--gold); font-size:clamp(13px,1.4vw,18px);
     padding-left:10px; border-left:3px solid var(--gold-dim); margin-bottom:6px;
   }
+  .agenda-block{ margin-bottom: clamp(10px,1.2vw,18px); }
   .match-grid.compact{ margin-bottom:2px; }
 
   /* ---- Riepilogo Gironi (3 mini tabelle affiancate) ---- */
-  .class-grid-3{ flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px,1.2vw,18px); overflow:hidden; }
+  .class-grid-3{ display:grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px,1.2vw,18px); align-items:start; }
   .class-grid-3 .class-block .cb-head{
     padding: clamp(6px,0.8vw,12px) clamp(10px,1.2vw,16px); background: rgba(227,178,60,0.08);
     border-bottom:1px solid var(--line); font-family:'Anton',sans-serif; font-size:clamp(12px,1.3vw,16px); color:var(--gold);
   }
-  .class-grid-3 .class-block td, .class-grid-3 .class-block th{ padding: clamp(5px,0.6vw,9px) clamp(8px,1vw,14px); font-size:clamp(11px,1.2vw,15px); }
+  .class-grid-3 .class-block td, .class-grid-3 .class-block th{ padding: clamp(4px,0.5vw,8px) clamp(7px,0.9vw,12px); font-size:clamp(10px,1.05vw,13px); }
 
   .loading-screen{
     position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -183,7 +191,7 @@
 
 <div class="tv-header">
   <div class="brand">
-    <img src="assets/logo.png" alt="Ronca City Playground">
+    <img src="../assets/logo.png" alt="Ronca City Playground">
     <div class="brand-text">
       <div class="l1">Ronca City Playground</div>
       <div class="l2">3v3 · 2026</div>
@@ -210,8 +218,12 @@
   // ==========================================================================
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAaaihsO4LC32UWxnSYPbQ5goR2FmYuPIPef-YdWKew4enJFm4QuOZ4bEQAejGqOby/exec";
   const DATA_REFRESH_MS = 60000;   // ogni 60s ricarica i dati
-  const PANEL_DURATION_MS = 10000; // ogni 10s cambia pannello (quando in play)
+  const PANEL_DURATION_MS = 10000; // durata minima di un pannello senza scroll (quando in play)
   const QUALIFY_TOP_N = 5;         // le prime N di ogni girone Senior si qualificano ai Triangolari
+  // Percorso della cartella assets rispetto a questo file. Questo file vive in Dashboard_TV/,
+  // mentre assets/ sta nella cartella principale del sito: da qui "../assets/".
+  // Se sposti il file altrove, aggiorna solo questa riga.
+  const ASSET_BASE = "../assets/";
 
   const DAY_LABELS = { lunedi:'Lun 13/07', martedi:'Mar 14/07', mercoledi:'Mer 15/07', giovedi:'Gio 16/07', venerdi:'Ven 17/07 — Finale' };
   const DATE_TO_DAY = {
@@ -227,30 +239,31 @@
   let currentDayKey = null;
 
   // ==========================================================================
-  // SPONSOR — stessa lista/loghi del sito principale (assets/sponsor/...)
+  // SPONSOR — stessa lista/loghi del sito principale (in assets/sponsor/...)
+  // I nomi file restano relativi: il prefisso ASSET_BASE viene aggiunto in renderSponsorMarquee.
   // ==========================================================================
   const sponsorsMarquee = [
-    { name:"Effedi Salotti", logo:"assets/sponsor/effedi-salotti.png" },
-    { name:"Erlux", logo:"assets/sponsor/erlux.png" },
-    { name:"Fideuram Private Banker", logo:"assets/sponsor/fideuram.png" },
-    { name:"Locanda Appennino", logo:"assets/sponsor/locanda-appennino.png", noPlate:true },
-    { name:"Lynk & Co Romagnauto", logo:"assets/sponsor/lynk-co.png" },
-    { name:"Olitalia", logo:"assets/sponsor/olitalia.png" },
-    { name:"Sport Service", logo:"assets/sponsor/sport-service.png" },
-    { name:"Stargrafic", logo:"assets/sponsor/stargrafic.png" },
-    { name:"Unieuro", logo:"assets/sponsor/unieuro.png" },
-    { name:"Adjutor", logo:"assets/sponsor/adjutor.png" },
-    { name:"Brico Ok", logo:"assets/sponsor/brico-ok.png" },
-    { name:"Emmeci", logo:"assets/sponsor/emmeci.png" },
-    { name:"Curcio Agenzia Immobiliare", logo:"assets/sponsor/curcio.png" },
-    { name:"Visani", logo:"assets/sponsor/visani.png" },
-    { name:"Caffitaly System", logo:"assets/sponsor/caffitaly.png" },
-    { name:"Da Giovanni - Osteria Buscherini", logo:"assets/sponsor/da-giovanni.png" },
-    { name:"Korasol Beach Restaurant & Sport", logo:"assets/sponsor/korasol.png" },
-    { name:"Pallacanestro Forlì 2015", logo:"assets/sponsor/pallacanestro-forli.png" },
-    { name:"Gioielleria Pretolani", logo:"assets/sponsor/pretolani.png" },
-    { name:"Farmacia San Martino", logo:"assets/sponsor/san-martino.png" },
-    { name:"Art Immagine", logo:"assets/sponsor/art-immagine.png" }
+    { name:"Effedi Salotti", logo:"sponsor/effedi-salotti.png" },
+    { name:"Erlux", logo:"sponsor/erlux.png" },
+    { name:"Fideuram Private Banker", logo:"sponsor/fideuram.png" },
+    { name:"Locanda Appennino", logo:"sponsor/locanda-appennino.png", noPlate:true },
+    { name:"Lynk & Co Romagnauto", logo:"sponsor/lynk-co.png" },
+    { name:"Olitalia", logo:"sponsor/olitalia.png" },
+    { name:"Sport Service", logo:"sponsor/sport-service.png" },
+    { name:"Stargrafic", logo:"sponsor/stargrafic.png" },
+    { name:"Unieuro", logo:"sponsor/unieuro.png" },
+    { name:"Adjutor", logo:"sponsor/adjutor.png" },
+    { name:"Brico Ok", logo:"sponsor/brico-ok.png" },
+    { name:"Emmeci", logo:"sponsor/emmeci.png" },
+    { name:"Curcio Agenzia Immobiliare", logo:"sponsor/curcio.png" },
+    { name:"Visani", logo:"sponsor/visani.png" },
+    { name:"Caffitaly System", logo:"sponsor/caffitaly.png" },
+    { name:"Da Giovanni - Osteria Buscherini", logo:"sponsor/da-giovanni.png" },
+    { name:"Korasol Beach Restaurant & Sport", logo:"sponsor/korasol.png" },
+    { name:"Pallacanestro Forlì 2015", logo:"sponsor/pallacanestro-forli.png" },
+    { name:"Gioielleria Pretolani", logo:"sponsor/pretolani.png" },
+    { name:"Farmacia San Martino", logo:"sponsor/san-martino.png" },
+    { name:"Art Immagine", logo:"sponsor/art-immagine.png" }
   ];
 
   function renderSponsorMarquee(){
@@ -258,7 +271,7 @@
     if (!track) return;
     const itemHTML = s => {
       const cls = s.noPlate ? 'sponsor-item noplate' : 'sponsor-item';
-      const inner = s.logo ? `<img src="${s.logo}" alt="${s.name}">` : `<span class="txt">${s.name}</span>`;
+      const inner = s.logo ? `<img src="${ASSET_BASE}${s.logo}" alt="${s.name}">` : `<span class="txt">${s.name}</span>`;
       return `<div class="${cls}">${inner}</div>`;
     };
     // lista duplicata per loop infinito senza scatti
