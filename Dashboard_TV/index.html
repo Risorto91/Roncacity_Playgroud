@@ -1,1 +1,694 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ronca City Playground 2026 — Dashboard TV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0d; --bg-card:#17151d; --gold:#e3b23c; --gold-dim:#a9812b;
+    --purple:#4a2384; --white:#f6f3ec; --muted:#9d97a3; --line:#2c2a35;
+    --green:#4caf50; --red:#ff5c5c; --qual:#5fd38d;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{ width:100%; height:100%; overflow:hidden; }
+  body{
+    background:
+      radial-gradient(ellipse 1400px 800px at 10% -10%, rgba(74,35,132,0.35), transparent 60%),
+      radial-gradient(ellipse 1000px 600px at 100% 0%, rgba(227,178,60,0.10), transparent 55%),
+      var(--bg);
+    color:var(--white); font-family:'Inter',sans-serif;
+    display:flex; flex-direction:column; height:100vh;
+  }
+  .display{ font-family:'Anton',sans-serif; text-transform:uppercase; letter-spacing:0.02em; }
 
+  /* ---- HEADER ---- */
+  .tv-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: clamp(10px,1.4vw,20px) clamp(24px,3vw,48px);
+    border-bottom:1px solid var(--line);
+    background: rgba(10,10,13,0.6);
+  }
+  .tv-header .brand{ display:flex; align-items:center; gap:14px; }
+  .tv-header .brand img{ height:clamp(30px,3.4vw,48px); }
+  .tv-header .brand-text .l1{ font-family:'Anton',sans-serif; font-size:clamp(16px,2vw,26px); letter-spacing:0.02em; }
+  .tv-header .brand-text .l2{ font-size:clamp(9px,0.9vw,12px); color:var(--gold); letter-spacing:0.18em; }
+  .tv-header .right{ display:flex; align-items:center; gap:18px; }
+  .tv-header .day-badge{
+    font-family:'Anton',sans-serif; font-size:clamp(12px,1.2vw,16px); color:var(--gold);
+    border:1px solid var(--gold-dim); border-radius:20px; padding:5px 14px;
+    background: rgba(227,178,60,0.08);
+  }
+  .tv-header .clock{ font-family:'Anton',sans-serif; font-size:clamp(18px,2.1vw,28px); color:var(--white); min-width:2.2em; text-align:right; }
+  .tv-header .status{ display:flex; align-items:center; gap:6px; font-size:clamp(9px,0.9vw,11px); color:var(--muted); }
+  .tv-header .status .dot{ width:8px; height:8px; border-radius:50%; background:var(--green); }
+  .tv-header .status.err .dot{ background:var(--red); }
+
+  /* ---- STAGE ---- */
+  .tv-stage{ flex:1; overflow:hidden; position:relative; }
+  .panel{
+    position:absolute; inset: clamp(14px,2vw,32px) clamp(24px,3vw,48px);
+    opacity:0; transition: opacity .5s ease;
+    display:flex; flex-direction:column;
+  }
+  .panel.active{ opacity:1; }
+
+  .panel-title{ display:flex; align-items:baseline; gap:16px; margin-bottom: clamp(10px,1.4vw,20px); }
+  .panel-title .cat{
+    font-family:'Anton',sans-serif; font-size:clamp(10px,1.1vw,14px); letter-spacing:0.14em;
+    padding: 5px 14px; border-radius:16px; border:1px solid var(--gold-dim); color:var(--gold);
+    background: rgba(227,178,60,0.08); white-space:nowrap;
+  }
+  .panel-title h1{ font-family:'Anton',sans-serif; font-size:clamp(22px,3vw,42px); }
+  .panel-title .sub{ font-size:clamp(11px,1.2vw,15px); color:var(--muted); margin-left:auto; }
+
+  /* ---- Match list ---- */
+  .match-grid{ flex:1; display:grid; grid-template-columns: 1fr 1fr; gap: clamp(8px,1vw,16px); align-content:start; overflow:hidden; }
+  .match-card{
+    background: var(--bg-card); border:1px solid var(--line); border-radius:8px;
+    padding: clamp(10px,1.2vw,18px) clamp(14px,1.6vw,24px);
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+  }
+  .match-card.done{ border-color: rgba(227,178,60,0.35); }
+  .match-teams{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+  .match-teams .mt-line{ font-size:clamp(14px,1.5vw,20px); font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .match-teams .mt-line .vs{ color:var(--muted); font-weight:400; margin:0 6px; font-size:0.8em; }
+  .match-teams .mt-line .team.winner{
+    color:var(--gold); background: rgba(227,178,60,0.16);
+    padding: 1px 7px; border-radius:4px;
+  }
+  .match-teams .mt-meta{ font-size:clamp(10px,1vw,12px); color:var(--muted); }
+  .match-score{ font-family:'Anton',sans-serif; font-size:clamp(18px,2.3vw,30px); color:var(--gold); flex-shrink:0; text-align:right; min-width: 2.4em; }
+  .match-score.time{ color:var(--white); font-size:clamp(14px,1.8vw,22px); }
+  .empty-msg{ flex:1; display:flex; align-items:center; justify-content:center; font-family:'Anton',sans-serif; font-size:clamp(18px,2.4vw,30px); color:var(--muted); text-align:center; }
+
+  /* ---- Classifiche (una tabella grande a pannello) ---- */
+  .class-wrap{ flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .class-block{ background: var(--bg-card); border:1px solid var(--line); border-radius:8px; overflow:hidden; display:flex; flex-direction:column; flex:1; }
+  .class-block table{ width:100%; border-collapse:collapse; }
+  .class-block th{
+    text-align:left; padding: clamp(8px,1vw,14px) clamp(14px,1.6vw,22px);
+    font-size:clamp(11px,1.1vw,14px); color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;
+    border-bottom:1px solid var(--line);
+  }
+  .class-block td{ padding: clamp(9px,1.1vw,16px) clamp(14px,1.6vw,22px); font-size:clamp(15px,1.7vw,22px); border-bottom:1px solid var(--line); }
+  .class-block td.num{ text-align:center; color:var(--muted); }
+  .class-block tr:last-child td{ border-bottom:none; }
+  .class-block td.squadra{ font-weight:700; }
+  .class-block tr.qualified{ background: rgba(95,211,141,0.10); }
+  .class-block tr.qualified td.num.pos{ color:var(--qual); font-weight:800; }
+  .class-block tr.qualified td.squadra::after{ content:' ✓'; color:var(--qual); }
+  .class-legend{ margin-top: clamp(6px,0.8vw,12px); font-size:clamp(10px,1vw,13px); color:var(--muted); display:flex; align-items:center; gap:8px; }
+  .class-legend .sw{ width:12px; height:12px; border-radius:3px; background: rgba(95,211,141,0.35); border:1px solid var(--qual); }
+
+  /* ---- Nav bar (selezione manuale) ---- */
+  .tv-nav{
+    display:flex; align-items:center; gap: clamp(6px,0.8vw,12px);
+    padding: clamp(8px,1vw,14px) clamp(18px,2vw,30px);
+    border-top:1px solid var(--line); background: rgba(10,10,13,0.75);
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+  }
+  .tv-nav::-webkit-scrollbar{ height:4px; }
+  .tv-nav::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
+  .nav-btn-play{
+    flex-shrink:0; width:clamp(30px,2.6vw,40px); height:clamp(30px,2.6vw,40px); border-radius:50%;
+    background: var(--bg-card); border:1px solid var(--gold-dim); color:var(--gold);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:clamp(12px,1.2vw,16px);
+  }
+  .nav-sep{ flex-shrink:0; width:1px; height:20px; background:var(--line); margin:0 4px; }
+  .nav-group-label{ flex-shrink:0; font-family:'Anton',sans-serif; font-size:clamp(9px,0.9vw,11px); color:var(--muted); letter-spacing:0.08em; margin-right:2px; }
+  .nav-pill{
+    flex-shrink:0; font-size:clamp(10px,1vw,13px); padding: clamp(5px,0.7vw,9px) clamp(10px,1.2vw,16px);
+    border-radius:16px; border:1px solid var(--line); background:var(--bg-card); color:var(--muted); cursor:pointer;
+    white-space:nowrap;
+  }
+  .nav-pill.active{ border-color:var(--gold-dim); color:var(--gold); background: rgba(227,178,60,0.1); }
+  .nav-pill.empty{ opacity:0.4; }
+
+  /* ---- Striscia sponsor scorrevole ---- */
+  .sponsor-marquee{
+    overflow:hidden; white-space:nowrap;
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    background: rgba(20,19,25,0.55);
+    padding: clamp(8px,1vw,12px) 0;
+  }
+  .sponsor-track{
+    display:inline-flex; align-items:center; gap: clamp(20px,2.4vw,36px);
+    animation: sponsorScroll 50s linear infinite;
+  }
+  .sponsor-marquee:hover .sponsor-track{ animation-play-state: paused; }
+  .sponsor-item{
+    flex-shrink:0; height: clamp(34px,3.6vw,52px); padding: 6px clamp(12px,1.4vw,20px);
+    background:#f4f2ec; border-radius:6px; display:flex; align-items:center; justify-content:center;
+  }
+  .sponsor-item.noplate{ background:transparent; border:1px solid var(--line); }
+  .sponsor-item img{ max-height:100%; max-width: clamp(90px,9vw,140px); object-fit:contain; }
+  .sponsor-item .txt{ color:var(--muted); font-size:12px; padding:0 6px; }
+  @keyframes sponsorScroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+
+  /* ---- Programma di giornata (agenda per fasi, venerdì) ---- */
+  .agenda-scroll{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap: clamp(10px,1.2vw,18px); }
+  .agenda-scroll::-webkit-scrollbar{ width:5px; }
+  .agenda-scroll::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
+  .agenda-fase{
+    font-family:'Anton',sans-serif; color:var(--gold); font-size:clamp(13px,1.4vw,18px);
+    padding-left:10px; border-left:3px solid var(--gold-dim); margin-bottom:6px;
+  }
+  .match-grid.compact{ margin-bottom:2px; }
+
+  /* ---- Riepilogo Gironi (3 mini tabelle affiancate) ---- */
+  .class-grid-3{ flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px,1.2vw,18px); overflow:hidden; }
+  .class-grid-3 .class-block .cb-head{
+    padding: clamp(6px,0.8vw,12px) clamp(10px,1.2vw,16px); background: rgba(227,178,60,0.08);
+    border-bottom:1px solid var(--line); font-family:'Anton',sans-serif; font-size:clamp(12px,1.3vw,16px); color:var(--gold);
+  }
+  .class-grid-3 .class-block td, .class-grid-3 .class-block th{ padding: clamp(5px,0.6vw,9px) clamp(8px,1vw,14px); font-size:clamp(11px,1.2vw,15px); }
+
+  .loading-screen{
+    position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:16px; background:var(--bg); z-index:100;
+  }
+  .loading-screen h2{ font-family:'Anton',sans-serif; font-size:clamp(20px,3vw,36px); color:var(--gold); text-align:center; padding:0 20px;}
+  .loading-screen p{ color:var(--muted); font-size:14px; text-align:center; padding: 0 30px; max-width:640px; }
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <h2>RONCA CITY PLAYGROUND — DASHBOARD TV</h2>
+  <p id="loadingMsg">Connessione ai dati del torneo…</p>
+</div>
+
+<div class="tv-header">
+  <div class="brand">
+    <img src="assets/logo.png" alt="Ronca City Playground">
+    <div class="brand-text">
+      <div class="l1">Ronca City Playground</div>
+      <div class="l2">3v3 · 2026</div>
+    </div>
+  </div>
+  <div class="right">
+    <div class="status" id="dataStatus"><span class="dot"></span><span class="txt">—</span></div>
+    <div class="day-badge" id="dayBadge">—</div>
+    <div class="clock" id="clock">--:--</div>
+  </div>
+</div>
+
+<div class="tv-stage" id="stage"></div>
+
+<div class="sponsor-marquee">
+  <div class="sponsor-track" id="sponsorTrack"></div>
+</div>
+
+<div class="tv-nav" id="tvNav"></div>
+
+<script>
+  // ==========================================================================
+  // CONFIGURAZIONE — stesso URL Apps Script usato dal sito principale
+  // ==========================================================================
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAaaihsO4LC32UWxnSYPbQ5goR2FmYuPIPef-YdWKew4enJFm4QuOZ4bEQAejGqOby/exec";
+  const DATA_REFRESH_MS = 60000;   // ogni 60s ricarica i dati
+  const PANEL_DURATION_MS = 10000; // ogni 10s cambia pannello (quando in play)
+  const QUALIFY_TOP_N = 5;         // le prime N di ogni girone Senior si qualificano ai Triangolari
+
+  const DAY_LABELS = { lunedi:'Lun 13/07', martedi:'Mar 14/07', mercoledi:'Mer 15/07', giovedi:'Gio 16/07', venerdi:'Ven 17/07 — Finale' };
+  const DATE_TO_DAY = {
+    '2026-07-13':'lunedi', '2026-07-14':'martedi', '2026-07-15':'mercoledi',
+    '2026-07-16':'giovedi', '2026-07-17':'venerdi'
+  };
+
+  let TORNEO_DATA = null;
+  let SEQUENCE = [];        // costruita dinamicamente in base al giorno
+  let seqIndex = 0;
+  let isPaused = false;
+  let panelTimer = null;
+  let currentDayKey = null;
+
+  // ==========================================================================
+  // SPONSOR — stessa lista/loghi del sito principale (assets/sponsor/...)
+  // ==========================================================================
+  const sponsorsMarquee = [
+    { name:"Effedi Salotti", logo:"assets/sponsor/effedi-salotti.png" },
+    { name:"Erlux", logo:"assets/sponsor/erlux.png" },
+    { name:"Fideuram Private Banker", logo:"assets/sponsor/fideuram.png" },
+    { name:"Locanda Appennino", logo:"assets/sponsor/locanda-appennino.png", noPlate:true },
+    { name:"Lynk & Co Romagnauto", logo:"assets/sponsor/lynk-co.png" },
+    { name:"Olitalia", logo:"assets/sponsor/olitalia.png" },
+    { name:"Sport Service", logo:"assets/sponsor/sport-service.png" },
+    { name:"Stargrafic", logo:"assets/sponsor/stargrafic.png" },
+    { name:"Unieuro", logo:"assets/sponsor/unieuro.png" },
+    { name:"Adjutor", logo:"assets/sponsor/adjutor.png" },
+    { name:"Brico Ok", logo:"assets/sponsor/brico-ok.png" },
+    { name:"Emmeci", logo:"assets/sponsor/emmeci.png" },
+    { name:"Curcio Agenzia Immobiliare", logo:"assets/sponsor/curcio.png" },
+    { name:"Visani", logo:"assets/sponsor/visani.png" },
+    { name:"Caffitaly System", logo:"assets/sponsor/caffitaly.png" },
+    { name:"Da Giovanni - Osteria Buscherini", logo:"assets/sponsor/da-giovanni.png" },
+    { name:"Korasol Beach Restaurant & Sport", logo:"assets/sponsor/korasol.png" },
+    { name:"Pallacanestro Forlì 2015", logo:"assets/sponsor/pallacanestro-forli.png" },
+    { name:"Gioielleria Pretolani", logo:"assets/sponsor/pretolani.png" },
+    { name:"Farmacia San Martino", logo:"assets/sponsor/san-martino.png" },
+    { name:"Art Immagine", logo:"assets/sponsor/art-immagine.png" }
+  ];
+
+  function renderSponsorMarquee(){
+    const track = document.getElementById('sponsorTrack');
+    if (!track) return;
+    const itemHTML = s => {
+      const cls = s.noPlate ? 'sponsor-item noplate' : 'sponsor-item';
+      const inner = s.logo ? `<img src="${s.logo}" alt="${s.name}">` : `<span class="txt">${s.name}</span>`;
+      return `<div class="${cls}">${inner}</div>`;
+    };
+    // lista duplicata per loop infinito senza scatti
+    track.innerHTML = sponsorsMarquee.map(itemHTML).join('') + sponsorsMarquee.map(itemHTML).join('');
+  }
+
+  function getCurrentDayKey(){
+    const params = new URLSearchParams(location.search);
+    if (params.get('day') && DAY_LABELS[params.get('day')]) return params.get('day');
+    const iso = new Date().toISOString().slice(0,10);
+    return DATE_TO_DAY[iso] || 'lunedi';
+  }
+
+  function updateClock(){
+    document.getElementById('clock').textContent =
+      new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // ==========================================================================
+  // FETCH DATI
+  // ==========================================================================
+  async function fetchTorneoData(){
+    const statusEl = document.getElementById('dataStatus');
+    const loading = document.getElementById('loadingScreen');
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('INCOLLA_QUI') !== -1){
+      document.getElementById('loadingMsg').textContent = 'Collegamento dati non configurato: imposta APPS_SCRIPT_URL nel file.';
+      statusEl.classList.add('err');
+      statusEl.querySelector('.txt').textContent = 'Non configurato';
+      return;
+    }
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, { cache:'no-store' });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || 'Errore sconosciuto');
+      TORNEO_DATA = json;
+      const stamp = new Date(json.generatedAt).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+      statusEl.classList.remove('err');
+      statusEl.querySelector('.txt').textContent = 'Aggiornato ' + stamp;
+      loading.style.display = 'none';
+
+      const dayKey = getCurrentDayKey();
+      const dayChanged = dayKey !== currentDayKey;
+      currentDayKey = dayKey;
+      document.getElementById('dayBadge').textContent = DAY_LABELS[dayKey] || dayKey;
+
+      const prevId = SEQUENCE[seqIndex] ? SEQUENCE[seqIndex].id : null;
+      SEQUENCE = buildSequence(dayKey);
+      markEmptiness(SEQUENCE, dayKey);
+      if (dayChanged || !prevId){
+        seqIndex = 0;
+      } else {
+        const found = SEQUENCE.findIndex(p => p.id === prevId);
+        seqIndex = found !== -1 ? found : 0;
+      }
+      renderNav();
+      renderCurrentPanel();
+      if (!panelTimer && !isPaused) startCycle();
+    } catch (err) {
+      statusEl.classList.add('err');
+      statusEl.querySelector('.txt').textContent = 'Errore dati: ' + err.message;
+      console.error('Errore fetch dati torneo (TV):', err);
+    }
+  }
+
+  // ==========================================================================
+  // HELPERS DATI
+  // ==========================================================================
+  function findBlocco(titoloParziale){
+    if (!TORNEO_DATA) return null;
+    const t = titoloParziale.toLowerCase();
+    return (TORNEO_DATA.classifiche || []).find(b => b.titolo.toLowerCase().indexOf(t) !== -1) || null;
+  }
+
+  function classifyFase(fase){
+    if (!fase) return 'eliminazione';
+    return fase.toLowerCase().indexOf('triangolare') !== -1 ? 'triangolare' : 'eliminazione';
+  }
+
+  function matchesForDay(dayKey, cat, calFilter){
+    const filtro = cat === 'senior' ? 'Main' : 'Over40';
+    if (dayKey === 'venerdi'){
+      let list = (TORNEO_DATA.calendarioFinale || [])
+        .filter(m => (m['Torneo'] || '').indexOf(filtro) !== -1)
+        .map(m => ({
+          orario: m['Orario'], campo: m['Campo'], meta: m['Meta'], fase: m['Fase'],
+          casa: m['Squadra Casa (risolta)'] || m['Squadra/Slot Casa'],
+          trasferta: m['Squadra Trasferta (risolta)'] || m['Squadra/Slot Trasferta'],
+          puntiCasa: m['Punti Casa'], puntiTrasferta: m['Punti Trasferta'],
+          giocata: !!(m['Punti Casa'] !== null && m['Punti Casa'] !== '' && m['Punti Trasferta'] !== null && m['Punti Trasferta'] !== '')
+        }));
+      if (calFilter){
+        list = list.filter(m => classifyFase(m.fase) === calFilter);
+      }
+      return list;
+    }
+    const arr = (TORNEO_DATA.calendario && TORNEO_DATA.calendario[dayKey]) || [];
+    return arr.filter(m => (m['Torneo'] || '').indexOf(filtro) !== -1).map(m => ({
+      orario: m['Orario'], campo: m['Campo'], meta: m['Meta'], girone: m['Girone'],
+      casa: m['Squadra Casa'], trasferta: m['Squadra Trasferta'],
+      puntiCasa: m['Punti Casa'], puntiTrasferta: m['Punti Trasferta'], giocata: m['giocata']
+    }));
+  }
+
+  function allDaysInOrder(){ return ['lunedi','martedi','mercoledi','giovedi','venerdi']; }
+
+  // ==========================================================================
+  // COSTRUZIONE SEQUENZA PANNELLI (dipende dal giorno)
+  // ==========================================================================
+  function buildSequence(dayKey){
+    const seq = [];
+
+    if (dayKey === 'venerdi'){
+      seq.push({ id:'sen-cal-tri', cat:'senior', type:'calendario', calFilter:'triangolare', navLabel:'Triangolari', group:'SENIOR' });
+      seq.push({ id:'sen-recap', cat:'senior', type:'classifiche', variant:'recap-gironi', navLabel:'Riepilogo Gironi', group:'SENIOR' });
+      for (let i = 1; i <= 5; i++){
+        seq.push({ id:'sen-tri-'+i, cat:'senior', type:'classifiche', variant:'triangolare', n:i, navLabel:'Triang. '+i, group:'SENIOR' });
+      }
+      seq.push({ id:'sen-cal-elim', cat:'senior', type:'calendario', calFilter:'eliminazione', navLabel:'Fase Eliminazione', group:'SENIOR' });
+    } else {
+      seq.push({ id:'sen-cal', cat:'senior', type:'calendario', navLabel:'Calendario', group:'SENIOR' });
+      ['A','B','C'].forEach(g => {
+        seq.push({ id:'sen-cl-'+g, cat:'senior', type:'classifiche', variant:'girone', girone:g, navLabel:'Girone '+g, group:'SENIOR' });
+      });
+    }
+    seq.push({ id:'sen-pro', cat:'senior', type:'prossime', navLabel:'Prossime', group:'SENIOR' });
+
+    seq.push({ id:'o40-cal', cat:'over40', type:'calendario', navLabel:'Calendario', group:'OVER40' });
+    if (dayKey === 'venerdi'){
+      seq.push({ id:'o40-gen', cat:'over40', type:'classifiche', variant:'generale', navLabel:'Generale', group:'OVER40' });
+    } else {
+      ['A','B'].forEach(g => {
+        seq.push({ id:'o40-cl-'+g, cat:'over40', type:'classifiche', variant:'girone', girone:g, navLabel:'Girone '+g, group:'OVER40' });
+      });
+    }
+    seq.push({ id:'o40-pro', cat:'over40', type:'prossime', navLabel:'Prossime', group:'OVER40' });
+
+    return seq;
+  }
+
+  // Marca def.empty=true per i pannelli senza contenuto: durante il ciclo automatico
+  // vengono saltati (restano comunque selezionabili a mano dalla barra di navigazione).
+  function markEmptiness(seq, dayKey){
+    seq.forEach(def => {
+      if (def.type === 'calendario'){
+        def.empty = matchesForDay(dayKey, def.cat, def.calFilter).length === 0;
+      } else if (def.type === 'prossime'){
+        const days = allDaysInOrder();
+        const startIdx = days.indexOf(dayKey);
+        let found = 0;
+        for (let i = startIdx; i < days.length && found === 0; i++){
+          found += matchesForDay(days[i], def.cat).filter(m => !m.giocata).length;
+        }
+        def.empty = found === 0;
+      } else if (def.type === 'classifiche'){
+        if (def.variant === 'recap-gironi'){
+          def.empty = !['A','B','C'].some(g => { const b = findBlocco(`GIRONE ${g} — Main`); return b && b.righe.length; });
+        } else if (def.variant === 'girone'){
+          const t = def.cat === 'senior' ? `GIRONE ${def.girone} — Main` : `OVER40 — GIRONE ${def.girone}`;
+          const b = findBlocco(t);
+          def.empty = !b || !b.righe.length;
+        } else if (def.variant === 'triangolare'){
+          const b = findBlocco('TRIANGOLARE ' + def.n);
+          def.empty = !b || !b.righe.length;
+        } else if (def.variant === 'generale'){
+          const b = findBlocco('OVER40 — CLASSIFICA GENERALE');
+          def.empty = !b || !b.righe.length;
+        }
+      }
+    });
+  }
+
+  // ==========================================================================
+  // RENDER PANNELLI
+  // ==========================================================================
+  function matchCardHTML(m){
+    const metaBits = [];
+    if (m.girone) metaBits.push('Girone ' + m.girone);
+    if (m.fase) metaBits.push(m.fase);
+    if (m.campo) metaBits.push('Campo ' + m.campo + (m.meta ? ' · metà ' + m.meta : ''));
+
+    let casaWin = false, trasfWin = false;
+    if (m.giocata){
+      const pc = Number(m.puntiCasa), pt = Number(m.puntiTrasferta);
+      if (!isNaN(pc) && !isNaN(pt)){
+        if (pc > pt) casaWin = true; else if (pt > pc) trasfWin = true;
+      }
+    }
+    const scoreHTML = m.giocata
+      ? `<div class="match-score">${m.puntiCasa} - ${m.puntiTrasferta}</div>`
+      : `<div class="match-score time">${m.orario || ''}</div>`;
+
+    return `
+      <div class="match-card${m.giocata ? ' done' : ''}">
+        <div class="match-teams">
+          <div class="mt-line">
+            <span class="team${casaWin ? ' winner' : ''}">${m.casa || '—'}</span><span class="vs">vs</span><span class="team${trasfWin ? ' winner' : ''}">${m.trasferta || '—'}</span>
+          </div>
+          <div class="mt-meta">${metaBits.join(' · ')}</div>
+        </div>
+        ${scoreHTML}
+      </div>`;
+  }
+
+  function renderCalendarioPanel(def, dayKey){
+    const matches = matchesForDay(dayKey, def.cat, def.calFilter);
+    const label = def.cat === 'senior' ? 'Senior' : 'Over40';
+    const titleText = def.calFilter === 'triangolare' ? 'Triangolari — Programma'
+      : def.calFilter === 'eliminazione' ? 'Fase a eliminazione — Programma'
+      : (dayKey === 'venerdi' ? 'Programma di giornata' : 'Calendario di oggi');
+
+    if (!matches.length){
+      return `
+        <div class="panel-title"><span class="cat">${label}</span><h1>${titleText}</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
+        <div class="empty-msg">Nessuna partita in programma${def.calFilter ? ' per questa fase' : ' oggi'} per ${label}</div>`;
+    }
+
+    // Venerdì: vista "agenda" raggruppata per fase (utile soprattutto per la Fase a eliminazione: Quarti, Semifinali, Finali...)
+    if (dayKey === 'venerdi'){
+      const groups = [];
+      matches.forEach(m => {
+        const faseName = m.fase || 'Programma';
+        let g = groups.find(x => x.fase === faseName);
+        if (!g){ g = { fase: faseName, items: [] }; groups.push(g); }
+        g.items.push(m);
+      });
+      const html = groups.map(g => `
+        <div class="agenda-fase">${g.fase}</div>
+        <div class="match-grid compact">${g.items.map(matchCardHTML).join('')}</div>
+      `).join('');
+      return `
+        <div class="panel-title"><span class="cat">${label}</span><h1>${titleText}</h1><span class="sub">${DAY_LABELS[dayKey]}</span></div>
+        <div class="agenda-scroll">${html}</div>`;
+    }
+
+    return `
+      <div class="panel-title"><span class="cat">${label}</span><h1>${titleText}</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
+      <div class="match-grid">${matches.map(matchCardHTML).join('')}</div>`;
+  }
+
+  function classTableHTML(righe, keySquadra, highlightTop){
+    const rows = righe.map((r,i) => {
+      const pos = Number(r['Pos'] || r['Posizione'] || (i+1));
+      const qualified = highlightTop && pos <= highlightTop;
+      return `
+      <tr class="${qualified ? 'qualified' : ''}">
+        <td class="num pos">${pos}</td>
+        <td class="squadra">${r[keySquadra] || '—'}</td>
+        <td class="num">${r['PG'] ?? ''}</td>
+        <td class="num">${r['V'] ?? ''}</td>
+        <td class="num">${r['S'] ?? ''}</td>
+        <td class="num">${r['PF'] ?? ''}</td>
+        <td class="num">${r['PS'] ?? ''}</td>
+        <td class="num">${r['DIFF'] ?? ''}</td>
+      </tr>`;
+    }).join('');
+    return `<table>
+      <thead><tr><th>#</th><th>Squadra</th><th>PG</th><th>V</th><th>S</th><th>PF</th><th>PS</th><th>Diff</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+
+  function renderClassifichePanel(def){
+    const label = def.cat === 'senior' ? 'Senior' : 'Over40';
+
+    if (def.variant === 'recap-gironi'){
+      const blocks = ['A','B','C'].map(g => {
+        const b = findBlocco(`GIRONE ${g} — Main`);
+        return { head: 'Girone ' + g, righe: b ? b.righe : [] };
+      }).filter(b => b.righe.length);
+      const body = blocks.length
+        ? `<div class="class-wrap">
+            <div class="class-grid-3">${blocks.map(b => `
+              <div class="class-block">
+                <div class="cb-head">${b.head}</div>
+                ${classTableHTML(b.righe, 'Squadra', QUALIFY_TOP_N)}
+              </div>`).join('')}</div>
+            <div class="class-legend"><span class="sw"></span> Evidenziate: qualificate ai Triangolari (vedi pannelli successivi)</div>
+          </div>`
+        : `<div class="empty-msg">Classifiche non ancora disponibili</div>`;
+      return `
+        <div class="panel-title"><span class="cat">${label}</span><h1>Riepilogo Gironi</h1><span class="sub">Fine fase a gruppi</span></div>
+        ${body}`;
+    }
+
+    let title = '', righe = [], highlightTop = 0;
+
+    if (def.variant === 'girone'){
+      const titolo = def.cat === 'senior' ? `GIRONE ${def.girone} — Main` : `OVER40 — GIRONE ${def.girone}`;
+      const b = findBlocco(titolo);
+      righe = b ? b.righe : [];
+      title = 'Girone ' + def.girone;
+      if (def.cat === 'senior') highlightTop = QUALIFY_TOP_N;
+    } else if (def.variant === 'triangolare'){
+      const b = findBlocco('TRIANGOLARE ' + def.n);
+      righe = b ? b.righe : [];
+      title = 'Triangolare ' + def.n;
+    } else if (def.variant === 'generale'){
+      const b = findBlocco('OVER40 — CLASSIFICA GENERALE');
+      righe = b ? b.righe : [];
+      title = 'Classifica generale';
+    }
+
+    const body = righe.length
+      ? `<div class="class-wrap">
+          <div class="class-block">${classTableHTML(righe, 'Squadra', highlightTop)}</div>
+          ${highlightTop ? `<div class="class-legend"><span class="sw"></span> Le prime ${highlightTop} si qualificano ai Triangolari del venerdì</div>` : ''}
+        </div>`
+      : `<div class="empty-msg">Classifica non ancora disponibile</div>`;
+
+    return `
+      <div class="panel-title"><span class="cat">${label}</span><h1>${title}</h1></div>
+      ${body}`;
+  }
+
+  function renderProssimePanel(def, dayKey){
+    const label = def.cat === 'senior' ? 'Senior' : 'Over40';
+    const days = allDaysInOrder();
+    const startIdx = days.indexOf(dayKey);
+    let found = [];
+    for (let i = startIdx; i < days.length && found.length < 8; i++){
+      const dm = matchesForDay(days[i], def.cat).filter(m => !m.giocata);
+      found = found.concat(dm);
+    }
+    found = found.slice(0, 8);
+    const body = found.length
+      ? `<div class="match-grid">${found.map(matchCardHTML).join('')}</div>`
+      : `<div class="empty-msg">Tutte le partite ${label} risultano giocate</div>`;
+    return `
+      <div class="panel-title"><span class="cat">${label}</span><h1>Prossime partite</h1></div>
+      ${body}`;
+  }
+
+  function renderPanelHTML(def, dayKey){
+    if (def.type === 'calendario') return renderCalendarioPanel(def, dayKey);
+    if (def.type === 'classifiche') return renderClassifichePanel(def);
+    if (def.type === 'prossime') return renderProssimePanel(def, dayKey);
+    return '';
+  }
+
+  function renderCurrentPanel(){
+    if (!TORNEO_DATA || !SEQUENCE.length) return;
+    const def = SEQUENCE[seqIndex];
+    const stage = document.getElementById('stage');
+    const html = renderPanelHTML(def, currentDayKey);
+    const newPanel = document.createElement('div');
+    newPanel.className = 'panel';
+    newPanel.innerHTML = html;
+    stage.querySelectorAll('.panel').forEach(p => p.remove());
+    stage.appendChild(newPanel);
+    requestAnimationFrame(() => newPanel.classList.add('active'));
+    highlightActiveNav();
+  }
+
+  // ==========================================================================
+  // NAV MANUALE + PLAY/PAUSE
+  // ==========================================================================
+  function renderNav(){
+    const nav = document.getElementById('tvNav');
+    let html = `<div class="nav-btn-play" id="playPauseBtn">${isPaused ? '▶' : '⏸'}</div><div class="nav-sep"></div>`;
+    let lastGroup = null;
+    SEQUENCE.forEach((def, i) => {
+      if (def.group !== lastGroup){
+        if (lastGroup !== null) html += `<div class="nav-sep"></div>`;
+        html += `<div class="nav-group-label">${def.group}</div>`;
+        lastGroup = def.group;
+      }
+      html += `<div class="nav-pill${def.empty ? ' empty' : ''}" data-idx="${i}" title="${def.empty ? 'Nessun dato al momento' : ''}">${def.navLabel}</div>`;
+    });
+    nav.innerHTML = html;
+
+    document.getElementById('playPauseBtn').addEventListener('click', togglePause);
+    nav.querySelectorAll('.nav-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        seqIndex = Number(pill.dataset.idx);
+        isPaused = true;
+        stopCycle();
+        renderCurrentPanel();
+        updatePlayPauseIcon();
+      });
+    });
+  }
+
+  function highlightActiveNav(){
+    document.querySelectorAll('.nav-pill').forEach((p,i) => p.classList.toggle('active', i === seqIndex));
+  }
+
+  function updatePlayPauseIcon(){
+    const btn = document.getElementById('playPauseBtn');
+    if (btn) btn.textContent = isPaused ? '▶' : '⏸';
+  }
+
+  function togglePause(){
+    isPaused = !isPaused;
+    updatePlayPauseIcon();
+    if (isPaused){ stopCycle(); } else { startCycle(); }
+  }
+
+  function startCycle(){
+    stopCycle();
+    panelTimer = setInterval(() => {
+      // salta automaticamente i pannelli senza dati (restano comunque
+      // selezionabili a mano dalla barra di navigazione)
+      let attempts = 0;
+      do {
+        seqIndex = (seqIndex + 1) % SEQUENCE.length;
+        attempts++;
+      } while (SEQUENCE[seqIndex] && SEQUENCE[seqIndex].empty && attempts < SEQUENCE.length);
+      renderCurrentPanel();
+    }, PANEL_DURATION_MS);
+  }
+  function stopCycle(){
+    if (panelTimer){ clearInterval(panelTimer); panelTimer = null; }
+  }
+
+  // Scorciatoie da tastiera: spazio = pausa/play, frecce = pannello precedente/successivo
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space'){ e.preventDefault(); togglePause(); }
+    else if (e.code === 'ArrowRight'){ seqIndex = (seqIndex + 1) % SEQUENCE.length; isPaused = true; stopCycle(); updatePlayPauseIcon(); renderCurrentPanel(); }
+    else if (e.code === 'ArrowLeft'){ seqIndex = (seqIndex - 1 + SEQUENCE.length) % SEQUENCE.length; isPaused = true; stopCycle(); updatePlayPauseIcon(); renderCurrentPanel(); }
+  });
+
+  // ==========================================================================
+  // AVVIO
+  // ==========================================================================
+  renderSponsorMarquee();
+  fetchTorneoData();
+  setInterval(fetchTorneoData, DATA_REFRESH_MS);
+</script>
+
+</body>
+</html>
