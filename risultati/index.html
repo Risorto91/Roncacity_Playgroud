@@ -495,35 +495,38 @@
       <div class="pill" data-day="martedi">Mar 14/07</div>
       <div class="pill" data-day="mercoledi">Mer 15/07</div>
       <div class="pill" data-day="giovedi">Gio 16/07</div>
+      <div class="pill" data-day="classifiche">Classifiche</div>
     </div>
 
-    <div id="gironiContainer">
-      <!-- Le card dei gironi (A/B/C per Senior, A/B/generale per Over40) vengono generate da JS -->
+    <div id="gironiContainer" style="display:none;">
+      <!-- Le card dei gironi (A/B/C per Senior, Girone Unico/Mini-girone/Finale per Over40) vengono generate da JS -->
     </div>
 
-    <div class="card">
-      <div class="card-head">Calendario del giorno</div>
-      <div id="calendarioGiornoBody">
-        <div class="match-row"><div class="match-teams"><span>Caricamento calendario…</span></div></div>
+    <div id="giornoCardsWrap">
+      <div class="card">
+        <div class="card-head">Calendario del giorno</div>
+        <div id="calendarioGiornoBody">
+          <div class="match-row"><div class="match-teams"><span>Caricamento calendario…</span></div></div>
+        </div>
       </div>
-    </div>
 
-    <div class="card">
-      <div class="card-head">Prossime partite</div>
-      <div id="prossimePartiteBody">
-        <div class="match-row"><div class="match-teams"><span>Caricamento…</span></div></div>
+      <div class="card">
+        <div class="card-head">Prossime partite</div>
+        <div id="prossimePartiteBody">
+          <div class="match-row"><div class="match-teams"><span>Caricamento…</span></div></div>
+        </div>
       </div>
-    </div>
 
-    <div class="card" id="triangolariCard">
-      <div class="card-head">Triangolari finali (Ven 17/07)</div>
-      <div class="table-scroll" id="triangolariBody">
-        <div class="match-row"><div class="match-teams"><span>Disponibili da venerdì 17/07</span></div></div>
+      <div class="card" id="triangolariCard">
+        <div class="card-head">Triangolari finali (Ven 17/07)</div>
+        <div class="table-scroll" id="triangolariBody">
+          <div class="match-row"><div class="match-teams"><span>Disponibili da venerdì 17/07</span></div></div>
+        </div>
       </div>
-    </div>
 
-    <div class="note-box">
-      I 5 triangolari del venerdì (migliori 5 di ogni girone A/B/C) determinano le 8 qualificate ai Quarti Senior: le 5 vincenti + le 3 migliori seconde in classifica avulsa.
+      <div class="note-box">
+        I 5 triangolari del venerdì (migliori 5 di ogni girone A/B/C) determinano le 8 qualificate ai Quarti Senior: le 5 vincenti + le 3 migliori seconde in classifica avulsa.
+      </div>
     </div>
     <div class="data-status" id="statusRisultati"><span class="dot"></span><span class="txt">In attesa di connessione ai dati…</span></div>
   </section>
@@ -820,20 +823,33 @@
       document.getElementById('catPillsRisultati').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
       currentCatRisultati = pill.dataset.cat;
-      renderGironi();
-      renderTriangolari();
+      updateRisultatiView();
     });
   });
 
-  // ---- Pillole giorno (Lun/Mar/Mer/Gio) ----
+  // ---- Pillole giorno (Lun/Mar/Mer/Gio/Classifiche) ----
   document.getElementById('dayPillsRisultati').querySelectorAll('.pill').forEach(pill => {
     pill.addEventListener('click', () => {
       document.getElementById('dayPillsRisultati').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
       currentDayRisultati = pill.dataset.day;
-      renderCalendarioGiorno();
+      updateRisultatiView();
     });
   });
+
+  // ---- Mostra la vista "Classifiche" oppure la vista "Calendario del giorno" ----
+  function updateRisultatiView(){
+    const isClassifiche = currentDayRisultati === 'classifiche';
+    document.getElementById('gironiContainer').style.display = isClassifiche ? '' : 'none';
+    document.getElementById('giornoCardsWrap').style.display = isClassifiche ? 'none' : '';
+    if (isClassifiche){
+      renderGironi();
+    } else {
+      renderCalendarioGiorno();
+      renderProssimePartite();
+      renderTriangolari();
+    }
+  }
 
   // ---- Pillole categoria Tabellone (Senior / Over40) ----
   document.getElementById('catPillsTabellone').querySelectorAll('.pill').forEach(pill => {
@@ -904,10 +920,7 @@
   }
 
   function renderAll(){
-    renderGironi();
-    renderCalendarioGiorno();
-    renderProssimePartite();
-    renderTriangolari();
+    updateRisultatiView();
     renderTabellone();
   }
 
