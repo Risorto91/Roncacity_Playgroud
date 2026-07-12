@@ -15,85 +15,102 @@
   *{box-sizing:border-box; margin:0; padding:0;}
   html,body{ width:100%; height:100%; overflow:hidden; }
   body{
+    background: var(--bg);
+    display:flex; align-items:center; justify-content:center;
+  }
+  /* ---- CANVAS FISSO 1920x1080 ----
+     La dashboard è progettata per una risoluzione fissa (pensata per TV 55" Full HD).
+     #tvRoot ha sempre dimensioni reali 1920x1080px; un transform:scale() calcolato via
+     JS (vedi fitToScreen()) lo adatta a qualsiasi finestra/risoluzione mantenendo
+     proporzioni e leggibilità identiche su ogni schermo, invece di ricalcolare il
+     layout con unità vw/vh (che su alcuni browser TV vengono interpretate in modo
+     incoerente ed è la causa più comune di layout "rotti"). */
+  #tvRoot{
+    width:1920px; height:1080px; flex-shrink:0;
+    transform-origin: center center;
     background:
       radial-gradient(ellipse 1400px 800px at 10% -10%, rgba(74,35,132,0.35), transparent 60%),
       radial-gradient(ellipse 1000px 600px at 100% 0%, rgba(227,178,60,0.10), transparent 55%),
       var(--bg);
     color:var(--white); font-family:'Inter',sans-serif;
-    display:flex; flex-direction:column; height:100vh;
+    display:flex; flex-direction:column; height:1080px; overflow:hidden;
   }
   .display{ font-family:'Anton',sans-serif; text-transform:uppercase; letter-spacing:0.02em; }
 
   /* ---- HEADER ---- */
   .tv-header{
     display:flex; align-items:center; justify-content:space-between;
-    padding: clamp(10px,1.4vw,20px) clamp(24px,3vw,48px);
+    padding: 20px 48px;
     border-bottom:1px solid var(--line);
     background: rgba(10,10,13,0.6);
   }
   .tv-header .brand{ display:flex; align-items:center; gap:14px; }
-  .tv-header .brand img{ height:clamp(30px,3.4vw,48px); }
-  .tv-header .brand-text .l1{ font-family:'Anton',sans-serif; font-size:clamp(16px,2vw,26px); letter-spacing:0.02em; }
-  .tv-header .brand-text .l2{ font-size:clamp(9px,0.9vw,12px); color:var(--gold); letter-spacing:0.18em; }
+  .tv-header .brand img{ height:48px; }
+  .tv-header .brand-text .l1{ font-family:'Anton',sans-serif; font-size:26px; letter-spacing:0.02em; }
+  .tv-header .brand-text .l2{ font-size:12px; color:var(--gold); letter-spacing:0.18em; }
   .tv-header .right{ display:flex; align-items:center; gap:18px; }
   .tv-header .day-badge{
-    font-family:'Anton',sans-serif; font-size:clamp(12px,1.2vw,16px); color:var(--gold);
+    font-family:'Anton',sans-serif; font-size:16px; color:var(--gold);
     border:1px solid var(--gold-dim); border-radius:20px; padding:5px 14px;
     background: rgba(227,178,60,0.08);
   }
-  .tv-header .clock{ font-family:'Anton',sans-serif; font-size:clamp(18px,2.1vw,28px); color:var(--white); min-width:2.2em; text-align:right; }
-  .tv-header .status{ display:flex; align-items:center; gap:6px; font-size:clamp(9px,0.9vw,11px); color:var(--muted); }
+  .tv-header .clock{ font-family:'Anton',sans-serif; font-size:28px; color:var(--white); min-width:2.2em; text-align:right; }
+  .tv-header .status{ display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); }
   .tv-header .status .dot{ width:8px; height:8px; border-radius:50%; background:var(--green); }
   .tv-header .status.err .dot{ background:var(--red); }
 
   /* ---- STAGE ---- */
   .tv-stage{ flex:1; overflow:hidden; position:relative; }
   .panel{
-    position:absolute; inset: clamp(14px,2vw,32px) clamp(24px,3vw,48px);
+    position:absolute; inset: 32px 48px;
     opacity:0; transition: opacity .5s ease;
     display:flex; flex-direction:column; min-height:0;
   }
   .panel.active{ opacity:1; }
 
-  .panel-title{ display:flex; align-items:baseline; gap:16px; margin-bottom: clamp(10px,1.4vw,20px); }
+  .panel-title{ display:flex; align-items:baseline; gap:16px; margin-bottom: 20px; }
   .panel-title .cat{
-    font-family:'Anton',sans-serif; font-size:clamp(10px,1.1vw,14px); letter-spacing:0.14em;
+    font-family:'Anton',sans-serif; font-size:14px; letter-spacing:0.14em;
     padding: 5px 14px; border-radius:16px; border:1px solid var(--gold-dim); color:var(--gold);
     background: rgba(227,178,60,0.08); white-space:nowrap;
   }
-  .panel-title h1{ font-family:'Anton',sans-serif; font-size:clamp(22px,3vw,42px); }
-  .panel-title .sub{ font-size:clamp(11px,1.2vw,15px); color:var(--muted); margin-left:auto; }
+  .panel-title h1{ font-family:'Anton',sans-serif; font-size:42px; }
+  .panel-title .sub{ font-size:15px; color:var(--muted); margin-left:auto; }
 
   /* ---- Match list ---- */
-  .match-grid{ flex:1; display:grid; grid-template-columns: 1fr 1fr; gap: clamp(8px,1vw,16px); align-content:start; overflow:hidden; min-height:0; }
+  .match-grid{ flex:1; display:grid; grid-template-columns: 1fr 1fr; gap: 16px; align-content:start; overflow-y:auto; overflow-x:hidden; min-height:0; }
+  .match-grid::-webkit-scrollbar{ width:5px; }
+  .match-grid::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
   .match-card{
     background: var(--bg-card); border:1px solid var(--line); border-radius:8px;
-    padding: clamp(10px,1.2vw,18px) clamp(14px,1.6vw,24px);
+    padding: 18px 24px;
     display:flex; align-items:center; justify-content:space-between; gap:14px;
   }
   .match-card.done{ border-color: rgba(227,178,60,0.35); }
   .match-teams{ display:flex; flex-direction:column; gap:6px; min-width:0; }
-  .match-teams .mt-line{ font-size:clamp(14px,1.5vw,20px); font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .match-teams .mt-line{ font-size:20px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .match-teams .mt-line .vs{ color:var(--muted); font-weight:400; margin:0 6px; font-size:0.8em; }
   .match-teams .mt-line .team.winner{
     color:var(--gold); background: rgba(227,178,60,0.16);
     padding: 1px 7px; border-radius:4px;
   }
-  .match-teams .mt-meta{ font-size:clamp(10px,1vw,12px); color:var(--muted); }
-  .match-score{ font-family:'Anton',sans-serif; font-size:clamp(18px,2.3vw,30px); color:var(--gold); flex-shrink:0; text-align:right; min-width: 2.4em; }
-  .match-score.time{ color:var(--white); font-size:clamp(14px,1.8vw,22px); }
-  .empty-msg{ flex:1; display:flex; align-items:center; justify-content:center; font-family:'Anton',sans-serif; font-size:clamp(18px,2.4vw,30px); color:var(--muted); text-align:center; }
+  .match-teams .mt-meta{ font-size:12px; color:var(--muted); }
+  .match-score{ font-family:'Anton',sans-serif; font-size:30px; color:var(--gold); flex-shrink:0; text-align:right; min-width: 2.4em; }
+  .match-score.time{ color:var(--white); font-size:22px; }
+  .empty-msg{ flex:1; display:flex; align-items:center; justify-content:center; font-family:'Anton',sans-serif; font-size:30px; color:var(--muted); text-align:center; }
 
   /* ---- Classifiche (una tabella grande a pannello) ---- */
   .class-wrap{ flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
-  .class-block{ background: var(--bg-card); border:1px solid var(--line); border-radius:8px; overflow:hidden; display:flex; flex-direction:column; flex:1; min-height:0; }
-  .class-block table{ width:100%; height:100%; border-collapse:collapse; table-layout:fixed; }
+  .class-block{ background: var(--bg-card); border:1px solid var(--line); border-radius:8px; overflow-y:auto; overflow-x:hidden; display:flex; flex-direction:column; flex:1; min-height:0; }
+  .class-block::-webkit-scrollbar{ width:5px; }
+  .class-block::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
+  .class-block table{ width:100%; border-collapse:collapse; table-layout:fixed; }
   .class-block th{
-    text-align:left; padding: clamp(6px,0.9vw,14px) clamp(14px,1.6vw,22px);
-    font-size:clamp(10px,1vw,14px); color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;
+    text-align:left; padding: 14px 22px;
+    font-size:14px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;
     border-bottom:1px solid var(--line);
   }
-  .class-block td{ padding: clamp(6px,0.9vw,16px) clamp(14px,1.6vw,22px); font-size:clamp(13px,1.5vw,22px); border-bottom:1px solid var(--line); }
+  .class-block td{ padding: 16px 22px; font-size:22px; border-bottom:1px solid var(--line); }
   .class-block td.num{ text-align:center; color:var(--muted); }
   .class-block tr:last-child td{ border-bottom:none; }
   .class-block td.squadra{ font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -102,29 +119,29 @@
   .class-block tr.qualified td.squadra::after{ content:' ✓'; color:var(--qual); }
   /* Variante compatta: usata quando ci sono molte righe (es. gironi Senior da 9 squadre),
      per garantire che l'intera tabella resti sempre visibile senza tagli. */
-  .class-block.compact th{ padding: clamp(4px,0.6vw,9px) clamp(10px,1.2vw,16px); font-size:clamp(9px,0.9vw,12px); }
-  .class-block.compact td{ padding: clamp(4px,0.6vw,9px) clamp(10px,1.2vw,16px); font-size:clamp(11px,1.2vw,17px); }
-  .class-legend{ margin-top: clamp(6px,0.8vw,12px); font-size:clamp(10px,1vw,13px); color:var(--muted); display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .class-block.compact th{ padding: 9px 16px; font-size:12px; }
+  .class-block.compact td{ padding: 9px 16px; font-size:17px; }
+  .class-legend{ margin-top: 12px; font-size:13px; color:var(--muted); display:flex; align-items:center; gap:8px; flex-shrink:0; }
   .class-legend .sw{ width:12px; height:12px; border-radius:3px; background: rgba(95,211,141,0.35); border:1px solid var(--qual); }
 
   /* ---- Nav bar (selezione manuale) ---- */
   .tv-nav{
-    display:flex; align-items:center; gap: clamp(6px,0.8vw,12px);
-    padding: clamp(8px,1vw,14px) clamp(18px,2vw,30px);
+    display:flex; align-items:center; gap: 12px;
+    padding: 14px 30px;
     border-top:1px solid var(--line); background: rgba(10,10,13,0.75);
     overflow-x:auto; -webkit-overflow-scrolling:touch;
   }
   .tv-nav::-webkit-scrollbar{ height:4px; }
   .tv-nav::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
   .nav-btn-play{
-    flex-shrink:0; width:clamp(30px,2.6vw,40px); height:clamp(30px,2.6vw,40px); border-radius:50%;
+    flex-shrink:0; width:40px; height:40px; border-radius:50%;
     background: var(--bg-card); border:1px solid var(--gold-dim); color:var(--gold);
-    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:clamp(12px,1.2vw,16px);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;
   }
   .nav-sep{ flex-shrink:0; width:1px; height:20px; background:var(--line); margin:0 4px; }
-  .nav-group-label{ flex-shrink:0; font-family:'Anton',sans-serif; font-size:clamp(9px,0.9vw,11px); color:var(--muted); letter-spacing:0.08em; margin-right:2px; }
+  .nav-group-label{ flex-shrink:0; font-family:'Anton',sans-serif; font-size:11px; color:var(--muted); letter-spacing:0.08em; margin-right:2px; }
   .nav-pill{
-    flex-shrink:0; font-size:clamp(10px,1vw,13px); padding: clamp(5px,0.7vw,9px) clamp(10px,1.2vw,16px);
+    flex-shrink:0; font-size:13px; padding: 9px 16px;
     border-radius:16px; border:1px solid var(--line); background:var(--bg-card); color:var(--muted); cursor:pointer;
     white-space:nowrap;
   }
@@ -136,59 +153,59 @@
     overflow:hidden; white-space:nowrap;
     border-top:1px solid var(--line); border-bottom:1px solid var(--line);
     background: rgba(20,19,25,0.55);
-    padding: clamp(8px,1vw,12px) 0;
+    padding: 12px 0;
   }
   .sponsor-track{
-    display:inline-flex; align-items:center; gap: clamp(20px,2.4vw,36px);
+    display:inline-flex; align-items:center; gap: 36px;
     animation: sponsorScroll 50s linear infinite;
   }
   .sponsor-marquee:hover .sponsor-track{ animation-play-state: paused; }
   .sponsor-item{
-    flex-shrink:0; height: clamp(34px,3.6vw,52px); padding: 6px clamp(12px,1.4vw,20px);
+    flex-shrink:0; height: 52px; padding: 6px 20px;
     background:#f4f2ec; border-radius:6px; display:flex; align-items:center; justify-content:center;
   }
   .sponsor-item.noplate{ background:transparent; border:1px solid var(--line); }
-  .sponsor-item img{ max-height:100%; max-width: clamp(90px,9vw,140px); object-fit:contain; }
+  .sponsor-item img{ max-height:100%; max-width: 140px; object-fit:contain; }
   .sponsor-item .txt{ color:var(--muted); font-size:12px; padding:0 6px; }
   @keyframes sponsorScroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
   /* ---- Programma di giornata (agenda per fasi, venerdì) ---- */
-  .agenda-scroll{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap: clamp(10px,1.2vw,18px); }
+  .agenda-scroll{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap: 18px; }
   .agenda-scroll::-webkit-scrollbar{ width:5px; }
   .agenda-scroll::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
   .agenda-fase{
-    font-family:'Anton',sans-serif; color:var(--gold); font-size:clamp(13px,1.4vw,18px);
+    font-family:'Anton',sans-serif; color:var(--gold); font-size:18px;
     padding-left:10px; border-left:3px solid var(--gold-dim); margin-bottom:6px;
   }
   .match-grid.compact{ margin-bottom:2px; }
 
   /* ---- Riepilogo Gironi (3 mini tabelle affiancate) ---- */
-  .class-grid-3{ flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px,1.2vw,18px); overflow:hidden; }
+  .class-grid-3{ flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; overflow:hidden; }
   .class-grid-3 .class-block .cb-head{
-    padding: clamp(6px,0.8vw,12px) clamp(10px,1.2vw,16px); background: rgba(227,178,60,0.08);
-    border-bottom:1px solid var(--line); font-family:'Anton',sans-serif; font-size:clamp(12px,1.3vw,16px); color:var(--gold);
+    padding: 12px 16px; background: rgba(227,178,60,0.08);
+    border-bottom:1px solid var(--line); font-family:'Anton',sans-serif; font-size:16px; color:var(--gold);
   }
-  .class-grid-3 .class-block td, .class-grid-3 .class-block th{ padding: clamp(5px,0.6vw,9px) clamp(8px,1vw,14px); font-size:clamp(11px,1.2vw,15px); }
+  .class-grid-3 .class-block td, .class-grid-3 .class-block th{ padding: 9px 14px; font-size:15px; }
 
   /* ---- Prossime partite per campo (pannello iniziale) ---- */
-  .court-grid{ flex:1; display:grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: clamp(12px,1.4vw,22px); min-height:0; }
+  .court-grid{ flex:1; display:grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 22px; min-height:0; }
   .court-card{
     background: var(--bg-card); border:1px solid var(--line); border-radius:12px;
-    padding: clamp(16px,2vw,28px); display:flex; flex-direction:column; justify-content:center; gap: clamp(6px,0.8vw,10px);
+    padding: 28px; display:flex; flex-direction:column; justify-content:center; gap: 10px;
     min-width:0; min-height:0;
   }
-  .court-head{ font-family:'Anton',sans-serif; font-size:clamp(13px,1.5vw,19px); color:var(--gold); letter-spacing:0.04em; }
-  .court-status{ font-size:clamp(10px,1vw,13px); color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; }
-  .court-teams{ font-family:'Anton',sans-serif; font-size:clamp(18px,2.6vw,34px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .court-head{ font-family:'Anton',sans-serif; font-size:19px; color:var(--gold); letter-spacing:0.04em; }
+  .court-status{ font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; }
+  .court-teams{ font-family:'Anton',sans-serif; font-size:34px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .court-teams .vs{ color:var(--muted); font-family:'Inter',sans-serif; font-weight:400; margin:0 8px; font-size:0.6em; }
-  .court-meta{ font-size:clamp(11px,1.1vw,14px); color:var(--muted); }
-  .court-time{ font-family:'Anton',sans-serif; font-size:clamp(20px,2.8vw,36px); color:var(--gold); }
+  .court-meta{ font-size:14px; color:var(--muted); }
+  .court-time{ font-family:'Anton',sans-serif; font-size:36px; color:var(--gold); }
 
   .loading-screen{
     position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:16px; background:var(--bg); z-index:100;
   }
-  .loading-screen h2{ font-family:'Anton',sans-serif; font-size:clamp(20px,3vw,36px); color:var(--gold); text-align:center; padding:0 20px;}
+  .loading-screen h2{ font-family:'Anton',sans-serif; font-size:36px; color:var(--gold); text-align:center; padding:0 20px;}
   .loading-screen p{ color:var(--muted); font-size:14px; text-align:center; padding: 0 30px; max-width:640px; }
 </style>
 </head>
@@ -199,28 +216,30 @@
   <p id="loadingMsg">Connessione ai dati del torneo…</p>
 </div>
 
-<div class="tv-header">
-  <div class="brand">
-    <img src="assets/logo.png" alt="Ronca City Playground">
-    <div class="brand-text">
-      <div class="l1">Ronca City Playground</div>
-      <div class="l2">3v3 · 2026</div>
+<div id="tvRoot">
+  <div class="tv-header">
+    <div class="brand">
+      <img src="https://risorto91.github.io/Roncacity_Playgroud/assets/logo.png" alt="Ronca City Playground">
+      <div class="brand-text">
+        <div class="l1">Ronca City Playground</div>
+        <div class="l2">3v3 · 2026</div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="status" id="dataStatus"><span class="dot"></span><span class="txt">—</span></div>
+      <div class="day-badge" id="dayBadge">—</div>
+      <div class="clock" id="clock">--:--</div>
     </div>
   </div>
-  <div class="right">
-    <div class="status" id="dataStatus"><span class="dot"></span><span class="txt">—</span></div>
-    <div class="day-badge" id="dayBadge">—</div>
-    <div class="clock" id="clock">--:--</div>
+
+  <div class="tv-stage" id="stage"></div>
+
+  <div class="sponsor-marquee">
+    <div class="sponsor-track" id="sponsorTrack"></div>
   </div>
+
+  <div class="tv-nav" id="tvNav"></div>
 </div>
-
-<div class="tv-stage" id="stage"></div>
-
-<div class="sponsor-marquee">
-  <div class="sponsor-track" id="sponsorTrack"></div>
-</div>
-
-<div class="tv-nav" id="tvNav"></div>
 
 <script>
   // ==========================================================================
@@ -248,48 +267,48 @@
   // SPONSOR — stessa lista/loghi del sito principale (assets/sponsor/...)
   // ==========================================================================
   const sponsorsMarquee = [
-    { name:"Effedi Salotti", logo:"assets/sponsor/effedi-salotti.png" },
-    { name:"Erlux", logo:"assets/sponsor/erlux.png" },
-    { name:"Fideuram Private Banker", logo:"assets/sponsor/fideuram.png" },
-    { name:"Locanda Appennino", logo:"assets/sponsor/locanda-appennino.png", noPlate:true },
-    { name:"Lynk & Co Romagnauto", logo:"assets/sponsor/lynk-co.png" },
-    { name:"Olitalia", logo:"assets/sponsor/olitalia.png" },
-    { name:"Sport Service", logo:"assets/sponsor/sport-service.png" },
-    { name:"Stargrafic", logo:"assets/sponsor/stargrafic.png" },
-    { name:"Unieuro", logo:"assets/sponsor/unieuro.png" },
-    { name:"Adjutor", logo:"assets/sponsor/adjutor.png" },
-    { name:"Brains", logo:"assets/sponsor/brains.png", noPlate:true },
-    { name:"Brico Ok", logo:"assets/sponsor/brico-ok.png" },
-    { name:"Emmeci", logo:"assets/sponsor/emmeci.png" },
-    { name:"Curcio Agenzia Immobiliare", logo:"assets/sponsor/curcio.png" },
-    { name:"Visani", logo:"assets/sponsor/visani.png" },
-    { name:"Caffitaly System", logo:"assets/sponsor/caffitaly.png" },
-    { name:"Cupro", logo:"assets/sponsor/cupro.png", noPlate:true },
-    { name:"Da Giovanni - Osteria Buscherini", logo:"assets/sponsor/da-giovanni.png" },
-    { name:"Fourteam", logo:"assets/sponsor/fourteam.png" },
-    { name:"Jacaré 167/168", logo:"assets/sponsor/jacare.png" },
-    { name:"Korasol Beach Restaurant & Sport", logo:"assets/sponsor/korasol.png" },
-    { name:"Lambruschi Romano & C.", logo:"assets/sponsor/lambruschi.png" },
-    { name:"L'Amorosina", logo:"assets/sponsor/amorosina.png", noPlate:true },
-    { name:"Little Italy Barber Shop", logo:"assets/sponsor/little-italy.png" },
-    { name:"Marco & Vito", logo:"assets/sponsor/marco-e-vito.png" },
-    { name:"Ottica Ghetti", logo:"assets/sponsor/ottica-ghetti.png" },
-    { name:"Pallacanestro Forlì 2015", logo:"assets/sponsor/pallacanestro-forli.png" },
-    { name:"Pineta Milano Marittima", logo:"assets/sponsor/pineta.png", noPlate:true },
-    { name:"Gioielleria Pretolani", logo:"assets/sponsor/pretolani.png" },
-    { name:"Farmacia San Martino", logo:"assets/sponsor/san-martino.png" },
-    { name:"AICS Basket Forlì", logo:"assets/sponsor/aics.png" },
-    { name:"Studio Armanda Rossi", logo:"assets/sponsor/armanda-rossi.png" },
-    { name:"Arquebuse Osteria Romagnola", logo:"assets/sponsor/arquebuse.png" },
-    { name:"Baldini Gomme", logo:"assets/sponsor/baldini.png" },
-    { name:"Birrino", logo:"assets/sponsor/birrino.png" },
-    { name:"Shoe", logo:"assets/sponsor/shoe.png" },
-    { name:"Spillo Pizza & Cucina", logo:"assets/sponsor/spillo.png", noPlate:true },
-    { name:"Villapapeete", logo:"assets/sponsor/villapapete.png" },
-    { name:"Vitamina's Bar Caffetteria", logo:"assets/sponsor/vitaminas.png" },
-    { name:"Vitarelax", logo:"assets/sponsor/vitarelax.png" },
-    { name:"Art Immagine", logo:"assets/sponsor/art-immagine.png" },
-    { name:"Panorama Basket", logo:"assets/sponsor/panorama-basket.png", noPlate:true }
+    { name:"Effedi Salotti", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/effedi-salotti.png" },
+    { name:"Erlux", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/erlux.png" },
+    { name:"Fideuram Private Banker", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/fideuram.png" },
+    { name:"Locanda Appennino", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/locanda-appennino.png", noPlate:true },
+    { name:"Lynk & Co Romagnauto", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/lynk-co.png" },
+    { name:"Olitalia", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/olitalia.png" },
+    { name:"Sport Service", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/sport-service.png" },
+    { name:"Stargrafic", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/stargrafic.png" },
+    { name:"Unieuro", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/unieuro.png" },
+    { name:"Adjutor", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/adjutor.png" },
+    { name:"Brains", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/brains.png", noPlate:true },
+    { name:"Brico Ok", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/brico-ok.png" },
+    { name:"Emmeci", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/emmeci.png" },
+    { name:"Curcio Agenzia Immobiliare", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/curcio.png" },
+    { name:"Visani", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/visani.png" },
+    { name:"Caffitaly System", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/caffitaly.png" },
+    { name:"Cupro", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/cupro.png", noPlate:true },
+    { name:"Da Giovanni - Osteria Buscherini", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/da-giovanni.png" },
+    { name:"Fourteam", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/fourteam.png" },
+    { name:"Jacaré 167/168", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/jacare.png" },
+    { name:"Korasol Beach Restaurant & Sport", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/korasol.png" },
+    { name:"Lambruschi Romano & C.", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/lambruschi.png" },
+    { name:"L'Amorosina", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/amorosina.png", noPlate:true },
+    { name:"Little Italy Barber Shop", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/little-italy.png" },
+    { name:"Marco & Vito", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/marco-e-vito.png" },
+    { name:"Ottica Ghetti", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/ottica-ghetti.png" },
+    { name:"Pallacanestro Forlì 2015", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/pallacanestro-forli.png" },
+    { name:"Pineta Milano Marittima", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/pineta.png", noPlate:true },
+    { name:"Gioielleria Pretolani", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/pretolani.png" },
+    { name:"Farmacia San Martino", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/san-martino.png" },
+    { name:"AICS Basket Forlì", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/aics.png" },
+    { name:"Studio Armanda Rossi", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/armanda-rossi.png" },
+    { name:"Arquebuse Osteria Romagnola", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/arquebuse.png" },
+    { name:"Baldini Gomme", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/baldini.png" },
+    { name:"Birrino", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/birrino.png" },
+    { name:"Shoe", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/shoe.png" },
+    { name:"Spillo Pizza & Cucina", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/spillo.png", noPlate:true },
+    { name:"Villapapeete", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/villapapete.png" },
+    { name:"Vitamina's Bar Caffetteria", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/vitaminas.png" },
+    { name:"Vitarelax", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/vitarelax.png" },
+    { name:"Art Immagine", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/art-immagine.png" },
+    { name:"Panorama Basket", logo:"https://risorto91.github.io/Roncacity_Playgroud/assets/sponsor/panorama-basket.png", noPlate:true }
   ];
 
   function renderSponsorMarquee(){
@@ -297,7 +316,9 @@
     if (!track) return;
     const itemHTML = s => {
       const cls = s.noPlate ? 'sponsor-item noplate' : 'sponsor-item';
-      const inner = s.logo ? `<img src="${s.logo}" alt="${s.name}">` : `<span class="txt">${s.name}</span>`;
+      const inner = s.logo
+        ? `<img src="${s.logo}" alt="${s.name}" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<span class=&quot;txt&quot;>${s.name}</span>');">`
+        : `<span class="txt">${s.name}</span>`;
       return `<div class="${cls}">${inner}</div>`;
     };
     // lista duplicata per loop infinito senza scatti
@@ -317,6 +338,19 @@
   }
   updateClock();
   setInterval(updateClock, 1000);
+
+  // ==========================================================================
+  // SCALING — il layout è disegnato a risoluzione fissa 1920x1080 (#tvRoot);
+  // qui lo adattiamo (senza deformarlo) a qualunque finestra/TV reale.
+  // ==========================================================================
+  function fitToScreen(){
+    const root = document.getElementById('tvRoot');
+    if (!root) return;
+    const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    root.style.transform = `scale(${scale})`;
+  }
+  fitToScreen();
+  window.addEventListener('resize', fitToScreen);
 
   // ==========================================================================
   // FETCH DATI
