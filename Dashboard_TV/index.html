@@ -51,7 +51,7 @@
   .panel{
     position:absolute; inset: clamp(14px,2vw,32px) clamp(24px,3vw,48px);
     opacity:0; transition: opacity .5s ease;
-    display:flex; flex-direction:column;
+    display:flex; flex-direction:column; min-height:0;
   }
   .panel.active{ opacity:1; }
 
@@ -65,7 +65,7 @@
   .panel-title .sub{ font-size:clamp(11px,1.2vw,15px); color:var(--muted); margin-left:auto; }
 
   /* ---- Match list ---- */
-  .match-grid{ flex:1; display:grid; grid-template-columns: 1fr 1fr; gap: clamp(8px,1vw,16px); align-content:start; overflow:hidden; }
+  .match-grid{ flex:1; display:grid; grid-template-columns: 1fr 1fr; gap: clamp(8px,1vw,16px); align-content:start; overflow:hidden; min-height:0; }
   .match-card{
     background: var(--bg-card); border:1px solid var(--line); border-radius:8px;
     padding: clamp(10px,1.2vw,18px) clamp(14px,1.6vw,24px);
@@ -85,22 +85,26 @@
   .empty-msg{ flex:1; display:flex; align-items:center; justify-content:center; font-family:'Anton',sans-serif; font-size:clamp(18px,2.4vw,30px); color:var(--muted); text-align:center; }
 
   /* ---- Classifiche (una tabella grande a pannello) ---- */
-  .class-wrap{ flex:1; display:flex; flex-direction:column; overflow:hidden; }
-  .class-block{ background: var(--bg-card); border:1px solid var(--line); border-radius:8px; overflow:hidden; display:flex; flex-direction:column; flex:1; }
-  .class-block table{ width:100%; border-collapse:collapse; }
+  .class-wrap{ flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
+  .class-block{ background: var(--bg-card); border:1px solid var(--line); border-radius:8px; overflow:hidden; display:flex; flex-direction:column; flex:1; min-height:0; }
+  .class-block table{ width:100%; height:100%; border-collapse:collapse; table-layout:fixed; }
   .class-block th{
-    text-align:left; padding: clamp(8px,1vw,14px) clamp(14px,1.6vw,22px);
-    font-size:clamp(11px,1.1vw,14px); color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;
+    text-align:left; padding: clamp(6px,0.9vw,14px) clamp(14px,1.6vw,22px);
+    font-size:clamp(10px,1vw,14px); color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;
     border-bottom:1px solid var(--line);
   }
-  .class-block td{ padding: clamp(9px,1.1vw,16px) clamp(14px,1.6vw,22px); font-size:clamp(15px,1.7vw,22px); border-bottom:1px solid var(--line); }
+  .class-block td{ padding: clamp(6px,0.9vw,16px) clamp(14px,1.6vw,22px); font-size:clamp(13px,1.5vw,22px); border-bottom:1px solid var(--line); }
   .class-block td.num{ text-align:center; color:var(--muted); }
   .class-block tr:last-child td{ border-bottom:none; }
-  .class-block td.squadra{ font-weight:700; }
+  .class-block td.squadra{ font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .class-block tr.qualified{ background: rgba(95,211,141,0.10); }
   .class-block tr.qualified td.num.pos{ color:var(--qual); font-weight:800; }
   .class-block tr.qualified td.squadra::after{ content:' ✓'; color:var(--qual); }
-  .class-legend{ margin-top: clamp(6px,0.8vw,12px); font-size:clamp(10px,1vw,13px); color:var(--muted); display:flex; align-items:center; gap:8px; }
+  /* Variante compatta: usata quando ci sono molte righe (es. gironi Senior da 9 squadre),
+     per garantire che l'intera tabella resti sempre visibile senza tagli. */
+  .class-block.compact th{ padding: clamp(4px,0.6vw,9px) clamp(10px,1.2vw,16px); font-size:clamp(9px,0.9vw,12px); }
+  .class-block.compact td{ padding: clamp(4px,0.6vw,9px) clamp(10px,1.2vw,16px); font-size:clamp(11px,1.2vw,17px); }
+  .class-legend{ margin-top: clamp(6px,0.8vw,12px); font-size:clamp(10px,1vw,13px); color:var(--muted); display:flex; align-items:center; gap:8px; flex-shrink:0; }
   .class-legend .sw{ width:12px; height:12px; border-radius:3px; background: rgba(95,211,141,0.35); border:1px solid var(--qual); }
 
   /* ---- Nav bar (selezione manuale) ---- */
@@ -165,6 +169,20 @@
     border-bottom:1px solid var(--line); font-family:'Anton',sans-serif; font-size:clamp(12px,1.3vw,16px); color:var(--gold);
   }
   .class-grid-3 .class-block td, .class-grid-3 .class-block th{ padding: clamp(5px,0.6vw,9px) clamp(8px,1vw,14px); font-size:clamp(11px,1.2vw,15px); }
+
+  /* ---- Prossime partite per campo (pannello iniziale) ---- */
+  .court-grid{ flex:1; display:grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: clamp(12px,1.4vw,22px); min-height:0; }
+  .court-card{
+    background: var(--bg-card); border:1px solid var(--line); border-radius:12px;
+    padding: clamp(16px,2vw,28px); display:flex; flex-direction:column; justify-content:center; gap: clamp(6px,0.8vw,10px);
+    min-width:0; min-height:0;
+  }
+  .court-head{ font-family:'Anton',sans-serif; font-size:clamp(13px,1.5vw,19px); color:var(--gold); letter-spacing:0.04em; }
+  .court-status{ font-size:clamp(10px,1vw,13px); color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; }
+  .court-teams{ font-family:'Anton',sans-serif; font-size:clamp(18px,2.6vw,34px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .court-teams .vs{ color:var(--muted); font-family:'Inter',sans-serif; font-weight:400; margin:0 8px; font-size:0.6em; }
+  .court-meta{ font-size:clamp(11px,1.1vw,14px); color:var(--muted); }
+  .court-time{ font-family:'Anton',sans-serif; font-size:clamp(20px,2.8vw,36px); color:var(--gold); }
 
   .loading-screen{
     position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -240,17 +258,38 @@
     { name:"Stargrafic", logo:"assets/sponsor/stargrafic.png" },
     { name:"Unieuro", logo:"assets/sponsor/unieuro.png" },
     { name:"Adjutor", logo:"assets/sponsor/adjutor.png" },
+    { name:"Brains", logo:"assets/sponsor/brains.png", noPlate:true },
     { name:"Brico Ok", logo:"assets/sponsor/brico-ok.png" },
     { name:"Emmeci", logo:"assets/sponsor/emmeci.png" },
     { name:"Curcio Agenzia Immobiliare", logo:"assets/sponsor/curcio.png" },
     { name:"Visani", logo:"assets/sponsor/visani.png" },
     { name:"Caffitaly System", logo:"assets/sponsor/caffitaly.png" },
+    { name:"Cupro", logo:"assets/sponsor/cupro.png", noPlate:true },
     { name:"Da Giovanni - Osteria Buscherini", logo:"assets/sponsor/da-giovanni.png" },
+    { name:"Fourteam", logo:"assets/sponsor/fourteam.png" },
+    { name:"Jacaré 167/168", logo:"assets/sponsor/jacare.png" },
     { name:"Korasol Beach Restaurant & Sport", logo:"assets/sponsor/korasol.png" },
+    { name:"Lambruschi Romano & C.", logo:"assets/sponsor/lambruschi.png" },
+    { name:"L'Amorosina", logo:"assets/sponsor/amorosina.png", noPlate:true },
+    { name:"Little Italy Barber Shop", logo:"assets/sponsor/little-italy.png" },
+    { name:"Marco & Vito", logo:"assets/sponsor/marco-e-vito.png" },
+    { name:"Ottica Ghetti", logo:"assets/sponsor/ottica-ghetti.png" },
     { name:"Pallacanestro Forlì 2015", logo:"assets/sponsor/pallacanestro-forli.png" },
+    { name:"Pineta Milano Marittima", logo:"assets/sponsor/pineta.png", noPlate:true },
     { name:"Gioielleria Pretolani", logo:"assets/sponsor/pretolani.png" },
     { name:"Farmacia San Martino", logo:"assets/sponsor/san-martino.png" },
-    { name:"Art Immagine", logo:"assets/sponsor/art-immagine.png" }
+    { name:"AICS Basket Forlì", logo:"assets/sponsor/aics.png" },
+    { name:"Studio Armanda Rossi", logo:"assets/sponsor/armanda-rossi.png" },
+    { name:"Arquebuse Osteria Romagnola", logo:"assets/sponsor/arquebuse.png" },
+    { name:"Baldini Gomme", logo:"assets/sponsor/baldini.png" },
+    { name:"Birrino", logo:"assets/sponsor/birrino.png" },
+    { name:"Shoe", logo:"assets/sponsor/shoe.png" },
+    { name:"Spillo Pizza & Cucina", logo:"assets/sponsor/spillo.png", noPlate:true },
+    { name:"Villapapeete", logo:"assets/sponsor/villapapete.png" },
+    { name:"Vitamina's Bar Caffetteria", logo:"assets/sponsor/vitaminas.png" },
+    { name:"Vitarelax", logo:"assets/sponsor/vitarelax.png" },
+    { name:"Art Immagine", logo:"assets/sponsor/art-immagine.png" },
+    { name:"Panorama Basket", logo:"assets/sponsor/panorama-basket.png", noPlate:true }
   ];
 
   function renderSponsorMarquee(){
@@ -366,11 +405,69 @@
 
   function allDaysInOrder(){ return ['lunedi','martedi','mercoledi','giovedi','venerdi']; }
 
+  // Raggruppa le partite del giorno per Campo+Metà (es. "1A","1B","2A","2B") e per ognuna
+  // individua la prossima da giocare (o l'ultima giocata, se la metà ha finito per la giornata).
+  function nextByCourtForDay(dayKey){
+    if (!TORNEO_DATA) return [];
+    const all = [
+      ...matchesForDay(dayKey, 'senior').map(m => Object.assign({ label:'Senior' }, m)),
+      ...matchesForDay(dayKey, 'over40').map(m => Object.assign({ label:'Over40' }, m))
+    ];
+    const groups = {};
+    all.forEach(m => {
+      if (!m.campo || !m.meta) return;
+      const key = m.campo + '|' + m.meta;
+      (groups[key] = groups[key] || []).push(m);
+    });
+    return Object.keys(groups).sort().map(key => {
+      const list = groups[key].slice().sort((a,b) => (a.orario||'').localeCompare(b.orario||''));
+      const next = list.find(m => !m.giocata);
+      const last = list.slice().reverse().find(m => m.giocata);
+      return { campo: list[0].campo, meta: list[0].meta, next, last };
+    });
+  }
+
+  function renderCampiPanel(dayKey){
+    const cards = nextByCourtForDay(dayKey);
+    if (!cards.length){
+      return `
+        <div class="panel-title"><span class="cat">Live</span><h1>Prossime partite per campo</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
+        <div class="empty-msg">Nessuna partita in programma oggi</div>`;
+    }
+    const cardHTML = c => {
+      const m = c.next || c.last;
+      const statusLabel = c.next ? 'In arrivo' : 'Ultima giocata';
+      const teams = m ? `${m.casa || '—'}<span class="vs">vs</span>${m.trasferta || '—'}` : '—';
+      const metaBits = [];
+      if (m){
+        metaBits.push(m.label);
+        if (m.girone) metaBits.push('Girone ' + m.girone);
+        if (m.fase) metaBits.push(m.fase);
+      }
+      const timeOrScore = c.next
+        ? (m.orario || '')
+        : (m ? `${m.puntiCasa} - ${m.puntiTrasferta}` : '');
+      return `
+        <div class="court-card">
+          <div class="court-head">Campo ${c.campo} · metà ${c.meta}</div>
+          <div class="court-status">${statusLabel}</div>
+          <div class="court-teams">${teams}</div>
+          <div class="court-meta">${metaBits.join(' · ')}</div>
+          <div class="court-time">${timeOrScore}</div>
+        </div>`;
+    };
+    return `
+      <div class="panel-title"><span class="cat">Live</span><h1>Prossime partite per campo</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
+      <div class="court-grid">${cards.map(cardHTML).join('')}</div>`;
+  }
+
   // ==========================================================================
   // COSTRUZIONE SEQUENZA PANNELLI (dipende dal giorno)
   // ==========================================================================
   function buildSequence(dayKey){
     const seq = [];
+
+    seq.push({ id:'home-campi', type:'campi', navLabel:'Prossime per campo', group:'LIVE' });
 
     if (dayKey === 'venerdi'){
       seq.push({ id:'sen-cal-tri', cat:'senior', type:'calendario', calFilter:'triangolare', navLabel:'Triangolari', group:'SENIOR' });
@@ -403,7 +500,9 @@
   // vengono saltati (restano comunque selezionabili a mano dalla barra di navigazione).
   function markEmptiness(seq, dayKey){
     seq.forEach(def => {
-      if (def.type === 'calendario'){
+      if (def.type === 'campi'){
+        def.empty = nextByCourtForDay(dayKey).length === 0;
+      } else if (def.type === 'calendario'){
         def.empty = matchesForDay(dayKey, def.cat, def.calFilter).length === 0;
       } else if (def.type === 'prossime'){
         const days = allDaysInOrder();
@@ -433,6 +532,36 @@
           const b = findBlocco('OVER40 — MINI-GIRONE');
           def.empty = !b || !b.righe.length;
         }
+      }
+    });
+    markDayRelevance(seq, dayKey);
+  }
+
+  // Restituisce i gironi Senior (A/B/C) e se Over40 gioca, dedotti direttamente
+  // dalle partite in programma quel giorno (nessun valore fisso): si adatta da solo
+  // se il calendario cambia.
+  function activeGironiSenior(dayKey){
+    const set = new Set();
+    matchesForDay(dayKey, 'senior').forEach(m => { if (m.girone) set.add(m.girone); });
+    return set;
+  }
+  function over40PlaysDay(dayKey){
+    return matchesForDay(dayKey, 'over40').length > 0;
+  }
+
+  // Marca def.skipAuto=true per i pannelli non rilevanti nel giorno corrente
+  // (es. Girone C il lunedì, quando giocano solo A e B): vengono saltati nel
+  // ciclo automatico ma restano cliccabili a mano dalla barra di navigazione.
+  function markDayRelevance(seq, dayKey){
+    if (dayKey === 'venerdi'){ seq.forEach(def => { def.skipAuto = false; }); return; }
+    const activeSenior = activeGironiSenior(dayKey);
+    const over40Today = over40PlaysDay(dayKey);
+    seq.forEach(def => {
+      def.skipAuto = false;
+      if (def.type === 'classifiche' && def.variant === 'girone' && def.cat === 'senior'){
+        def.skipAuto = activeSenior.size > 0 && !activeSenior.has(def.girone);
+      } else if (def.cat === 'over40' && (def.type === 'calendario' || (def.type === 'classifiche' && def.variant === 'girone-unico'))){
+        def.skipAuto = !over40Today;
       }
     });
   }
@@ -576,9 +705,12 @@
       title = 'Mini-girone 5°-6°-7°';
     }
 
+    // Tabelle con più di 6 righe passano alla variante compatta, per restare sempre
+    // leggibili per intero nel pannello senza tagli né scroll.
+    const compactCls = righe.length > 6 ? ' compact' : '';
     const body = righe.length
       ? `<div class="class-wrap">
-          <div class="class-block">${classTableHTML(righe, 'Squadra', highlightTop)}</div>
+          <div class="class-block${compactCls}">${classTableHTML(righe, 'Squadra', highlightTop)}</div>
           ${highlightTop ? `<div class="class-legend"><span class="sw"></span> Le prime ${highlightTop} si qualificano ai Triangolari del venerdì</div>` : ''}
         </div>`
       : `<div class="empty-msg">Classifica non ancora disponibile</div>`;
@@ -607,6 +739,7 @@
   }
 
   function renderPanelHTML(def, dayKey){
+    if (def.type === 'campi') return renderCampiPanel(dayKey);
     if (def.type === 'calendario') return renderCalendarioPanel(def, dayKey);
     if (def.type === 'classifiche') return renderClassifichePanel(def);
     if (def.type === 'prossime') return renderProssimePanel(def, dayKey);
@@ -674,13 +807,13 @@
   function startCycle(){
     stopCycle();
     panelTimer = setInterval(() => {
-      // salta automaticamente i pannelli senza dati (restano comunque
-      // selezionabili a mano dalla barra di navigazione)
+      // salta automaticamente i pannelli senza dati o non rilevanti per il giorno
+      // corrente (restano comunque selezionabili a mano dalla barra di navigazione)
       let attempts = 0;
       do {
         seqIndex = (seqIndex + 1) % SEQUENCE.length;
         attempts++;
-      } while (SEQUENCE[seqIndex] && SEQUENCE[seqIndex].empty && attempts < SEQUENCE.length);
+      } while (SEQUENCE[seqIndex] && (SEQUENCE[seqIndex].empty || SEQUENCE[seqIndex].skipAuto) && attempts < SEQUENCE.length);
       renderCurrentPanel();
     }, PANEL_DURATION_MS);
   }
