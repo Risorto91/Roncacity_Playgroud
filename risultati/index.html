@@ -571,24 +571,26 @@
     <div class="bracket-scroll" id="bracketOver40" style="display:none;">
       <div class="bracket">
         <div class="bracket-round">
-          <div class="rlabel">Incroci</div>
-          <div class="bracket-match" data-partita="Incrocio 1 (1 vs 4)"><div class="t"><span class="tn">1° O40</span></div><div class="t"><span class="tn">4° O40</span></div></div>
-          <div class="bracket-match" data-partita="Incrocio 2 (2 vs 3)"><div class="t"><span class="tn">2° O40</span></div><div class="t"><span class="tn">3° O40</span></div></div>
-          <div class="bracket-match" data-partita="Incrocio 3 (5 vs 8)"><div class="t"><span class="tn">5° O40</span></div><div class="t"><span class="tn">8° O40</span></div></div>
-          <div class="bracket-match" data-partita="Incrocio 4 (6 vs 7)"><div class="t"><span class="tn">6° O40</span></div><div class="t"><span class="tn">7° O40</span></div></div>
+          <div class="rlabel">Mini-girone 5°-6°-7°</div>
+          <div class="bracket-match" data-partita="Mini-girone 5v6"><div class="t"><span class="tn">5° Girone</span></div><div class="t"><span class="tn">6° Girone</span></div></div>
+          <div class="bracket-match" data-partita="Mini-girone 6v7"><div class="t"><span class="tn">6° Girone</span></div><div class="t"><span class="tn">7° Girone</span></div></div>
+          <div class="bracket-match" data-partita="Mini-girone 5v7"><div class="t"><span class="tn">5° Girone</span></div><div class="t"><span class="tn">7° Girone</span></div></div>
+        </div>
+        <div class="bracket-round">
+          <div class="rlabel">Semifinali</div>
+          <div class="bracket-match" data-partita="Semifinale 1 (1v4)"><div class="t"><span class="tn">1° Girone</span></div><div class="t"><span class="tn">4° Girone</span></div></div>
+          <div class="bracket-match" data-partita="Semifinale 2 (2v3)"><div class="t"><span class="tn">2° Girone</span></div><div class="t"><span class="tn">3° Girone</span></div></div>
         </div>
         <div class="bracket-round">
           <div class="rlabel">Finali</div>
-          <div class="bracket-match" data-partita="Finale 7°/8°"><div class="t"><span class="tn">Perd. Inc.1</span></div><div class="t"><span class="tn">Perd. Inc.2</span></div></div>
-          <div class="bracket-match" data-partita="Finale 5°/6°"><div class="t"><span class="tn">Perd. Inc.3</span></div><div class="t"><span class="tn">Perd. Inc.4</span></div></div>
-          <div class="bracket-match" data-partita="Finale 3°/4°"><div class="t"><span class="tn">?</span></div><div class="t"><span class="tn">?</span></div></div>
-          <div class="bracket-match" data-partita="Finale 1°/2°"><div class="t"><span class="tn">?</span></div><div class="t"><span class="tn">?</span></div></div>
+          <div class="bracket-match" data-partita="Finale 3°/4°"><div class="t"><span class="tn">Perd. SF1</span></div><div class="t"><span class="tn">Perd. SF2</span></div></div>
+          <div class="bracket-match" data-partita="Finale 1°/2°"><div class="t"><span class="tn">Vinc. SF1</span></div><div class="t"><span class="tn">Vinc. SF2</span></div></div>
         </div>
       </div>
     </div>
 
     <div class="note-box" id="tabelloneNote">
-      <b>Come si formano i Quarti (Senior):</b> le 8 qualificate arrivano dai 5 triangolari del venerdì (le 5 vincenti + le 3 migliori seconde). <b>Over40:</b> i Quarti sono direttamente le 8 squadre del girone O40, con torneo giocato tutto in sequenza su una metà campo, dalle 20:15 alle 22:15.
+      <b>Come si formano i Quarti (Senior):</b> le 8 qualificate arrivano dai 5 triangolari del venerdì (le 5 vincenti + le 3 migliori seconde). <b>Over40:</b> girone unico da 7 squadre (tutte contro tutte) il martedì; il venerdì le prime 4 giocano Semifinali e Finali, mentre 5ª-6ª-7ª si giocano il piazzamento in un mini-girone, tutto in sequenza su una metà campo dalle 20:15 alle 22:15.
     </div>
     <div class="data-status" id="statusTabellone"><span class="dot"></span><span class="txt">In attesa di connessione ai dati…</span></div>
   </section>
@@ -778,7 +780,7 @@
   // ==========================================================================
   // 1. Deploya Code.gs come App Web (accesso "Chiunque"), copia l'URL /exec
   // 2. Incollalo qui sotto tra le virgolette.
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAaaihsO4LC32UWxnSYPbQ5goR2FmYuPIPef-YdWKew4enJFm4QuOZ4bEQAejGqOby/exec";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMITp1YFm2Ws_1Q_4txk1qIN0pG-KDQceY79ptLx3PxiqezuLs4VzBhwEbZ8iij5B5uA/exec";
   const REFRESH_MS = 60000; // ogni 60 secondi
 
   let TORNEO_DATA = null;
@@ -937,14 +939,14 @@
         if (b) cards.push({ head: titolo.replace(' — Main',''), html: classificaTableHTML(b.righe) });
       });
     } else {
-      const a = findBlocco('OVER40 — GIRONE A');
-      const bb = findBlocco('OVER40 — GIRONE B');
-      const gen = findBlocco('OVER40 — CLASSIFICA GENERALE');
-      if (a) cards.push({ head: 'Over40 · Girone A', html: classificaTableHTML(a.righe) });
-      if (bb) cards.push({ head: 'Over40 · Girone B', html: classificaTableHTML(bb.righe) });
-      if (gen){
-        const rows = gen.righe.map(r => `<tr><td>${r['Posizione']}</td><td>${r['Squadra'] || '—'}</td><td>${r['Incrocio di riferimento'] || ''}</td></tr>`).join('');
-        cards.push({ head: 'Over40 · Classifica generale (post incroci)', html: `<table><thead><tr><th>Pos</th><th>Squadra</th><th>Incrocio</th></tr></thead><tbody>${rows}</tbody></table>` });
+      const g = findBlocco('OVER40 — GIRONE UNICO');
+      const mini = findBlocco('OVER40 — MINI-GIRONE');
+      const fin = findBlocco('OVER40 — CLASSIFICA FINALE');
+      if (g) cards.push({ head: 'Over40 · Girone (tutte contro tutte)', html: classificaTableHTML(g.righe) });
+      if (mini) cards.push({ head: 'Over40 · Mini-girone 5°-6°-7° (venerdì)', html: classificaTableHTML(mini.righe) });
+      if (fin){
+        const rows = fin.righe.map(r => `<tr><td>${r['Posizione']}</td><td>${r['Squadra'] || '—'}</td><td>${r['Riferimento'] || ''}</td></tr>`).join('');
+        cards.push({ head: 'Over40 · Classifica finale 1°-7° (post venerdì)', html: `<table><thead><tr><th>Pos</th><th>Squadra</th><th>Riferimento</th></tr></thead><tbody>${rows}</tbody></table>` });
       }
     }
 
