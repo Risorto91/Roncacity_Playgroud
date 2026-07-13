@@ -95,6 +95,15 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--green);flex-shrin
 .info-box{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:14px;font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;}
 .info-box strong{color:#fff;}
 
+.countdown-box{background:linear-gradient(135deg,rgba(123,47,190,0.15),rgba(245,197,24,0.08));border:1px solid rgba(155,89,182,0.35);border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.countdown-label{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:rgba(255,255,255,0.7);}
+.countdown-timer{display:flex;gap:8px;}
+.countdown-unit{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:7px;padding:6px 10px;min-width:52px;text-align:center;}
+.countdown-unit .num{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--green);line-height:1;}
+.countdown-unit .lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+.countdown-box.expired{border-color:rgba(226,75,74,0.4);background:rgba(226,75,74,0.08);}
+.countdown-box.expired .countdown-label{color:var(--danger);}
+
 .alert{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px;}
 .alert-danger{background:rgba(226,75,74,0.12);color:var(--danger);border:1px solid rgba(226,75,74,0.3);}
 .alert-warn{background:rgba(239,159,39,0.12);color:var(--warning);border:1px solid rgba(239,159,39,0.3);}
@@ -143,7 +152,18 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--green);flex-shrin
   </div>
 
   <div class="alert alert-warn">
-    ⚠️ <strong>Categoria Senior:</strong> iscrizioni chiuse, raggiunto il numero massimo di 24 squadre.
+    ⚠️ <strong>Categorie Senior e Over 40:</strong> iscrizioni chiuse, numero massimo di squadre raggiunto.
+  </div>
+
+  <!-- COUNTDOWN ISCRIZIONI UNDER -->
+  <div class="countdown-box" id="countdownBox">
+    <div class="countdown-label" id="countdownLabel">⏳ Iscrizioni U19/U15 chiudono tra:</div>
+    <div class="countdown-timer" id="countdownTimer">
+      <div class="countdown-unit"><div class="num" id="cdDays">--</div><div class="lbl">giorni</div></div>
+      <div class="countdown-unit"><div class="num" id="cdHours">--</div><div class="lbl">ore</div></div>
+      <div class="countdown-unit"><div class="num" id="cdMin">--</div><div class="lbl">min</div></div>
+      <div class="countdown-unit"><div class="num" id="cdSec">--</div><div class="lbl">sec</div></div>
+    </div>
   </div>
 
   <!-- SELEZIONE CATEGORIA -->
@@ -155,10 +175,10 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--green);flex-shrin
         Senior
         <span class="cat-sub" style="color:var(--danger);font-weight:600;">Iscrizioni chiuse (24/24)</span>
       </button>
-      <button class="cat-btn" onclick="selectCat('over40',this)">
+      <button class="cat-btn cat-btn-disabled" id="btnOver40" onclick="return false;">
         <span class="cat-icon">🏆</span>
         Over 40
-        <span class="cat-sub">Nati nel 1986 o prima</span>
+        <span class="cat-sub" style="color:var(--danger);font-weight:600;">Iscrizioni chiuse</span>
       </button>
       <button class="cat-btn" onclick="selectCat('u19',this)">
         <span class="cat-icon">⚡</span>
@@ -284,7 +304,56 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKPoIyUK9N1vD-
 const taglie = ['','M','L','XL','XXL','XXXL'];
 let players = [], nextId = 0;
 let categoria = '';
-const SENIOR_CHIUSO = true; // 24/24 squadre raggiunte
+const SENIOR_CHIUSO = true;  // 24/24 squadre raggiunte
+const OVER40_CHIUSO = true;  // iscrizioni Over 40 chiuse
+
+// Deadline iscrizioni categorie U19/U15: 14/07/2026 ore 23:00
+const UNDER_DEADLINE = new Date('2026-07-14T23:00:00');
+let underScadute = false;
+
+function updateCountdown() {
+  const now = new Date();
+  const diff = UNDER_DEADLINE - now;
+  const box = document.getElementById('countdownBox');
+  const label = document.getElementById('countdownLabel');
+  const timer = document.getElementById('countdownTimer');
+
+  if (diff <= 0) {
+    underScadute = true;
+    box.classList.add('expired');
+    label.textContent = '⛔ Iscrizioni U19/U15 chiuse';
+    timer.style.display = 'none';
+    lockUnderCategories();
+    return;
+  }
+
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+
+  document.getElementById('cdDays').textContent = days;
+  document.getElementById('cdHours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('cdMin').textContent = String(mins).padStart(2,'0');
+  document.getElementById('cdSec').textContent = String(secs).padStart(2,'0');
+}
+
+function lockUnderCategories() {
+  ['u19','u15'].forEach(cat => {
+    const btn = document.querySelector(`.cat-btn[onclick*="'${cat}'"]`);
+    if (!btn) return;
+    btn.classList.add('cat-btn-disabled');
+    btn.setAttribute('onclick', 'return false;');
+    const sub = btn.querySelector('.cat-sub');
+    if (sub) { sub.textContent = 'Iscrizioni chiuse'; sub.style.color = 'var(--danger)'; sub.style.fontWeight = '600'; }
+  });
+  if (categoria === 'u19' || categoria === 'u15') {
+    document.getElementById('alertCat').innerHTML = '<div class="alert alert-warn">Le iscrizioni per questa categoria si sono chiuse.</div>';
+  }
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
 
 // Quota d'iscrizione per atleta in base alla categoria
 const QUOTA_PER_ATLETA = {
@@ -296,6 +365,8 @@ const QUOTA_PER_ATLETA = {
 
 function selectCat(cat, el) {
   if (cat === 'senior' && SENIOR_CHIUSO) return;
+  if (cat === 'over40' && OVER40_CHIUSO) return;
+  if ((cat === 'u19' || cat === 'u15') && underScadute) return;
   categoria = cat;
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
