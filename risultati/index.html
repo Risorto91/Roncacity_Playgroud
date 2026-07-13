@@ -160,6 +160,37 @@
   .cd-box .n{ font-family:'Anton',sans-serif; font-size:26px; color:var(--gold); }
   .cd-box .u{ font-size:9px; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; margin-top:2px; }
 
+  /* ---- LIVE NOW (sostituisce il countdown a torneo iniziato) ---- */
+  .live-now{ margin: 26px 0 8px; }
+  .live-now-label{
+    display:inline-flex; align-items:center; gap:7px; font-family:'Anton',sans-serif;
+    font-size:13px; letter-spacing:0.1em; color:#ff5c5c; margin-bottom:12px;
+  }
+  .live-now-label .blinkdot{
+    width:8px; height:8px; border-radius:50%; background:#ff5c5c;
+    animation: blink 1.4s ease-in-out infinite;
+  }
+  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:0.25;} }
+  .live-now-grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap:10px;
+  }
+  .live-card{
+    background: linear-gradient(160deg, rgba(74,35,132,0.30), var(--bg-card));
+    border:1px solid var(--purple); border-radius: var(--radius);
+    padding: 12px 10px; text-align:left;
+  }
+  .live-card.upcoming{ border-color: var(--line); background: var(--bg-card); }
+  .live-card .lc-campo{ font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold-dim); display:flex; align-items:center; justify-content:space-between; }
+  .live-card .lc-status{ font-size:9px; padding:1px 6px; border-radius:8px; }
+  .live-card .lc-status.now{ color:#ff5c5c; border:1px solid #ff5c5c; }
+  .live-card .lc-status.next{ color:var(--muted); border:1px solid var(--line); }
+  .live-card .lc-teams{ font-family:'Anton',sans-serif; font-size:15px; margin: 6px 0 2px; line-height:1.25; }
+  .live-card .lc-meta{ font-size:10px; color:var(--muted); }
+  .live-card .lc-empty{ font-size:12px; color:var(--muted); padding: 6px 0; }
+  @media (max-width: 380px){
+    .live-card .lc-teams{ font-size:13px; }
+  }
+
   .cta-row{ display:flex; gap:10px; padding: 22px 20px 6px; }
   .btn{
     flex:1; text-align:center; padding: 14px 10px; border-radius: var(--radius);
@@ -404,6 +435,14 @@
         <div class="cd-box"><div class="n" id="cd-d">--</div><div class="u">Giorni</div></div>
         <div class="cd-box"><div class="n" id="cd-h">--</div><div class="u">Ore</div></div>
         <div class="cd-box"><div class="n" id="cd-m">--</div><div class="u">Min</div></div>
+      </div>
+
+      <div class="live-now" id="liveNow" style="display:none;">
+        <div class="live-now-label"><span class="blinkdot"></span> IN CORSO ORA</div>
+        <div class="live-now-grid" id="liveNowGrid">
+          <div class="live-card"><div class="lc-empty">Caricamento…</div></div>
+          <div class="live-card"><div class="lc-empty">Caricamento…</div></div>
+        </div>
       </div>
 
       <div class="cta-row">
@@ -863,26 +902,119 @@
     });
   });
 
-  // ---- Countdown al 13 luglio 2026, ore 18:00 ----
+  // ---- Countdown al 13 luglio 2026, ore 18:00 — poi passa al box "in corso ora" ----
   const targetDate = new Date('2026-07-13T18:00:00+02:00');
+
+  // Mappa giorno del torneo -> chiave usata in TORNEO_DATA.calendario
+  const GIORNI_TORNEO = {
+    '2026-07-13': 'lunedi',
+    '2026-07-14': 'martedi',
+    '2026-07-15': 'mercoledi',
+    '2026-07-16': 'giovedi',
+    '2026-07-17': 'venerdi'
+  };
+  function isoDateOnly(d){
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function dayKeyOggi(){
+    return GIORNI_TORNEO[isoDateOnly(new Date())] || null;
+  }
+  // Combina la data odierna con un orario "HH:MM" preso dal foglio
+  function orarioToDate(orarioStr){
+    if (!orarioStr) return null;
+    const m = String(orarioStr).match(/(\d{1,2}):(\d{2})/);
+    if (!m) return null;
+    const d = new Date();
+    d.setHours(parseInt(m[1],10), parseInt(m[2],10), 0, 0);
+    return d;
+  }
+
   function updateCountdown(){
     const now = new Date();
     const diff = targetDate - now;
+    const cdEl = document.getElementById('countdown');
+    const liveEl = document.getElementById('liveNow');
     if (diff <= 0){
-      document.getElementById('cd-d').textContent = '0';
-      document.getElementById('cd-h').textContent = '0';
-      document.getElementById('cd-m').textContent = '0';
+      // Torneo iniziato: nascondi il countdown, mostra "in corso ora"
+      cdEl.style.display = 'none';
+      liveEl.style.display = '';
+      renderLiveNow();
       return;
     }
+    cdEl.style.display = '';
+    liveEl.style.display = 'none';
     const d = Math.floor(diff / (1000*60*60*24));
     const h = Math.floor((diff / (1000*60*60)) % 24);
-    const m = Math.floor((diff / (1000*60)) % 60);
+    const mnt = Math.floor((diff / (1000*60)) % 60);
     document.getElementById('cd-d').textContent = d;
     document.getElementById('cd-h').textContent = h;
-    document.getElementById('cd-m').textContent = m;
+    document.getElementById('cd-m').textContent = mnt;
   }
   updateCountdown();
   setInterval(updateCountdown, 60000);
+
+  // ---- "IN CORSO ORA": partita in corso sui due campi, letta dal Google Sheet ----
+  function partitaCardHTML(m, status){
+    if (!m){
+      return `<div class="live-card"><div class="lc-campo">Campo</div><div class="lc-empty">Nessuna partita in programma</div></div>`;
+    }
+    const casa = m['Squadra Casa'] || m['Squadra/Slot Casa'] || '—';
+    const trasferta = m['Squadra Trasferta'] || m['Squadra/Slot Trasferta'] || '—';
+    const campoLbl = m['Campo'] ? `Campo ${m['Campo']}` : 'Campo';
+    const meta = m['Meta'] ? ` · metà ${m['Meta']}` : '';
+    const girone = m['Girone'] ? `Girone ${m['Girone']} · ` : '';
+    const orario = m['Orario'] || '';
+    const statusHTML = status === 'now'
+      ? `<span class="lc-status now">ORA</span>`
+      : `<span class="lc-status next">ORE ${orario}</span>`;
+    return `
+      <div class="live-card${status === 'next' ? ' upcoming' : ''}">
+        <div class="lc-campo">${campoLbl}${meta} ${statusHTML}</div>
+        <div class="lc-teams">${casa}<br>vs ${trasferta}</div>
+        <div class="lc-meta">${girone}${status === 'now' ? 'iniziata alle ' + orario : ''}</div>
+      </div>`;
+  }
+
+  function trovaPartitaPerCampo(campoNum){
+    const key = dayKeyOggi();
+    if (!TORNEO_DATA || !key || key === 'venerdi' || !TORNEO_DATA.calendario) return { match:null, status:null };
+    const partite = (TORNEO_DATA.calendario[key] || []).filter(m => String(m['Campo']) === String(campoNum));
+    const now = new Date();
+
+    // Partite già iniziate (orario <= ora) e non ancora segnate come giocate: la più recente è quella "in corso"
+    const iniziate = partite
+      .filter(m => !m.giocata && orarioToDate(m['Orario']) && orarioToDate(m['Orario']) <= now)
+      .sort((a,b) => orarioToDate(b['Orario']) - orarioToDate(a['Orario']));
+    if (iniziate.length) return { match: iniziate[0], status: 'now' };
+
+    // Altrimenti la prossima in programma
+    const future = partite
+      .filter(m => !m.giocata && orarioToDate(m['Orario']) && orarioToDate(m['Orario']) > now)
+      .sort((a,b) => orarioToDate(a['Orario']) - orarioToDate(b['Orario']));
+    if (future.length) return { match: future[0], status: 'next' };
+
+    return { match:null, status:null };
+  }
+
+  function renderLiveNow(){
+    const grid = document.getElementById('liveNowGrid');
+    const key = dayKeyOggi();
+    if (!TORNEO_DATA){
+      grid.innerHTML = `<div class="live-card"><div class="lc-empty">Caricamento…</div></div><div class="live-card"><div class="lc-empty">Caricamento…</div></div>`;
+      return;
+    }
+    if (!key){
+      grid.innerHTML = `<div class="live-card"><div class="lc-empty">Il torneo non è in programma oggi.</div></div>`;
+      return;
+    }
+    if (key === 'venerdi'){
+      grid.innerHTML = `<div class="live-card"><div class="lc-empty">Oggi: fase finale — vedi il Tabellone per i risultati live.</div></div>`;
+      return;
+    }
+    const c1 = trovaPartitaPerCampo(1);
+    const c2 = trovaPartitaPerCampo(2);
+    grid.innerHTML = partitaCardHTML(c1.match, c1.status) + partitaCardHTML(c2.match, c2.status);
+  }
 
   // ---- Link iscrizioni: da collegare al form esistente ----
   document.getElementById('iscrizioniLink').href = 'https://risorto91.github.io/Roncacity_Playgroud/';
@@ -922,6 +1054,9 @@
   function renderAll(){
     updateRisultatiView();
     renderTabellone();
+    if (document.getElementById('liveNow').style.display !== 'none'){
+      renderLiveNow();
+    }
   }
 
   // ---- Trova un blocco "Classifiche" per titolo (match parziale, case-insensitive) ----
