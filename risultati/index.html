@@ -302,6 +302,23 @@
   }
   .pill.active{ border-color:var(--gold-dim); color:var(--gold); background: rgba(227,178,60,0.08); }
 
+  /* ---- FILTRI (squadra / girone) ---- */
+  .filter-bar{ display:flex; gap:8px; padding: 8px 18px 4px; flex-wrap:wrap; align-items:center; }
+  .filter-bar input[type=text]{
+    flex:1; min-width:150px; background: var(--bg-card); border:1px solid var(--line); border-radius:20px;
+    padding:9px 16px; color:var(--white); font-size:13px; font-family:'Inter',sans-serif;
+  }
+  .filter-bar input[type=text]::placeholder{ color:var(--muted); }
+  .filter-bar select{
+    background: var(--bg-card); border:1px solid var(--line); border-radius:20px;
+    padding:9px 14px; color:var(--white); font-size:13px; font-family:'Inter',sans-serif; cursor:pointer;
+  }
+  .filter-bar input:focus, .filter-bar select:focus{ outline:none; border-color:var(--gold-dim); }
+  .filter-clear{
+    font-size:12px; color:var(--gold); cursor:pointer; white-space:nowrap; padding:6px 4px;
+  }
+  .filter-clear:hover{ text-decoration:underline; }
+
   /* ---- BRACKET ---- */
   .bracket-scroll{ overflow-x:auto; padding: 10px 18px 30px; -webkit-overflow-scrolling:touch; }
   .bracket-hint{ padding: 4px 20px 0; font-size:11px; color:var(--gold-dim); }
@@ -539,6 +556,12 @@
       <div class="pill" data-day="mercoledi">Mer 15/07</div>
       <div class="pill" data-day="giovedi">Gio 16/07</div>
       <div class="pill" data-day="classifiche">Classifiche</div>
+    </div>
+
+    <div class="filter-bar" id="filterBar">
+      <input type="text" id="filterSquadra" placeholder="🔍 Cerca squadra…">
+      <select id="filterGirone"><option value="">Tutti i gironi</option></select>
+      <div class="filter-clear" id="filterClear" style="display:none;">✕ Rimuovi filtri</div>
     </div>
 
     <div id="gironiContainer" style="display:none;">
@@ -834,6 +857,8 @@
   let currentCatRisultati = 'senior';
   let currentDayRisultati = 'lunedi';
   let currentCatTabellone = 'senior';
+  let filtroSquadra = '';
+  let filtroGirone = '';
 
   // ---- Navigazione tra sezioni ----
   const links = document.querySelectorAll('[data-target]');
@@ -867,9 +892,73 @@
       document.getElementById('catPillsRisultati').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
       currentCatRisultati = pill.dataset.cat;
+      filtroGirone = '';
+      document.getElementById('filterGirone').value = '';
+      popolaFiltroGirone();
       updateRisultatiView();
     });
   });
+
+  // ---- Filtro squadra (ricerca live) e filtro girone ----
+  const filterSquadraEl = document.getElementById('filterSquadra');
+  const filterGironeEl = document.getElementById('filterGirone');
+  const filterClearEl = document.getElementById('filterClear');
+
+  function aggiornaVisibilitaClear(){
+    filterClearEl.style.display = (filtroSquadra || filtroGirone) ? '' : 'none';
+  }
+
+  filterSquadraEl.addEventListener('input', () => {
+    filtroSquadra = filterSquadraEl.value.trim();
+    aggiornaVisibilitaClear();
+    updateRisultatiView();
+  });
+  filterGironeEl.addEventListener('change', () => {
+    filtroGirone = filterGironeEl.value;
+    aggiornaVisibilitaClear();
+    updateRisultatiView();
+  });
+  filterClearEl.addEventListener('click', () => {
+    filtroSquadra = ''; filtroGirone = '';
+    filterSquadraEl.value = ''; filterGironeEl.value = '';
+    aggiornaVisibilitaClear();
+    updateRisultatiView();
+  });
+
+  // Popola il menu "girone" in base alla categoria corrente, leggendo i valori presenti nel foglio
+  function popolaFiltroGirone(){
+    const sel = filterGironeEl;
+    const valorePrecedente = sel.value;
+    sel.innerHTML = '<option value="">Tutti i gironi</option>';
+    if (!TORNEO_DATA || !TORNEO_DATA.calendario) return;
+    const filtroCat = currentCatRisultati === 'senior' ? 'Main' : 'Over40';
+    const gironi = new Set();
+    Object.values(TORNEO_DATA.calendario).forEach(arr => {
+      (arr || []).forEach(m => {
+        if ((m['Torneo'] || '').indexOf(filtroCat) !== -1 && m['Girone']) gironi.add(String(m['Girone']));
+      });
+    });
+    Array.from(gironi).sort().forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g; opt.textContent = 'Girone ' + g;
+      sel.appendChild(opt);
+    });
+    if (Array.from(gironi).includes(valorePrecedente)) sel.value = valorePrecedente;
+  }
+
+  // Applica i filtri squadra/girone a un array di partite
+  function applicaFiltri(righe){
+    return righe.filter(m => {
+      if (filtroGirone && String(m['Girone'] || '') !== filtroGirone) return false;
+      if (filtroSquadra){
+        const q = filtroSquadra.toLowerCase();
+        const casa = String(m['Squadra Casa'] || m['Squadra/Slot Casa'] || '').toLowerCase();
+        const trasferta = String(m['Squadra Trasferta'] || m['Squadra/Slot Trasferta'] || '').toLowerCase();
+        if (casa.indexOf(q) === -1 && trasferta.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+  }
 
   // ---- Pillole giorno (Lun/Mar/Mer/Gio/Classifiche) ----
   document.getElementById('dayPillsRisultati').querySelectorAll('.pill').forEach(pill => {
@@ -1057,6 +1146,7 @@
   }
 
   function renderAll(){
+    popolaFiltroGirone();
     updateRisultatiView();
     renderTabellone();
     if (document.getElementById('liveNow').style.display !== 'none'){
@@ -1139,8 +1229,14 @@
       return;
     }
     const filtro = currentCatRisultati === 'senior' ? 'Main' : 'Over40';
-    const rows = giorno.filter(m => (m['Torneo'] || '').indexOf(filtro) !== -1);
-    el.innerHTML = (rows.length ? rows : giorno).map(matchRowHTML).join('');
+    let rows = giorno.filter(m => (m['Torneo'] || '').indexOf(filtro) !== -1);
+    rows = rows.length ? rows : giorno;
+    rows = applicaFiltri(rows);
+    if (!rows.length){
+      el.innerHTML = '<div class="match-row"><div class="match-teams"><span>Nessuna partita trovata con questi filtri.</span></div></div>';
+      return;
+    }
+    el.innerHTML = rows.map(matchRowHTML).join('');
   }
 
   function renderProssimePartite(){
@@ -1161,11 +1257,22 @@
     el.innerHTML = prossime.map(matchRowHTML).join('');
   }
 
+  // I triangolari finali vengono mostrati solo da venerdì 17/07 in poi, quando i gironi sono conclusi:
+  // prima di allora eventuali abbinamenti nel foglio sono solo provvisori/di calcolo e non vanno mostrati alle squadre.
+  const DATA_TRIANGOLARI = new Date('2026-07-17T00:00:00+02:00');
+  function triangolariDisponibili(){
+    return new Date() >= DATA_TRIANGOLARI;
+  }
+
   function renderTriangolari(){
     const wrap = document.getElementById('triangolariCard');
     const body = document.getElementById('triangolariBody');
     if (currentCatRisultati !== 'senior'){ wrap.style.display = 'none'; return; }
     wrap.style.display = '';
+    if (!triangolariDisponibili()){
+      body.innerHTML = '<div class="match-row"><div class="match-teams"><span>Disponibili da venerdì 17/07</span></div></div>';
+      return;
+    }
     if (!TORNEO_DATA){ return; }
     const blocchi = (TORNEO_DATA.classifiche || []).filter(b => b.titolo.toUpperCase().indexOf('TRIANGOLARE') === 0);
     if (!blocchi.length){
@@ -1178,6 +1285,7 @@
         <table><thead><tr><th>Squadra</th><th>V</th><th>Diff</th><th>PF</th></tr></thead><tbody>${rows}</tbody></table>`;
     }).join('');
   }
+
 
   // ---- Tabellone finale (Senior + Over40) ----
   function renderTabellone(){
