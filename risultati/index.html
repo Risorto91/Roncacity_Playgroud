@@ -249,6 +249,21 @@
     color: var(--muted); font-size:10px; text-align:center; padding:6px;
   }
   img.gallery-item{ display:block; object-fit:cover; }
+  .gallery-item.photo{ cursor:pointer; padding:0; border:1px solid var(--line); transition: transform 0.15s, border-color 0.15s; }
+  .gallery-item.photo:hover{ border-color: var(--gold-dim); transform: scale(1.02); }
+  .gallery-item.photo img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:3px; }
+
+  .lightbox{
+    display:none; position:fixed; inset:0; z-index:200;
+    background: rgba(0,0,0,0.92); align-items:center; justify-content:center; padding:24px;
+  }
+  .lightbox.open{ display:flex; }
+  .lightbox img{ max-width:100%; max-height:100%; border-radius:6px; }
+  .lightbox-close{
+    position:absolute; top:18px; right:22px; font-size:26px; color:var(--white);
+    cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center;
+    border-radius:50%; background: rgba(255,255,255,0.08);
+  }
 
   .insta-scroll{
     display:flex; gap:12px; overflow-x:auto; padding: 16px 18px 8px;
@@ -767,13 +782,21 @@
     <div class="section-sub">Foto e video del torneo 2026 — in aggiornamento durante l'evento</div>
     <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripGalleria"></div></div>
 
-    <div class="gallery-grid" style="grid-template-columns: repeat(3,1fr);">
-      <div class="gallery-item">foto/video</div>
-      <div class="gallery-item">foto/video</div>
-      <div class="gallery-item">foto/video</div>
-      <div class="gallery-item">foto/video</div>
-      <div class="gallery-item">foto/video</div>
-      <div class="gallery-item">foto/video</div>
+    <div class="tabs-inline" id="galleryDayPills">
+      <div class="pill active" data-day="lunedi">Lun 13/07</div>
+      <div class="pill" data-day="martedi">Mar 14/07</div>
+      <div class="pill" data-day="mercoledi">Mer 15/07</div>
+      <div class="pill" data-day="giovedi">Gio 16/07</div>
+      <div class="pill" data-day="venerdi">Ven 17/07</div>
+    </div>
+
+    <div class="gallery-grid" id="galleryGrid" style="grid-template-columns: repeat(3,1fr);">
+      <!-- Popolata da JS in base al giorno selezionato -->
+    </div>
+
+    <div class="lightbox" id="lightbox">
+      <span class="lightbox-close" id="lightboxClose">✕</span>
+      <img id="lightboxImg" src="" alt="">
     </div>
 
     <a class="archive-card" href="storico/2025.html" style="display:flex; text-decoration:none; margin-top:4px;">
@@ -1042,6 +1065,72 @@
 
   // ---- Link iscrizioni: da collegare al form esistente ----
   document.getElementById('iscrizioniLink').href = 'https://risorto91.github.io/Roncacity_Playgroud/';
+
+  // ==========================================================================
+  // GALLERIA 2026 — organizzata per giornata (cartelle assets/gallery/<cartella>/)
+  // Aggiorna solo "count" (numero foto caricate) man mano che carichi i file su
+  // GitHub: i nomi vengono generati da soli come Foto_1.jpg, Foto_2.jpg, ecc.
+  // ==========================================================================
+  const galleryConfig = {
+    lunedi:    { label:'Lun 13/07',  folder:'assets/gallery/Lunedì',    count:56, ext:'jpg', prefix:'Foto_' },
+    martedi:   { label:'Mar 14/07',  folder:'assets/gallery/martedi',   count:0,  ext:'jpg', prefix:'Foto_' },
+    mercoledi: { label:'Mer 15/07',  folder:'assets/gallery/mercoledi', count:0,  ext:'jpg', prefix:'Foto_' },
+    giovedi:   { label:'Gio 16/07',  folder:'assets/gallery/giovedi',   count:0,  ext:'jpg', prefix:'Foto_' },
+    venerdi:   { label:'Ven 17/07',  folder:'assets/gallery/venerdi',   count:0,  ext:'jpg', prefix:'Foto_' }
+  };
+  let currentGalleryDay = 'lunedi';
+
+  function galleryPhotosForDay(dayKey){
+    const cfg = galleryConfig[dayKey];
+    if (!cfg || !cfg.count) return [];
+    const arr = [];
+    for (let i = 1; i <= cfg.count; i++) arr.push(`${cfg.folder}/${cfg.prefix}${i}.${cfg.ext}`);
+    return arr;
+  }
+
+  function renderGallery(){
+    const grid = document.getElementById('galleryGrid');
+    if (!grid) return;
+    const photos = galleryPhotosForDay(currentGalleryDay);
+    const dayLabel = (galleryConfig[currentGalleryDay] || {}).label || currentGalleryDay;
+    if (!photos.length){
+      grid.innerHTML = `<div class="gallery-item" style="grid-column: 1 / -1; aspect-ratio: auto; padding: 30px;">Foto di ${dayLabel} in arrivo</div>`;
+      return;
+    }
+    grid.innerHTML = photos.map((src, i) => `
+      <div class="gallery-item photo" data-idx="${i}">
+        <img src="${src}" alt="Ronca City Playground 2026 - ${dayLabel} - foto ${i+1}" loading="lazy">
+      </div>
+    `).join('');
+    grid.querySelectorAll('.gallery-item.photo').forEach(el => {
+      el.addEventListener('click', () => openLightbox(photos[Number(el.dataset.idx)]));
+    });
+  }
+
+  document.getElementById('galleryDayPills').querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.getElementById('galleryDayPills').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentGalleryDay = pill.dataset.day;
+      renderGallery();
+    });
+  });
+
+  function openLightbox(src){
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox(){
+    document.getElementById('lightbox').classList.remove('open');
+    document.getElementById('lightboxImg').src = '';
+  }
+  document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+  document.getElementById('lightbox').addEventListener('click', e => {
+    if (e.target.id === 'lightbox') closeLightbox();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  renderGallery();
 
   // ==========================================================================
   // FETCH DATI TORNEO DAL GOOGLE SHEET (via Apps Script) — Senior/Over40
