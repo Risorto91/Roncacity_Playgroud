@@ -302,23 +302,6 @@
   }
   .pill.active{ border-color:var(--gold-dim); color:var(--gold); background: rgba(227,178,60,0.08); }
 
-  /* ---- FILTRI (squadra / girone) ---- */
-  .filter-bar{ display:flex; gap:8px; padding: 8px 18px 4px; flex-wrap:wrap; align-items:center; }
-  .filter-bar input[type=text]{
-    flex:1; min-width:150px; background: var(--bg-card); border:1px solid var(--line); border-radius:20px;
-    padding:9px 16px; color:var(--white); font-size:13px; font-family:'Inter',sans-serif;
-  }
-  .filter-bar input[type=text]::placeholder{ color:var(--muted); }
-  .filter-bar select{
-    background: var(--bg-card); border:1px solid var(--line); border-radius:20px;
-    padding:9px 14px; color:var(--white); font-size:13px; font-family:'Inter',sans-serif; cursor:pointer;
-  }
-  .filter-bar input:focus, .filter-bar select:focus{ outline:none; border-color:var(--gold-dim); }
-  .filter-clear{
-    font-size:12px; color:var(--gold); cursor:pointer; white-space:nowrap; padding:6px 4px;
-  }
-  .filter-clear:hover{ text-decoration:underline; }
-
   /* ---- BRACKET ---- */
   .bracket-scroll{ overflow-x:auto; padding: 10px 18px 30px; -webkit-overflow-scrolling:touch; }
   .bracket-hint{ padding: 4px 20px 0; font-size:11px; color:var(--gold-dim); }
@@ -558,12 +541,6 @@
       <div class="pill" data-day="classifiche">Classifiche</div>
     </div>
 
-    <div class="filter-bar" id="filterBar">
-      <input type="text" id="filterSquadra" placeholder="🔍 Cerca squadra…">
-      <select id="filterGirone"><option value="">Tutti i gironi</option></select>
-      <div class="filter-clear" id="filterClear" style="display:none;">✕ Rimuovi filtri</div>
-    </div>
-
     <div id="gironiContainer" style="display:none;">
       <!-- Le card dei gironi (A/B/C per Senior, Girone Unico/Mini-girone/Finale per Over40) vengono generate da JS -->
     </div>
@@ -667,109 +644,101 @@
   <!-- ============ U19/U17 ============ -->
   <section class="section" id="u19">
     <div class="section-heading"><span class="num">04</span><h2>U19 / U17</h2></div>
-    <div class="section-sub">Giovedì 16/07 (Campo 2) · Fase finale venerdì 17/07</div>
+    <div class="section-sub">Girone unico — Giovedì e Venerdì (Campo 2) · Fase finale venerdì sera</div>
     <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripU19"></div></div>
 
-    <div class="note-box">
-      Questa categoria non è ancora collegata al foglio dati: appena i gironi U19/U17 saranno definiti nel Google Sheet, questa sezione si popolerà automaticamente allo stesso modo di Senior/Over40.
-    </div>
-
-    <div class="tabs-inline">
-      <div class="pill active" data-cat="g1">Girone G1</div>
-      <div class="pill" data-cat="g2">Girone G2</div>
+    <div class="tabs-inline" id="dayPillsU19">
+      <div class="pill active" data-day="giovedi">Gio 16/07</div>
+      <div class="pill" data-day="venerdi">Ven 17/07</div>
     </div>
 
     <div class="card">
-      <div class="card-head">Classifica</div>
+      <div class="card-head">Classifica — Girone Unico</div>
       <div class="table-scroll">
         <table>
-          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th></tr></thead>
-          <tbody><tr><td>—</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>S</th><th>PF</th><th>PS</th><th>Diff</th></tr></thead>
+          <tbody id="classificaU19Body"><tr><td colspan="7">Caricamento classifica…</td></tr></tbody>
         </table>
       </div>
     </div>
 
     <div class="card">
       <div class="card-head">Calendario</div>
-      <div class="match-row">
-        <div class="match-teams"><span>Squadra A vs Squadra B</span><span class="match-meta">Campo 2 · metà A</span></div>
-        <div class="match-score">16:00</div>
+      <div id="calendarioU19Body">
+        <div class="match-row"><div class="match-teams"><span>Caricamento calendario…</span></div></div>
       </div>
     </div>
 
     <div class="section-heading"><span class="num">—</span><h2 style="font-size:16px;">Fase Finale</h2></div>
-    <div class="section-sub">Venerdì 17/07 — 1°/2° di ogni girone si incrociano (1°G1-2°G2, 1°G2-2°G1)</div>
+    <div class="section-sub">Venerdì — semifinali incrociate 1°vs4° e 2°vs3° del girone unico</div>
     <div class="bracket-scroll">
       <div class="bracket">
         <div class="bracket-round">
           <div class="rlabel">Semifinali</div>
-          <div class="bracket-match"><div class="t">1° G1</div><div class="t">2° G2</div></div>
-          <div class="bracket-match"><div class="t">1° G2</div><div class="t">2° G1</div></div>
+          <div class="bracket-match" data-partita="SF1_U19"><div class="t"><span class="tn">1°</span></div><div class="t"><span class="tn">4°</span></div></div>
+          <div class="bracket-match" data-partita="SF2_U19"><div class="t"><span class="tn">2°</span></div><div class="t"><span class="tn">3°</span></div></div>
         </div>
         <div class="bracket-round">
           <div class="rlabel">Finale 3°/4°</div>
-          <div class="bracket-match"><div class="t">Perd. SF1</div><div class="t">Perd. SF2</div></div>
+          <div class="bracket-match" data-partita="F34_U19"><div class="t"><span class="tn">Perd. SF1</span></div><div class="t"><span class="tn">Perd. SF2</span></div></div>
         </div>
         <div class="bracket-round">
           <div class="rlabel">Finale 1°/2°</div>
-          <div class="bracket-match"><div class="t">Vinc. SF1</div><div class="t">Vinc. SF2</div></div>
+          <div class="bracket-match" data-partita="F12_U19"><div class="t"><span class="tn">Vinc. SF1</span></div><div class="t"><span class="tn">Vinc. SF2</span></div></div>
         </div>
       </div>
     </div>
+    <div class="data-status" id="statusU19"><span class="dot"></span><span class="txt">In attesa di connessione ai dati…</span></div>
   </section>
 
   <!-- ============ U15/U14 ============ -->
   <section class="section" id="u15">
     <div class="section-heading"><span class="num">05</span><h2>U15 / U14</h2></div>
-    <div class="section-sub">Giovedì 16/07 (Campo 1) · Fase finale venerdì 17/07</div>
+    <div class="section-sub">Girone unico — Giovedì e Venerdì (Campo 1) · Fase finale venerdì</div>
     <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripU15"></div></div>
 
-    <div class="note-box">
-      Questa categoria non è ancora collegata al foglio dati: appena i gironi U15/U14 saranno definiti nel Google Sheet, questa sezione si popolerà automaticamente allo stesso modo di Senior/Over40.
-    </div>
-
-    <div class="tabs-inline">
-      <div class="pill active" data-cat="g1">Girone G1</div>
-      <div class="pill" data-cat="g2">Girone G2</div>
+    <div class="tabs-inline" id="dayPillsU15">
+      <div class="pill active" data-day="giovedi">Gio 16/07</div>
+      <div class="pill" data-day="venerdi">Ven 17/07</div>
     </div>
 
     <div class="card">
-      <div class="card-head">Classifica</div>
+      <div class="card-head">Classifica — Girone Unico</div>
       <div class="table-scroll">
         <table>
-          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th></tr></thead>
-          <tbody><tr><td>—</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+          <thead><tr><th>Squadra</th><th>PG</th><th>V</th><th>S</th><th>PF</th><th>PS</th><th>Diff</th></tr></thead>
+          <tbody id="classificaU15Body"><tr><td colspan="7">Caricamento classifica…</td></tr></tbody>
         </table>
       </div>
     </div>
 
     <div class="card">
       <div class="card-head">Calendario</div>
-      <div class="match-row">
-        <div class="match-teams"><span>Squadra A vs Squadra B</span><span class="match-meta">Campo 1 · metà A</span></div>
-        <div class="match-score">16:00</div>
+      <div id="calendarioU15Body">
+        <div class="match-row"><div class="match-teams"><span>Caricamento calendario…</span></div></div>
       </div>
     </div>
 
     <div class="section-heading"><span class="num">—</span><h2 style="font-size:16px;">Fase Finale</h2></div>
-    <div class="section-sub">Venerdì 17/07 — 1°/2° di ogni girone si incrociano (1°G1-2°G2, 1°G2-2°G1)</div>
+    <div class="section-sub">Venerdì — semifinali incrociate 1°vs4° e 2°vs3° del girone unico</div>
     <div class="bracket-scroll">
       <div class="bracket">
         <div class="bracket-round">
           <div class="rlabel">Semifinali</div>
-          <div class="bracket-match"><div class="t">1° G1</div><div class="t">2° G2</div></div>
-          <div class="bracket-match"><div class="t">1° G2</div><div class="t">2° G1</div></div>
+          <div class="bracket-match" data-partita="SF1_U15"><div class="t"><span class="tn">1°</span></div><div class="t"><span class="tn">4°</span></div></div>
+          <div class="bracket-match" data-partita="SF2_U15"><div class="t"><span class="tn">2°</span></div><div class="t"><span class="tn">3°</span></div></div>
         </div>
         <div class="bracket-round">
           <div class="rlabel">Finale 3°/4°</div>
-          <div class="bracket-match"><div class="t">Perd. SF1</div><div class="t">Perd. SF2</div></div>
+          <div class="bracket-match" data-partita="F34_U15"><div class="t"><span class="tn">Perd. SF1</span></div><div class="t"><span class="tn">Perd. SF2</span></div></div>
         </div>
         <div class="bracket-round">
           <div class="rlabel">Finale 1°/2°</div>
-          <div class="bracket-match"><div class="t">Vinc. SF1</div><div class="t">Vinc. SF2</div></div>
+          <div class="bracket-match" data-partita="F12_U15"><div class="t"><span class="tn">Vinc. SF1</span></div><div class="t"><span class="tn">Vinc. SF2</span></div></div>
         </div>
       </div>
     </div>
+    <div class="data-status" id="statusU15"><span class="dot"></span><span class="txt">In attesa di connessione ai dati…</span></div>
   </section>
 
   <!-- ============ SPONSOR ============ -->
@@ -853,12 +822,19 @@
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMITp1YFm2Ws_1Q_4txk1qIN0pG-KDQceY79ptLx3PxiqezuLs4VzBhwEbZ8iij5B5uA/exec";
   const REFRESH_MS = 60000; // ogni 60 secondi
 
+  // Apps Script del torneo UNDER (U15/U14 + U19/U17) — foglio separato,
+  // generato dal file RoncaCityPlayground_Under.xlsx. Incolla qui l'URL
+  // /exec dopo aver distribuito Code.gs sul foglio Under.
+  const APPS_SCRIPT_URL_UNDER = "https://script.google.com/macros/s/AKfycbzEsgaAFUXJF7SfJOSvlGXYIoeJvz9aju26bJyH3iyhA6aBRFonlvNqVfJkfEgr5_5uOA/exec";
+  const REFRESH_MS_UNDER = 60000;
+
   let TORNEO_DATA = null;
+  let UNDER_DATA = null;
   let currentCatRisultati = 'senior';
   let currentDayRisultati = 'lunedi';
   let currentCatTabellone = 'senior';
-  let filtroSquadra = '';
-  let filtroGirone = '';
+  let currentDayU19 = 'giovedi';
+  let currentDayU15 = 'giovedi';
 
   // ---- Navigazione tra sezioni ----
   const links = document.querySelectorAll('[data-target]');
@@ -892,73 +868,9 @@
       document.getElementById('catPillsRisultati').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
       currentCatRisultati = pill.dataset.cat;
-      filtroGirone = '';
-      document.getElementById('filterGirone').value = '';
-      popolaFiltroGirone();
       updateRisultatiView();
     });
   });
-
-  // ---- Filtro squadra (ricerca live) e filtro girone ----
-  const filterSquadraEl = document.getElementById('filterSquadra');
-  const filterGironeEl = document.getElementById('filterGirone');
-  const filterClearEl = document.getElementById('filterClear');
-
-  function aggiornaVisibilitaClear(){
-    filterClearEl.style.display = (filtroSquadra || filtroGirone) ? '' : 'none';
-  }
-
-  filterSquadraEl.addEventListener('input', () => {
-    filtroSquadra = filterSquadraEl.value.trim();
-    aggiornaVisibilitaClear();
-    updateRisultatiView();
-  });
-  filterGironeEl.addEventListener('change', () => {
-    filtroGirone = filterGironeEl.value;
-    aggiornaVisibilitaClear();
-    updateRisultatiView();
-  });
-  filterClearEl.addEventListener('click', () => {
-    filtroSquadra = ''; filtroGirone = '';
-    filterSquadraEl.value = ''; filterGironeEl.value = '';
-    aggiornaVisibilitaClear();
-    updateRisultatiView();
-  });
-
-  // Popola il menu "girone" in base alla categoria corrente, leggendo i valori presenti nel foglio
-  function popolaFiltroGirone(){
-    const sel = filterGironeEl;
-    const valorePrecedente = sel.value;
-    sel.innerHTML = '<option value="">Tutti i gironi</option>';
-    if (!TORNEO_DATA || !TORNEO_DATA.calendario) return;
-    const filtroCat = currentCatRisultati === 'senior' ? 'Main' : 'Over40';
-    const gironi = new Set();
-    Object.values(TORNEO_DATA.calendario).forEach(arr => {
-      (arr || []).forEach(m => {
-        if ((m['Torneo'] || '').indexOf(filtroCat) !== -1 && m['Girone']) gironi.add(String(m['Girone']));
-      });
-    });
-    Array.from(gironi).sort().forEach(g => {
-      const opt = document.createElement('option');
-      opt.value = g; opt.textContent = 'Girone ' + g;
-      sel.appendChild(opt);
-    });
-    if (Array.from(gironi).includes(valorePrecedente)) sel.value = valorePrecedente;
-  }
-
-  // Applica i filtri squadra/girone a un array di partite
-  function applicaFiltri(righe){
-    return righe.filter(m => {
-      if (filtroGirone && String(m['Girone'] || '') !== filtroGirone) return false;
-      if (filtroSquadra){
-        const q = filtroSquadra.toLowerCase();
-        const casa = String(m['Squadra Casa'] || m['Squadra/Slot Casa'] || '').toLowerCase();
-        const trasferta = String(m['Squadra Trasferta'] || m['Squadra/Slot Trasferta'] || '').toLowerCase();
-        if (casa.indexOf(q) === -1 && trasferta.indexOf(q) === -1) return false;
-      }
-      return true;
-    });
-  }
 
   // ---- Pillole giorno (Lun/Mar/Mer/Gio/Classifiche) ----
   document.getElementById('dayPillsRisultati').querySelectorAll('.pill').forEach(pill => {
@@ -967,6 +879,24 @@
       pill.classList.add('active');
       currentDayRisultati = pill.dataset.day;
       updateRisultatiView();
+    });
+  });
+
+  // ---- Pillole giorno U19 / U15 ----
+  document.getElementById('dayPillsU19').querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.getElementById('dayPillsU19').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentDayU19 = pill.dataset.day;
+      renderCalendarioUnder('U19');
+    });
+  });
+  document.getElementById('dayPillsU15').querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.getElementById('dayPillsU15').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentDayU15 = pill.dataset.day;
+      renderCalendarioUnder('U15');
     });
   });
 
@@ -1114,7 +1044,7 @@
   document.getElementById('iscrizioniLink').href = 'https://risorto91.github.io/Roncacity_Playgroud/';
 
   // ==========================================================================
-  // FETCH DATI TORNEO DAL GOOGLE SHEET (via Apps Script)
+  // FETCH DATI TORNEO DAL GOOGLE SHEET (via Apps Script) — Senior/Over40
   // ==========================================================================
   async function fetchTorneoData(){
     const statusEls = [document.getElementById('statusRisultati'), document.getElementById('statusTabellone')];
@@ -1146,12 +1076,108 @@
   }
 
   function renderAll(){
-    popolaFiltroGirone();
     updateRisultatiView();
     renderTabellone();
     if (document.getElementById('liveNow').style.display !== 'none'){
       renderLiveNow();
     }
+  }
+
+  // ==========================================================================
+  // FETCH DATI TORNEO UNDER (U15/U14 + U19/U17) — Apps Script separato
+  // ==========================================================================
+  async function fetchUnderData(){
+    const statusEls = [document.getElementById('statusU19'), document.getElementById('statusU15')];
+    if (!APPS_SCRIPT_URL_UNDER || APPS_SCRIPT_URL_UNDER.indexOf('INCOLLA_QUI') !== -1){
+      statusEls.forEach(el => {
+        el.classList.add('err');
+        el.querySelector('.txt').textContent = 'Collegamento dati Under non configurato (APPS_SCRIPT_URL_UNDER)';
+      });
+      return;
+    }
+    try {
+      const res = await fetch(APPS_SCRIPT_URL_UNDER, { cache: 'no-store' });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || 'Errore sconosciuto');
+      UNDER_DATA = json.under;
+      const stamp = new Date(json.generatedAt).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+      statusEls.forEach(el => {
+        el.classList.remove('err');
+        el.querySelector('.txt').textContent = 'Dati aggiornati alle ' + stamp;
+      });
+      renderUnderAll();
+    } catch (err) {
+      statusEls.forEach(el => {
+        el.classList.add('err');
+        el.querySelector('.txt').textContent = 'Errore nel caricamento dati: ' + err.message;
+      });
+      console.error('Errore fetch dati Under:', err);
+    }
+  }
+
+  function renderUnderAll(){
+    renderClassificaUnder('U19');
+    renderClassificaUnder('U15');
+    renderCalendarioUnder('U19');
+    renderCalendarioUnder('U15');
+    renderBracketUnder('U19');
+    renderBracketUnder('U15');
+  }
+
+  function renderClassificaUnder(cat){
+    const body = document.getElementById(cat === 'U19' ? 'classificaU19Body' : 'classificaU15Body');
+    if (!UNDER_DATA || !UNDER_DATA[cat]) return;
+    const righe = UNDER_DATA[cat].classifica || [];
+    if (!righe.length){
+      body.innerHTML = '<tr><td colspan="7">Nessuna partita del girone ancora giocata.</td></tr>';
+      return;
+    }
+    body.innerHTML = righe.map(r => `
+      <tr>
+        <td>${r['Squadra']}</td>
+        <td>${r['PG']}</td>
+        <td>${r['V']}</td>
+        <td>${r['S']}</td>
+        <td>${r['PF']}</td>
+        <td>${r['PS']}</td>
+        <td>${r['DIFF']}</td>
+      </tr>`).join('');
+  }
+
+  function renderCalendarioUnder(cat){
+    const body = document.getElementById(cat === 'U19' ? 'calendarioU19Body' : 'calendarioU15Body');
+    const giornoCorrente = cat === 'U19' ? currentDayU19 : currentDayU15;
+    if (!UNDER_DATA || !UNDER_DATA[cat]) return;
+    const partite = (UNDER_DATA[cat].calendario || {})[giornoCorrente] || [];
+    if (!partite.length){
+      body.innerHTML = '<div class="match-row"><div class="match-teams"><span>Nessuna partita in programma per questo giorno.</span></div></div>';
+      return;
+    }
+    body.innerHTML = partite.map(matchRowHTML).join('');
+  }
+
+  // ---- Riempie i box del bracket (Semifinali/Finali) di U19 e U15 ----
+  function renderBracketUnder(cat){
+    if (!UNDER_DATA || !UNDER_DATA[cat]) return;
+    const finale = UNDER_DATA[cat].finale || [];
+    finale.forEach(riga => {
+      const fase = riga['Fase'];
+      if (!fase) return;
+      const box = document.querySelector(`.bracket-match[data-partita="${CSS.escape(fase)}"]`);
+      if (!box) return;
+      const s1 = riga['Squadra Casa'], s2 = riga['Squadra Trasferta'];
+      const p1 = riga['Punti Casa'], p2 = riga['Punti Trasferta'];
+      const vincitore = riga['Vincitore'];
+      const hasScore = riga.giocata;
+      const nome1 = (s1 && !String(s1).match(/^(\d)G1U|^(Vinc|Perd)SF/)) ? s1 : box.children[0].querySelector('.tn').textContent;
+      const nome2 = (s2 && !String(s2).match(/^(\d)G1U|^(Vinc|Perd)SF/)) ? s2 : box.children[1].querySelector('.tn').textContent;
+      const win1 = vincitore && s1 && vincitore === s1;
+      const win2 = vincitore && s2 && vincitore === s2;
+      box.innerHTML = `
+        <div class="t${win1 ? ' win' : ''}"><span class="tn">${nome1}</span>${hasScore ? `<span class="ts">${p1}</span>` : ''}</div>
+        <div class="t${win2 ? ' win' : ''}"><span class="tn">${nome2}</span>${hasScore ? `<span class="ts">${p2}</span>` : ''}</div>
+      `;
+    });
   }
 
   // ---- Trova un blocco "Classifiche" per titolo (match parziale, case-insensitive) ----
@@ -1229,14 +1255,8 @@
       return;
     }
     const filtro = currentCatRisultati === 'senior' ? 'Main' : 'Over40';
-    let rows = giorno.filter(m => (m['Torneo'] || '').indexOf(filtro) !== -1);
-    rows = rows.length ? rows : giorno;
-    rows = applicaFiltri(rows);
-    if (!rows.length){
-      el.innerHTML = '<div class="match-row"><div class="match-teams"><span>Nessuna partita trovata con questi filtri.</span></div></div>';
-      return;
-    }
-    el.innerHTML = rows.map(matchRowHTML).join('');
+    const rows = giorno.filter(m => (m['Torneo'] || '').indexOf(filtro) !== -1);
+    el.innerHTML = (rows.length ? rows : giorno).map(matchRowHTML).join('');
   }
 
   function renderProssimePartite(){
@@ -1257,22 +1277,11 @@
     el.innerHTML = prossime.map(matchRowHTML).join('');
   }
 
-  // I triangolari finali vengono mostrati solo da venerdì 17/07 in poi, quando i gironi sono conclusi:
-  // prima di allora eventuali abbinamenti nel foglio sono solo provvisori/di calcolo e non vanno mostrati alle squadre.
-  const DATA_TRIANGOLARI = new Date('2026-07-17T00:00:00+02:00');
-  function triangolariDisponibili(){
-    return new Date() >= DATA_TRIANGOLARI;
-  }
-
   function renderTriangolari(){
     const wrap = document.getElementById('triangolariCard');
     const body = document.getElementById('triangolariBody');
     if (currentCatRisultati !== 'senior'){ wrap.style.display = 'none'; return; }
     wrap.style.display = '';
-    if (!triangolariDisponibili()){
-      body.innerHTML = '<div class="match-row"><div class="match-teams"><span>Disponibili da venerdì 17/07</span></div></div>';
-      return;
-    }
     if (!TORNEO_DATA){ return; }
     const blocchi = (TORNEO_DATA.classifiche || []).filter(b => b.titolo.toUpperCase().indexOf('TRIANGOLARE') === 0);
     if (!blocchi.length){
@@ -1285,7 +1294,6 @@
         <table><thead><tr><th>Squadra</th><th>V</th><th>Diff</th><th>PF</th></tr></thead><tbody>${rows}</tbody></table>`;
     }).join('');
   }
-
 
   // ---- Tabellone finale (Senior + Over40) ----
   function renderTabellone(){
@@ -1422,6 +1430,8 @@
   // ==========================================================================
   fetchTorneoData();
   setInterval(fetchTorneoData, REFRESH_MS);
+  fetchUnderData();
+  setInterval(fetchUnderData, REFRESH_MS_UNDER);
 </script>
 
 </body>
