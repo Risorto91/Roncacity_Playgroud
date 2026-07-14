@@ -253,6 +253,15 @@
   .filter-bar input:focus, .filter-bar select:focus{ outline:none; border-color:var(--gold-dim); }
   .filter-clear{ font-size:12px; color:var(--gold); cursor:pointer; white-space:nowrap; padding:6px 4px; }
   .filter-clear:hover{ text-decoration:underline; }
+  .table-scroll table tr.qualified{ background: rgba(227,178,60,0.10); }
+  .table-scroll table tr.qualified td:first-child{ color: var(--gold); font-weight:800; }
+  .table-scroll table tr.qualified td.squadra-cell::after{ content:' ✓'; color: var(--gold); }
+  .qualify-legend{
+    display:flex; align-items:center; gap:8px; padding: 8px 16px 2px;
+    font-size:11px; color:var(--muted);
+  }
+  .qualify-legend .sw{ width:11px; height:11px; border-radius:3px; background: rgba(227,178,60,0.25); border:1px solid var(--gold-dim); flex-shrink:0; }
+
   .bracket-scroll{ overflow-x:auto; padding: 10px 18px 30px; -webkit-overflow-scrolling:touch; }
   .bracket-hint{ padding: 4px 20px 0; font-size:11px; color:var(--gold-dim); }
   .bracket{ display:flex; gap: 34px; min-width: 760px; }
@@ -595,6 +604,7 @@
           <tbody id="classificaU19Body"><tr><td colspan="7">Caricamento classifica…</td></tr></tbody>
         </table>
       </div>
+      <div class="qualify-legend"><span class="sw"></span>Le prime 4 accedono alle semifinali incrociate del venerdì</div>
     </div>
 
     <div class="card">
@@ -645,6 +655,7 @@
           <tbody id="classificaU15Body"><tr><td colspan="7">Caricamento classifica…</td></tr></tbody>
         </table>
       </div>
+      <div class="qualify-legend"><span class="sw"></span>Le prime 4 accedono alle semifinali incrociate del venerdì</div>
     </div>
 
     <div class="card">
@@ -1186,16 +1197,20 @@
       body.innerHTML = '<tr><td colspan="7">Nessuna partita del girone ancora giocata.</td></tr>';
       return;
     }
-    body.innerHTML = righe.map(r => `
-      <tr>
-        <td>${r['Squadra']}</td>
+    body.innerHTML = righe.map((r, i) => {
+      const pos = Number(r['Pos'] ?? r['Posizione'] ?? (i + 1));
+      const qualified = pos <= 4;
+      return `
+      <tr class="${qualified ? 'qualified' : ''}">
+        <td class="squadra-cell">${r['Squadra']}</td>
         <td>${r['PG']}</td>
         <td>${r['V']}</td>
         <td>${r['S']}</td>
         <td>${r['PF']}</td>
         <td>${r['PS']}</td>
         <td>${r['DIFF']}</td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
   }
 
   function renderCalendarioUnder(cat){
@@ -1239,14 +1254,15 @@
     return (TORNEO_DATA.classifiche || []).find(b => b.titolo.toLowerCase().indexOf(t) !== -1) || null;
   }
 
-  function classificaTableHTML(righe, extraCols){
+  function classificaTableHTML(righe, extraCols, highlightTop){
     extraCols = extraCols || [];
     const righeOrdinate = ordinaClassifica(righe);
     let head = '<tr><th>#</th><th>Squadra</th><th>PG</th><th>V</th><th>P</th><th>PF</th><th>PS</th><th>Diff</th></tr>';
     let body = righeOrdinate.map((r, i) => {
       const squadra = r['Squadra'] || '—';
-      const pos = r['Pos'] ?? r['Posizione'] ?? (i + 1);
-      return `<tr><td>${pos}</td><td>${squadra}</td><td>${r['PG'] ?? 0}</td><td>${r['V'] ?? 0}</td><td>${r['S'] ?? 0}</td><td>${r['PF'] ?? 0}</td><td>${r['PS'] ?? 0}</td><td>${r['DIFF'] ?? 0}</td></tr>`;
+      const pos = Number(r['Pos'] ?? r['Posizione'] ?? (i + 1));
+      const qualified = highlightTop && pos <= highlightTop;
+      return `<tr class="${qualified ? 'qualified' : ''}"><td>${pos}</td><td class="squadra-cell">${squadra}</td><td>${r['PG'] ?? 0}</td><td>${r['V'] ?? 0}</td><td>${r['S'] ?? 0}</td><td>${r['PF'] ?? 0}</td><td>${r['PS'] ?? 0}</td><td>${r['DIFF'] ?? 0}</td></tr>`;
     }).join('');
     return `<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
   }
@@ -1259,13 +1275,13 @@
     if (currentCatRisultati === 'senior'){
       ['GIRONE A — Main', 'GIRONE B — Main', 'GIRONE C — Main'].forEach(titolo => {
         const b = findBlocco(titolo);
-        if (b) cards.push({ head: titolo.replace(' — Main',''), html: classificaTableHTML(b.righe) });
+        if (b) cards.push({ head: titolo.replace(' — Main',''), html: classificaTableHTML(b.righe, [], 5), legend: 'Le prime 5 si qualificano ai Triangolari del venerdì' });
       });
     } else {
       const g = findBlocco('OVER40 — GIRONE UNICO');
       const mini = findBlocco('OVER40 — MINI-GIRONE');
       const fin = findBlocco('OVER40 — CLASSIFICA FINALE');
-      if (g) cards.push({ head: 'Over40 · Girone (tutte contro tutte)', html: classificaTableHTML(g.righe) });
+      if (g) cards.push({ head: 'Over40 · Girone (tutte contro tutte)', html: classificaTableHTML(g.righe, [], 4), legend: 'Le prime 4 giocano direttamente Semifinali e Finali' });
       if (mini) cards.push({ head: 'Over40 · Mini-girone 5°-6°-7° (venerdì)', html: classificaTableHTML(mini.righe) });
       if (fin){
         const righeFin = fin.righe.slice().sort((a,b) => Number(a['Posizione']||0) - Number(b['Posizione']||0));
@@ -1278,6 +1294,7 @@
       <div class="card">
         <div class="card-head">${c.head}</div>
         <div class="table-scroll">${c.html}</div>
+        ${c.legend ? `<div class="qualify-legend"><span class="sw"></span>${c.legend}</div>` : ''}
       </div>
     `).join('') || '<div class="note-box">Nessun dato disponibile per questa categoria.</div>';
   }
@@ -1364,7 +1381,10 @@
     }
     body.innerHTML = blocchi.map(b => {
       const righeOrdinate = ordinaClassifica(b.righe);
-      const rows = righeOrdinate.map(r => `<tr><td>${r['Squadra'] || '—'}</td><td>${r['V'] ?? 0}</td><td>${r['DIFF'] ?? 0}</td><td>${r['PF'] ?? 0}</td></tr>`).join('');
+      const rows = righeOrdinate.map((r,i) => {
+        const pos = Number(r['Pos'] ?? r['Posizione'] ?? (i+1));
+        return `<tr class="${pos === 1 ? 'qualified' : ''}"><td class="squadra-cell">${r['Squadra'] || '—'}</td><td>${r['V'] ?? 0}</td><td>${r['DIFF'] ?? 0}</td><td>${r['PF'] ?? 0}</td></tr>`;
+      }).join('');
       return `<div style="padding:10px 16px; font-size:12px; color:var(--gold); font-weight:700;">${b.titolo}</div>
         <table><thead><tr><th>Squadra</th><th>V</th><th>Diff</th><th>PF</th></tr></thead><tbody>${rows}</tbody></table>`;
     }).join('');
