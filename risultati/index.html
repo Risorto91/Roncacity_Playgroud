@@ -235,6 +235,11 @@
   .match-row{ display:flex; align-items:center; justify-content:space-between; padding: 12px 16px; border-bottom:1px solid var(--line); font-size:13px; }
   .match-row:last-child{ border-bottom:none; }
   .match-teams{ display:flex; flex-direction:column; gap:4px; }
+  .match-teams .team-winner{
+    color: var(--gold); font-weight:800;
+    background: rgba(227,178,60,0.16);
+    padding: 1px 7px; border-radius:4px;
+  }
   .match-score{ font-family:'Anton',sans-serif; font-size:18px; color:var(--gold); min-width:56px; text-align:center; }
   .match-meta{ font-size:11px; color:var(--muted); }
   .tabs-inline{ display:flex; gap:8px; padding: 4px 18px 4px; flex-wrap:wrap; }
@@ -1300,11 +1305,22 @@
   }
 
   function matchRowHTML(m){
-    const casa = m['Squadra Casa'] || m['Squadra/Slot Casa'] || '—';
-    const trasferta = m['Squadra Trasferta'] || m['Squadra/Slot Trasferta'] || '—';
+    const casaNome = m['Squadra Casa'] || m['Squadra/Slot Casa'] || '—';
+    const trasfNome = m['Squadra Trasferta'] || m['Squadra/Slot Trasferta'] || '—';
     const campo = m['Campo'] ? `Campo ${m['Campo']}` : '';
     const meta = m['Meta'] ? ` · metà ${m['Meta']}` : '';
     const girone = m['Girone'] ? `Girone ${m['Girone']} · ` : '';
+
+    let casaWin = false, trasfWin = false;
+    if (m.giocata){
+      const pc = Number(m['Punti Casa']), pt = Number(m['Punti Trasferta']);
+      if (!isNaN(pc) && !isNaN(pt)){
+        if (pc > pt) casaWin = true; else if (pt > pc) trasfWin = true;
+      }
+    }
+    const casa = `<span class="${casaWin ? 'team-winner' : ''}">${casaNome}</span>`;
+    const trasferta = `<span class="${trasfWin ? 'team-winner' : ''}">${trasfNome}</span>`;
+
     const scoreOrTime = m.giocata
       ? `${m['Punti Casa']} - ${m['Punti Trasferta']}`
       : (m['Orario'] || '');
