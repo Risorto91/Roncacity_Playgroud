@@ -42,11 +42,7 @@
   }
   a{color:inherit; text-decoration:none;}
   img{max-width:100%; display:block;}
-
-  /* ===== Court-line texture (signature motif) ===== */
-  .court-seam{
-    position:relative;
-  }
+  .court-seam{ position:relative; }
   .court-seam::before{
     content:"";
     position:absolute; inset:0;
@@ -57,8 +53,6 @@
     );
     pointer-events:none;
   }
-
-  /* ===== HEADER ===== */
   header{
     position: sticky; top:0; z-index: 50;
     display:flex; align-items:center; justify-content:space-between;
@@ -68,15 +62,11 @@
     border-bottom: 1px solid var(--line);
   }
   .brand{ display:flex; align-items:center; gap:10px; cursor:pointer; }
-  .brand-mark{
-    width:40px; height:40px;
-    display:flex; align-items:center; justify-content:center;
-  }
+  .brand-mark{ width:40px; height:40px; display:flex; align-items:center; justify-content:center; }
   .brand-mark img{ width:100%; height:100%; object-fit:contain; }
   .brand-text{ display:flex; flex-direction:column; line-height:1; }
   .brand-text .l1{ font-family:'Anton',sans-serif; font-size:15px; letter-spacing:0.03em; }
   .brand-text .l2{ font-size:10px; color:var(--gold); letter-spacing:0.15em; margin-top:2px; }
-
   .menu-btn{
     width:40px; height:40px; border-radius:50%;
     background: var(--bg-card); border:1px solid var(--line);
@@ -84,8 +74,6 @@
     cursor:pointer;
   }
   .menu-btn span{ width:16px; height:2px; background:var(--gold); border-radius:2px; }
-
-  /* ===== NAV DRAWER ===== */
   .drawer-overlay{
     position:fixed; inset:0; background:rgba(0,0,0,0.6);
     opacity:0; pointer-events:none; transition: opacity .25s ease; z-index:60;
@@ -112,20 +100,11 @@
   .drawer nav a .idx{ font-family:'Anton',sans-serif; color:var(--gold-dim); font-size:13px; width:20px; }
   .drawer nav a.active{ background: rgba(227,178,60,0.08); color:var(--gold); }
   .drawer nav a.active .idx{ color:var(--gold); }
-
-  /* ===== SECTIONS ===== */
   main{ max-width: 720px; margin: 0 auto; padding-bottom: 60px; }
   .section{ display:none; animation: fadeIn .3s ease; }
   .section.active{ display:block; }
   @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
-
-  /* ---- HOME / HERO ---- */
-  .hero{
-    padding: 40px 20px 30px;
-    text-align:center;
-    position:relative;
-    overflow:hidden;
-  }
+  .hero{ padding: 40px 20px 30px; text-align:center; position:relative; overflow:hidden; }
   .hero::before{
     content:"";
     position:absolute; top:-60px; left:50%; transform:translateX(-50%);
@@ -140,18 +119,11 @@
     border:1px solid var(--gold-dim); border-radius: 20px; padding:5px 14px; margin-bottom:18px;
     background: rgba(74,35,132,0.18);
   }
-  .hero h1{
-    font-size: clamp(2.4rem, 12vw, 3.6rem);
-    color:var(--white);
-    -webkit-text-stroke: 1px var(--gold-dim);
-  }
+  .hero h1{ font-size: clamp(2.4rem, 12vw, 3.6rem); color:var(--white); -webkit-text-stroke: 1px var(--gold-dim); }
   .hero h1 .accent{ color:var(--gold); -webkit-text-stroke:0; }
   .hero .loc{ margin-top:14px; color:var(--muted); font-size:14px; }
   .hero .loc b{ color:var(--white); }
-
-  .countdown{
-    display:flex; justify-content:center; gap:10px; margin: 26px 0 8px;
-  }
+  .countdown{ display:flex; justify-content:center; gap:10px; margin: 26px 0 8px; }
   .cd-box{
     background: linear-gradient(160deg, rgba(74,35,132,0.35), var(--bg-card));
     border:1px solid var(--purple); border-radius: var(--radius);
@@ -159,8 +131,6 @@
   }
   .cd-box .n{ font-family:'Anton',sans-serif; font-size:26px; color:var(--gold); }
   .cd-box .u{ font-size:9px; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; margin-top:2px; }
-
-  /* ---- LIVE NOW (sostituisce il countdown a torneo iniziato) ---- */
   .live-now{ margin: 26px 0 8px; }
   .live-now-label{
     display:inline-flex; align-items:center; gap:7px; font-family:'Anton',sans-serif;
@@ -171,9 +141,7 @@
     animation: blink 1.4s ease-in-out infinite;
   }
   @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:0.25;} }
-  .live-now-grid{
-    display:grid; grid-template-columns: 1fr 1fr; gap:10px;
-  }
+  .live-now-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
   .live-card{
     background: linear-gradient(160deg, rgba(74,35,132,0.30), var(--bg-card));
     border:1px solid var(--purple); border-radius: var(--radius);
@@ -187,18 +155,11 @@
   .live-card .lc-teams{ font-family:'Anton',sans-serif; font-size:15px; margin: 6px 0 2px; line-height:1.25; }
   .live-card .lc-meta{ font-size:10px; color:var(--muted); }
   .live-card .lc-empty{ font-size:12px; color:var(--muted); padding: 6px 0; }
-  @media (max-width: 380px){
-    .live-card .lc-teams{ font-size:13px; }
-  }
-
+  @media (max-width: 380px){ .live-card .lc-teams{ font-size:13px; } }
   .cta-row{ display:flex; gap:10px; padding: 22px 20px 6px; }
-  .btn{
-    flex:1; text-align:center; padding: 14px 10px; border-radius: var(--radius);
-    font-weight:700; font-size:14px; cursor:pointer; border:1px solid transparent;
-  }
+  .btn{ flex:1; text-align:center; padding: 14px 10px; border-radius: var(--radius); font-weight:700; font-size:14px; cursor:pointer; border:1px solid transparent; }
   .btn-gold{ background: linear-gradient(135deg, var(--gold), #b8872c); color:#1a1408; }
   .btn-outline{ border-color: var(--line); color:var(--white); background:var(--bg-card); }
-
   .title-banner{
     margin: 22px 18px 0; padding: 18px 18px; border-radius: var(--radius);
     background: linear-gradient(135deg, rgba(227,178,60,0.10), rgba(74,35,132,0.12));
@@ -208,41 +169,22 @@
   .title-banner .tb-label{ font-size:11px; letter-spacing:0.12em; color:var(--gold); text-transform:uppercase; white-space:nowrap; line-height:1.4; }
   .title-banner .tb-logo{ height:64px; flex:1; display:flex; align-items:center; justify-content:center; background:#f4f2ec; border-radius:4px; padding:10px 16px; }
   .title-banner .tb-logo img{ max-height:100%; max-width:100%; }
-
-  .quick-grid{
-    display:grid; grid-template-columns: 1fr 1fr; gap:12px; padding: 26px 18px 10px;
-  }
-  .quick-card{
-    background: var(--bg-card); border:1px solid var(--line); border-radius: var(--radius);
-    padding: 16px 14px; position:relative; overflow:hidden;
-  }
-  .quick-card::after{
-    content:""; position:absolute; top:0; right:0; width:40px; height:40px;
-    background: var(--purple); opacity:0.25; filter: blur(18px);
-  }
+  .quick-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; padding: 26px 18px 10px; }
+  .quick-card{ background: var(--bg-card); border:1px solid var(--line); border-radius: var(--radius); padding: 16px 14px; position:relative; overflow:hidden; }
+  .quick-card::after{ content:""; position:absolute; top:0; right:0; width:40px; height:40px; background: var(--purple); opacity:0.25; filter: blur(18px); }
   .quick-card .qt{ font-family:'Anton',sans-serif; font-size:16px; margin-bottom:4px; }
   .quick-card .qd{ font-size:12px; color:var(--muted); }
-
   .sponsor-strip-wrap{ padding: 14px 18px 4px; }
   .sponsor-strip-label{ font-size:9px; letter-spacing:0.12em; color:var(--muted); text-transform:uppercase; margin-bottom:7px; text-align:center; }
   .sponsor-strip{ display:flex; gap:8px; }
-  .sponsor-strip a{
-    flex:1; height:42px; border-radius:4px; display:flex; align-items:center; justify-content:center;
-    padding:6px 8px; background:#f4f2ec;
-  }
+  .sponsor-strip a{ flex:1; height:42px; border-radius:4px; display:flex; align-items:center; justify-content:center; padding:6px 8px; background:#f4f2ec; }
   .sponsor-strip a.noplate{ background:transparent; border:1px solid var(--line); }
   .sponsor-strip img{ max-height:100%; max-width:100%; }
-
-  .section-heading{
-    padding: 30px 20px 4px; display:flex; align-items:baseline; gap:10px;
-  }
+  .section-heading{ padding: 30px 20px 4px; display:flex; align-items:baseline; gap:10px; }
   .section-heading .num{ font-family:'Anton',sans-serif; color:var(--gold-dim); font-size:14px; }
   .section-heading h2{ font-family:'Anton',sans-serif; font-size:22px; letter-spacing:0.02em; }
   .section-sub{ padding: 0 20px; color:var(--muted); font-size:13px; margin-top:2px; }
-
-  .gallery-grid{
-    display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; padding: 16px 18px;
-  }
+  .gallery-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; padding: 16px 18px; }
   .gallery-item{
     width:100%; aspect-ratio: 4/5; background: var(--bg-card); border:1px dashed var(--line);
     border-radius: 3px; display:flex; align-items:center; justify-content:center;
@@ -252,7 +194,6 @@
   .gallery-item.photo{ cursor:pointer; padding:0; border:1px solid var(--line); transition: transform 0.15s, border-color 0.15s; }
   .gallery-item.photo:hover{ border-color: var(--gold-dim); transform: scale(1.02); }
   .gallery-item.photo img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:3px; }
-
   .lightbox{
     display:none; position:fixed; inset:0; z-index:200;
     background: rgba(0,0,0,0.92); align-items:center; justify-content:center; padding:24px;
@@ -264,11 +205,7 @@
     cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center;
     border-radius:50%; background: rgba(255,255,255,0.08);
   }
-
-  .insta-scroll{
-    display:flex; gap:12px; overflow-x:auto; padding: 16px 18px 8px;
-    -webkit-overflow-scrolling:touch;
-  }
+  .insta-scroll{ display:flex; gap:12px; overflow-x:auto; padding: 16px 18px 8px; -webkit-overflow-scrolling:touch; }
   .insta-card{
     flex: 0 0 auto; width: 130px; aspect-ratio: 4/5;
     background: linear-gradient(160deg, rgba(74,35,132,0.35), var(--bg-card));
@@ -278,12 +215,7 @@
   }
   .insta-card .insta-icon{ font-size:28px; }
   .insta-card .insta-label{ font-size:11px; color:var(--gold); font-weight:600; }
-
-  /* ---- TABLES (Risultati/Calendario/Categorie giovanili) ---- */
-  .card{
-    margin: 14px 18px; background: var(--bg-card); border:1px solid var(--line);
-    border-radius: var(--radius); overflow:hidden;
-  }
+  .card{ margin: 14px 18px; background: var(--bg-card); border:1px solid var(--line); border-radius: var(--radius); overflow:hidden; }
   .card-head{
     padding: 12px 16px; background: rgba(227,178,60,0.06);
     border-bottom:1px solid var(--line);
@@ -292,7 +224,7 @@
   }
   .card-head .live{
     font-size:9px; color:#ff5c5c; border:1px solid #ff5c5c; border-radius:10px;
-    padding:2px 8px; letter-spacing:0.1em; display:none; /* attivare durante il torneo */
+    padding:2px 8px; letter-spacing:0.1em; display:none;
   }
   table{ width:100%; border-collapse: collapse; font-size:13px; }
   th{ text-align:left; padding:10px 12px; color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--line); }
@@ -300,57 +232,50 @@
   tr:last-child td{ border-bottom:none; }
   .table-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
   .table-scroll table{ min-width: 480px; }
-
-  .match-row{
-    display:flex; align-items:center; justify-content:space-between;
-    padding: 12px 16px; border-bottom:1px solid var(--line); font-size:13px;
-  }
+  .match-row{ display:flex; align-items:center; justify-content:space-between; padding: 12px 16px; border-bottom:1px solid var(--line); font-size:13px; }
   .match-row:last-child{ border-bottom:none; }
   .match-teams{ display:flex; flex-direction:column; gap:4px; }
   .match-score{ font-family:'Anton',sans-serif; font-size:18px; color:var(--gold); min-width:56px; text-align:center; }
   .match-meta{ font-size:11px; color:var(--muted); }
-
   .tabs-inline{ display:flex; gap:8px; padding: 4px 18px 4px; flex-wrap:wrap; }
-  .pill{
-    font-size:12px; padding:7px 14px; border-radius:20px; border:1px solid var(--line);
-    background: var(--bg-card); color:var(--muted); cursor:pointer;
-  }
+  .pill{ font-size:12px; padding:7px 14px; border-radius:20px; border:1px solid var(--line); background: var(--bg-card); color:var(--muted); cursor:pointer; }
   .pill.active{ border-color:var(--gold-dim); color:var(--gold); background: rgba(227,178,60,0.08); }
-
-  /* ---- BRACKET ---- */
+  .filter-bar{ display:flex; gap:8px; padding: 8px 18px 4px; flex-wrap:wrap; align-items:center; }
+  .filter-bar input[type=text]{
+    flex:1; min-width:150px; background: var(--bg-card); border:1px solid var(--line); border-radius:20px;
+    padding:9px 16px; color:var(--white); font-size:13px; font-family:'Inter',sans-serif;
+  }
+  .filter-bar input[type=text]::placeholder{ color:var(--muted); }
+  .filter-bar select{
+    background: var(--bg-card); border:1px solid var(--line); border-radius:20px;
+    padding:9px 14px; color:var(--white); font-size:13px; font-family:'Inter',sans-serif; cursor:pointer;
+  }
+  .filter-bar input:focus, .filter-bar select:focus{ outline:none; border-color:var(--gold-dim); }
+  .filter-clear{ font-size:12px; color:var(--gold); cursor:pointer; white-space:nowrap; padding:6px 4px; }
+  .filter-clear:hover{ text-decoration:underline; }
   .bracket-scroll{ overflow-x:auto; padding: 10px 18px 30px; -webkit-overflow-scrolling:touch; }
   .bracket-hint{ padding: 4px 20px 0; font-size:11px; color:var(--gold-dim); }
   .bracket{ display:flex; gap: 34px; min-width: 760px; }
   .bracket-round{ display:flex; flex-direction:column; justify-content:space-around; gap:18px; min-width:160px; }
   .bracket-round .rlabel{ font-size:10px; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:4px; text-align:center; }
-  .bracket-match{
-    background: var(--bg-card); border:1px solid var(--line); border-radius:4px; padding:8px 10px; font-size:12px;
-  }
+  .bracket-match{ background: var(--bg-card); border:1px solid var(--line); border-radius:4px; padding:8px 10px; font-size:12px; }
   .bracket-match .t{ display:flex; justify-content:space-between; padding:3px 0; gap:8px; }
   .bracket-match .t.win{ color:var(--gold); font-weight:700; }
   .bracket-match .t .tn{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .bracket-match .t .ts{ flex-shrink:0; color:var(--muted); }
   .bracket-match .t.win .ts{ color:var(--gold); }
-
-  /* ---- SPONSOR ---- */
-  .sponsor-tier-label{
-    padding: 22px 18px 6px; display:flex; align-items:center; gap:8px;
-  }
+  .sponsor-tier-label{ padding: 22px 18px 6px; display:flex; align-items:center; gap:8px; }
   .sponsor-tier-label .tt{ font-family:'Anton',sans-serif; font-size:13px; letter-spacing:0.08em; }
   .tier-title .tt{ color:var(--gold); font-size:16px; }
   .tier-main .tt{ color:var(--white); }
   .tier-sponsor .tt{ color:var(--muted); }
   .tier-media .tt{ color:var(--muted); }
-
   .sponsor-grid.dense{ grid-template-columns: repeat(3, 1fr); gap:8px; }
   .sponsor-card.mini{ padding:10px 8px; gap:5px; }
   .sponsor-card.mini .logo-slot{ height:38px; font-size:9px; }
   .sponsor-card.mini .sponsor-name{ font-size:11px; }
-  @media (min-width: 480px){
-    .sponsor-grid.dense{ grid-template-columns: repeat(4, 1fr); }
-  }
+  @media (min-width: 480px){ .sponsor-grid.dense{ grid-template-columns: repeat(4, 1fr); } }
   .sponsor-tier-label .line{ flex:1; height:1px; background: var(--line); }
-
   .sponsor-grid{ display:grid; grid-template-columns: 1fr; gap:10px; padding: 0 18px; }
   .sponsor-grid.two-col{ grid-template-columns: 1fr 1fr; }
   .sponsor-card{
@@ -362,15 +287,11 @@
     width:100%; height:56px; display:flex; align-items:center; justify-content:center;
     color:var(--muted); font-size:10px; border:1px dashed var(--line); border-radius:6px;
   }
-  .logo-slot.filled{
-    background: #f4f2ec; padding: 8px 12px; border:none;
-  }
+  .logo-slot.filled{ background: #f4f2ec; padding: 8px 12px; border:none; }
   .tier-title .logo-slot{ height:72px; }
   .sponsor-name{ font-weight:700; font-size:13px; }
   .sponsor-caption{ font-size:11px; color:var(--muted); line-height:1.4; }
   .sponsor-link{ font-size:11px; color:var(--gold); text-decoration:underline; }
-
-  /* ---- STORICO ---- */
   .archive-card{
     display:flex; gap:14px; margin: 14px 18px; background: var(--bg-card);
     border:1px solid var(--line); border-radius: var(--radius); padding:14px; align-items:center;
@@ -383,26 +304,20 @@
   .archive-info .at{ font-family:'Anton',sans-serif; font-size:15px; }
   .archive-info .ad{ font-size:12px; color:var(--muted); margin-top:2px; }
   .archive-info .aa{ font-size:11px; color:var(--gold); margin-top:6px; }
-
   .note-box{
     margin: 16px 18px 28px; padding: 14px 16px; border-radius: var(--radius);
     background: rgba(74,35,132,0.15); border:1px solid var(--purple);
     font-size:12px; color:var(--muted); line-height:1.5;
   }
   .note-box b{ color:var(--white); }
-
   .data-status{
     margin: 10px 18px 0; font-size:10px; color:var(--muted); text-align:right;
     display:flex; align-items:center; justify-content:flex-end; gap:6px;
   }
   .data-status .dot{ width:6px; height:6px; border-radius:50%; background:#4caf50; }
   .data-status.err .dot{ background:#ff5c5c; }
-
-  footer{
-    text-align:center; padding: 30px 20px 40px; color:var(--muted); font-size:11px; border-top:1px solid var(--line); margin-top:20px;
-  }
+  footer{ text-align:center; padding: 30px 20px 40px; color:var(--muted); font-size:11px; border-top:1px solid var(--line); margin-top:20px; }
   footer .fmark{ color:var(--gold); font-family:'Anton',sans-serif; font-size:14px; margin-bottom:6px; }
-
   @media (min-width: 480px){
     .gallery-grid{ grid-template-columns: repeat(4,1fr); }
     .sponsor-grid.two-col{ grid-template-columns: 1fr 1fr 1fr; }
@@ -534,7 +449,6 @@
         <div class="insta-label">Guarda il Reel</div>
       </a>
     </div>
-    <!-- Nota: ogni card apre il post/reel direttamente su Instagram in una nuova scheda. Per aggiungerne altri, basta una nuova card con lo stesso schema e il link. -->
   </section>
 
   <!-- ============ RISULTATI E CALENDARIO ============ -->
@@ -554,6 +468,12 @@
       <div class="pill" data-day="mercoledi">Mer 15/07</div>
       <div class="pill" data-day="giovedi">Gio 16/07</div>
       <div class="pill" data-day="classifiche">Classifiche</div>
+    </div>
+
+    <div class="filter-bar" id="filterBar">
+      <input type="text" id="filterSquadra" placeholder="🔍 Cerca squadra…">
+      <select id="filterGirone"><option value="">Tutti i gironi</option></select>
+      <div class="filter-clear" id="filterClear" style="display:none;">✕ Rimuovi filtri</div>
     </div>
 
     <div id="gironiContainer" style="display:none;">
@@ -578,7 +498,7 @@
       <div class="card" id="triangolariCard">
         <div class="card-head">Triangolari finali (Ven 17/07)</div>
         <div class="table-scroll" id="triangolariBody">
-          <div class="match-row"><div class="match-teams"><span>Disponibili da venerdì 17/07</span></div></div>
+          <div class="match-row"><div class="match-teams"><span>Disponibili da giovedì 16/07, ore 23:30</span></div></div>
         </div>
       </div>
 
@@ -772,8 +692,6 @@
 
     <div class="sponsor-tier-label tier-media"><span class="tt">Media Partner</span><span class="line"></span></div>
     <div class="sponsor-grid two-col" id="tierMedia"></div>
-
-    <!-- Nota tecnica: struttura pronta a 4 livelli (Title → Main → Sponsor → Media Partner). Le card sono generate dall'elenco sponsorsData nel codice; per aggiungere/modificare uno sponsor basta compilare quella lista. -->
   </section>
 
   <!-- ============ GALLERIA ============ -->
@@ -807,8 +725,6 @@
         <div class="aa">Guarda l'archivio →</div>
       </div>
     </a>
-
-    <!-- Nota: questa sezione si popolerà con le foto/video del torneo 2026 durante la settimana dell'evento. L'archivio 2025 è nella pagina Storico. -->
   </section>
 
   <!-- ============ STORICO ============ -->
@@ -824,8 +740,6 @@
         <div class="aa">Risultati completi →</div>
       </div>
     </a>
-
-    <!-- Nota: archivio completo 2025 (gironi, calendario partita per partita, fase finale, premi individuali, galleria foto/video) per Senior, Under15 e Under19. I punteggi di Semifinale/Finale Senior e Under19 sono stati ricostruiti in modo plausibile a partire dalle classifiche finali reali fornite; il 3° posto Under19 non è confermato. -->
   </section>
 
   <footer>
@@ -837,17 +751,9 @@
 </main>
 
 <script>
-  // ==========================================================================
-  // CONFIGURAZIONE DATI TORNEO — Apps Script Web App collegato al Google Sheet
-  // ==========================================================================
-  // 1. Deploya Code.gs come App Web (accesso "Chiunque"), copia l'URL /exec
-  // 2. Incollalo qui sotto tra le virgolette.
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMITp1YFm2Ws_1Q_4txk1qIN0pG-KDQceY79ptLx3PxiqezuLs4VzBhwEbZ8iij5B5uA/exec";
-  const REFRESH_MS = 60000; // ogni 60 secondi
+  const REFRESH_MS = 60000;
 
-  // Apps Script del torneo UNDER (U15/U14 + U19/U17) — foglio separato,
-  // generato dal file RoncaCityPlayground_Under.xlsx. Incolla qui l'URL
-  // /exec dopo aver distribuito Code.gs sul foglio Under.
   const APPS_SCRIPT_URL_UNDER = "https://script.google.com/macros/s/AKfycbzEsgaAFUXJF7SfJOSvlGXYIoeJvz9aju26bJyH3iyhA6aBRFonlvNqVfJkfEgr5_5uOA/exec";
   const REFRESH_MS_UNDER = 60000;
 
@@ -858,8 +764,9 @@
   let currentCatTabellone = 'senior';
   let currentDayU19 = 'giovedi';
   let currentDayU15 = 'giovedi';
+  let filtroSquadra = '';
+  let filtroGirone = '';
 
-  // ---- Navigazione tra sezioni ----
   const links = document.querySelectorAll('[data-target]');
   const sections = document.querySelectorAll('.section');
   const drawer = document.getElementById('drawer');
@@ -885,17 +792,18 @@
   document.getElementById('drawerClose').addEventListener('click', closeDrawer);
   overlay.addEventListener('click', closeDrawer);
 
-  // ---- Pillole categoria Risultati (Senior / Over40) ----
   document.getElementById('catPillsRisultati').querySelectorAll('.pill').forEach(pill => {
     pill.addEventListener('click', () => {
       document.getElementById('catPillsRisultati').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
       currentCatRisultati = pill.dataset.cat;
+      filtroGirone = '';
+      document.getElementById('filterGirone').value = '';
+      popolaFiltroGirone();
       updateRisultatiView();
     });
   });
 
-  // ---- Pillole giorno (Lun/Mar/Mer/Gio/Classifiche) ----
   document.getElementById('dayPillsRisultati').querySelectorAll('.pill').forEach(pill => {
     pill.addEventListener('click', () => {
       document.getElementById('dayPillsRisultati').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
@@ -905,7 +813,6 @@
     });
   });
 
-  // ---- Pillole giorno U19 / U15 ----
   document.getElementById('dayPillsU19').querySelectorAll('.pill').forEach(pill => {
     pill.addEventListener('click', () => {
       document.getElementById('dayPillsU19').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
@@ -923,11 +830,11 @@
     });
   });
 
-  // ---- Mostra la vista "Classifiche" oppure la vista "Calendario del giorno" ----
   function updateRisultatiView(){
     const isClassifiche = currentDayRisultati === 'classifiche';
     document.getElementById('gironiContainer').style.display = isClassifiche ? '' : 'none';
     document.getElementById('giornoCardsWrap').style.display = isClassifiche ? 'none' : '';
+    document.getElementById('filterBar').style.display = isClassifiche ? 'none' : '';
     if (isClassifiche){
       renderGironi();
     } else {
@@ -937,7 +844,6 @@
     }
   }
 
-  // ---- Pillole categoria Tabellone (Senior / Over40) ----
   document.getElementById('catPillsTabellone').querySelectorAll('.pill').forEach(pill => {
     pill.addEventListener('click', () => {
       document.getElementById('catPillsTabellone').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
@@ -949,10 +855,67 @@
     });
   });
 
-  // ---- Countdown al 13 luglio 2026, ore 18:00 — poi passa al box "in corso ora" ----
+  // ---- Filtro squadra (ricerca live) e filtro girone — solo per "Calendario del giorno" ----
+  const filterSquadraEl = document.getElementById('filterSquadra');
+  const filterGironeEl = document.getElementById('filterGirone');
+  const filterClearEl = document.getElementById('filterClear');
+
+  function aggiornaVisibilitaClear(){
+    filterClearEl.style.display = (filtroSquadra || filtroGirone) ? '' : 'none';
+  }
+
+  filterSquadraEl.addEventListener('input', () => {
+    filtroSquadra = filterSquadraEl.value.trim();
+    aggiornaVisibilitaClear();
+    renderCalendarioGiorno();
+  });
+  filterGironeEl.addEventListener('change', () => {
+    filtroGirone = filterGironeEl.value;
+    aggiornaVisibilitaClear();
+    renderCalendarioGiorno();
+  });
+  filterClearEl.addEventListener('click', () => {
+    filtroSquadra = ''; filtroGirone = '';
+    filterSquadraEl.value = ''; filterGironeEl.value = '';
+    aggiornaVisibilitaClear();
+    renderCalendarioGiorno();
+  });
+
+  function popolaFiltroGirone(){
+    const sel = filterGironeEl;
+    const valorePrecedente = sel.value;
+    sel.innerHTML = '<option value="">Tutti i gironi</option>';
+    if (!TORNEO_DATA || !TORNEO_DATA.calendario) return;
+    const filtroCat = currentCatRisultati === 'senior' ? 'Main' : 'Over40';
+    const gironi = new Set();
+    Object.values(TORNEO_DATA.calendario).forEach(arr => {
+      (arr || []).forEach(m => {
+        if ((m['Torneo'] || '').indexOf(filtroCat) !== -1 && m['Girone']) gironi.add(String(m['Girone']));
+      });
+    });
+    Array.from(gironi).sort().forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g; opt.textContent = 'Girone ' + g;
+      sel.appendChild(opt);
+    });
+    if (Array.from(gironi).includes(valorePrecedente)) sel.value = valorePrecedente;
+  }
+
+  function applicaFiltri(righe){
+    return righe.filter(m => {
+      if (filtroGirone && String(m['Girone'] || '') !== filtroGirone) return false;
+      if (filtroSquadra){
+        const q = filtroSquadra.toLowerCase();
+        const casa = String(m['Squadra Casa'] || m['Squadra/Slot Casa'] || '').toLowerCase();
+        const trasferta = String(m['Squadra Trasferta'] || m['Squadra/Slot Trasferta'] || '').toLowerCase();
+        if (casa.indexOf(q) === -1 && trasferta.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+  }
+
   const targetDate = new Date('2026-07-13T18:00:00+02:00');
 
-  // Mappa giorno del torneo -> chiave usata in TORNEO_DATA.calendario
   const GIORNI_TORNEO = {
     '2026-07-13': 'lunedi',
     '2026-07-14': 'martedi',
@@ -966,7 +929,6 @@
   function dayKeyOggi(){
     return GIORNI_TORNEO[isoDateOnly(new Date())] || null;
   }
-  // Combina la data odierna con un orario "HH:MM" preso dal foglio
   function orarioToDate(orarioStr){
     if (!orarioStr) return null;
     const m = String(orarioStr).match(/(\d{1,2}):(\d{2})/);
@@ -982,7 +944,6 @@
     const cdEl = document.getElementById('countdown');
     const liveEl = document.getElementById('liveNow');
     if (diff <= 0){
-      // Torneo iniziato: nascondi il countdown, mostra "in corso ora"
       cdEl.style.display = 'none';
       liveEl.style.display = '';
       renderLiveNow();
@@ -1000,7 +961,6 @@
   updateCountdown();
   setInterval(updateCountdown, 60000);
 
-  // ---- "IN CORSO ORA": partita in corso sui due campi, letta dal Google Sheet ----
   function partitaCardHTML(m, status){
     if (!m){
       return `<div class="live-card"><div class="lc-campo">Campo</div><div class="lc-empty">Nessuna partita in programma</div></div>`;
@@ -1028,13 +988,11 @@
     const partite = (TORNEO_DATA.calendario[key] || []).filter(m => String(m['Campo']) === String(campoNum));
     const now = new Date();
 
-    // Partite già iniziate (orario <= ora) e non ancora segnate come giocate: la più recente è quella "in corso"
     const iniziate = partite
       .filter(m => !m.giocata && orarioToDate(m['Orario']) && orarioToDate(m['Orario']) <= now)
       .sort((a,b) => orarioToDate(b['Orario']) - orarioToDate(a['Orario']));
     if (iniziate.length) return { match: iniziate[0], status: 'now' };
 
-    // Altrimenti la prossima in programma
     const future = partite
       .filter(m => !m.giocata && orarioToDate(m['Orario']) && orarioToDate(m['Orario']) > now)
       .sort((a,b) => orarioToDate(a['Orario']) - orarioToDate(b['Orario']));
@@ -1063,14 +1021,8 @@
     grid.innerHTML = partitaCardHTML(c1.match, c1.status) + partitaCardHTML(c2.match, c2.status);
   }
 
-  // ---- Link iscrizioni: da collegare al form esistente ----
   document.getElementById('iscrizioniLink').href = 'https://risorto91.github.io/Roncacity_Playgroud/';
 
-  // ==========================================================================
-  // GALLERIA 2026 — organizzata per giornata (cartelle assets/gallery/<cartella>/)
-  // Aggiorna solo "count" (numero foto caricate) man mano che carichi i file su
-  // GitHub: i nomi vengono generati da soli come Foto_1.jpg, Foto_2.jpg, ecc.
-  // ==========================================================================
   const galleryConfig = {
     lunedi:    { label:'Lun 13/07',  folder:'assets/gallery/Lunedì',    count:56, ext:'jpeg', prefix:'Foto_' },
     martedi:   { label:'Mar 14/07',  folder:'assets/gallery/martedi',   count:0,  ext:'jpg', prefix:'Foto_' },
@@ -1132,9 +1084,6 @@
 
   renderGallery();
 
-  // ==========================================================================
-  // FETCH DATI TORNEO DAL GOOGLE SHEET (via Apps Script) — Senior/Over40
-  // ==========================================================================
   async function fetchTorneoData(){
     const statusEls = [document.getElementById('statusRisultati'), document.getElementById('statusTabellone')];
     if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('INCOLLA_QUI') !== -1){
@@ -1165,6 +1114,7 @@
   }
 
   function renderAll(){
+    popolaFiltroGirone();
     updateRisultatiView();
     renderTabellone();
     if (document.getElementById('liveNow').style.display !== 'none'){
@@ -1172,9 +1122,6 @@
     }
   }
 
-  // ==========================================================================
-  // FETCH DATI TORNEO UNDER (U15/U14 + U19/U17) — Apps Script separato
-  // ==========================================================================
   async function fetchUnderData(){
     const statusEls = [document.getElementById('statusU19'), document.getElementById('statusU15')];
     if (!APPS_SCRIPT_URL_UNDER || APPS_SCRIPT_URL_UNDER.indexOf('INCOLLA_QUI') !== -1){
@@ -1213,10 +1160,28 @@
     renderBracketUnder('U15');
   }
 
+  // Ordina le righe di una classifica per posizione (usa Pos/Posizione se
+  // presente nei dati del foglio, altrimenti calcola con V > Diff > PF).
+  function ordinaClassifica(righe){
+    return righe.slice().sort((a, b) => {
+      const posA = a['Pos'] ?? a['Posizione'];
+      const posB = b['Pos'] ?? b['Posizione'];
+      if (posA != null && posB != null && posA !== '' && posB !== ''){
+        return Number(posA) - Number(posB);
+      }
+      const vA = Number(a['V'] ?? 0), vB = Number(b['V'] ?? 0);
+      if (vB !== vA) return vB - vA;
+      const dA = Number(a['DIFF'] ?? 0), dB = Number(b['DIFF'] ?? 0);
+      if (dB !== dA) return dB - dA;
+      const pfA = Number(a['PF'] ?? 0), pfB = Number(b['PF'] ?? 0);
+      return pfB - pfA;
+    });
+  }
+
   function renderClassificaUnder(cat){
     const body = document.getElementById(cat === 'U19' ? 'classificaU19Body' : 'classificaU15Body');
     if (!UNDER_DATA || !UNDER_DATA[cat]) return;
-    const righe = UNDER_DATA[cat].classifica || [];
+    const righe = ordinaClassifica(UNDER_DATA[cat].classifica || []);
     if (!righe.length){
       body.innerHTML = '<tr><td colspan="7">Nessuna partita del girone ancora giocata.</td></tr>';
       return;
@@ -1245,7 +1210,6 @@
     body.innerHTML = partite.map(matchRowHTML).join('');
   }
 
-  // ---- Riempie i box del bracket (Semifinali/Finali) di U19 e U15 ----
   function renderBracketUnder(cat){
     if (!UNDER_DATA || !UNDER_DATA[cat]) return;
     const finale = UNDER_DATA[cat].finale || [];
@@ -1269,7 +1233,6 @@
     });
   }
 
-  // ---- Trova un blocco "Classifiche" per titolo (match parziale, case-insensitive) ----
   function findBlocco(titoloParziale){
     if (!TORNEO_DATA) return null;
     const t = titoloParziale.toLowerCase();
@@ -1278,10 +1241,12 @@
 
   function classificaTableHTML(righe, extraCols){
     extraCols = extraCols || [];
-    let head = '<tr><th>Squadra</th><th>PG</th><th>V</th><th>P</th><th>PF</th><th>PS</th><th>Diff</th></tr>';
-    let body = righe.map(r => {
+    const righeOrdinate = ordinaClassifica(righe);
+    let head = '<tr><th>#</th><th>Squadra</th><th>PG</th><th>V</th><th>P</th><th>PF</th><th>PS</th><th>Diff</th></tr>';
+    let body = righeOrdinate.map((r, i) => {
       const squadra = r['Squadra'] || '—';
-      return `<tr><td>${squadra}</td><td>${r['PG'] ?? 0}</td><td>${r['V'] ?? 0}</td><td>${r['S'] ?? 0}</td><td>${r['PF'] ?? 0}</td><td>${r['PS'] ?? 0}</td><td>${r['DIFF'] ?? 0}</td></tr>`;
+      const pos = r['Pos'] ?? r['Posizione'] ?? (i + 1);
+      return `<tr><td>${pos}</td><td>${squadra}</td><td>${r['PG'] ?? 0}</td><td>${r['V'] ?? 0}</td><td>${r['S'] ?? 0}</td><td>${r['PF'] ?? 0}</td><td>${r['PS'] ?? 0}</td><td>${r['DIFF'] ?? 0}</td></tr>`;
     }).join('');
     return `<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
   }
@@ -1303,7 +1268,8 @@
       if (g) cards.push({ head: 'Over40 · Girone (tutte contro tutte)', html: classificaTableHTML(g.righe) });
       if (mini) cards.push({ head: 'Over40 · Mini-girone 5°-6°-7° (venerdì)', html: classificaTableHTML(mini.righe) });
       if (fin){
-        const rows = fin.righe.map(r => `<tr><td>${r['Posizione']}</td><td>${r['Squadra'] || '—'}</td><td>${r['Riferimento'] || ''}</td></tr>`).join('');
+        const righeFin = fin.righe.slice().sort((a,b) => Number(a['Posizione']||0) - Number(b['Posizione']||0));
+        const rows = righeFin.map(r => `<tr><td>${r['Posizione']}</td><td>${r['Squadra'] || '—'}</td><td>${r['Riferimento'] || ''}</td></tr>`).join('');
         cards.push({ head: 'Over40 · Classifica finale 1°-7° (post venerdì)', html: `<table><thead><tr><th>Pos</th><th>Squadra</th><th>Riferimento</th></tr></thead><tbody>${rows}</tbody></table>` });
       }
     }
@@ -1344,8 +1310,14 @@
       return;
     }
     const filtro = currentCatRisultati === 'senior' ? 'Main' : 'Over40';
-    const rows = giorno.filter(m => (m['Torneo'] || '').indexOf(filtro) !== -1);
-    el.innerHTML = (rows.length ? rows : giorno).map(matchRowHTML).join('');
+    let rows = giorno.filter(m => (m['Torneo'] || '').indexOf(filtro) !== -1);
+    rows = rows.length ? rows : giorno;
+    rows = applicaFiltri(rows);
+    if (!rows.length){
+      el.innerHTML = '<div class="match-row"><div class="match-teams"><span>Nessuna partita trovata con questi filtri.</span></div></div>';
+      return;
+    }
+    el.innerHTML = rows.map(matchRowHTML).join('');
   }
 
   function renderProssimePartite(){
@@ -1366,25 +1338,38 @@
     el.innerHTML = prossime.map(matchRowHTML).join('');
   }
 
+  // I triangolari finali vengono mostrati solo da giovedì 16/07 ore 23:30 in poi
+  // (quando le partite del giovedì sono finite e le qualificate ricontrollate):
+  // prima di quel momento eventuali abbinamenti nel foglio sono solo provvisori
+  // e non vanno mostrati per non creare fraintendimenti tra le squadre.
+  const DATA_TRIANGOLARI = new Date('2026-07-16T23:30:00+02:00');
+  function triangolariDisponibili(){
+    return new Date() >= DATA_TRIANGOLARI;
+  }
+
   function renderTriangolari(){
     const wrap = document.getElementById('triangolariCard');
     const body = document.getElementById('triangolariBody');
     if (currentCatRisultati !== 'senior'){ wrap.style.display = 'none'; return; }
     wrap.style.display = '';
+    if (!triangolariDisponibili()){
+      body.innerHTML = '<div class="match-row"><div class="match-teams"><span>Disponibili da giovedì 16/07, ore 23:30</span></div></div>';
+      return;
+    }
     if (!TORNEO_DATA){ return; }
     const blocchi = (TORNEO_DATA.classifiche || []).filter(b => b.titolo.toUpperCase().indexOf('TRIANGOLARE') === 0);
     if (!blocchi.length){
-      body.innerHTML = '<div class="match-row"><div class="match-teams"><span>Disponibili da venerdì 17/07</span></div></div>';
+      body.innerHTML = '<div class="match-row"><div class="match-teams"><span>Disponibili da giovedì 16/07, ore 23:30</span></div></div>';
       return;
     }
     body.innerHTML = blocchi.map(b => {
-      const rows = b.righe.map(r => `<tr><td>${r['Squadra'] || '—'}</td><td>${r['V'] ?? 0}</td><td>${r['DIFF'] ?? 0}</td><td>${r['PF'] ?? 0}</td></tr>`).join('');
+      const righeOrdinate = ordinaClassifica(b.righe);
+      const rows = righeOrdinate.map(r => `<tr><td>${r['Squadra'] || '—'}</td><td>${r['V'] ?? 0}</td><td>${r['DIFF'] ?? 0}</td><td>${r['PF'] ?? 0}</td></tr>`).join('');
       return `<div style="padding:10px 16px; font-size:12px; color:var(--gold); font-weight:700;">${b.titolo}</div>
         <table><thead><tr><th>Squadra</th><th>V</th><th>Diff</th><th>PF</th></tr></thead><tbody>${rows}</tbody></table>`;
     }).join('');
   }
 
-  // ---- Tabellone finale (Senior + Over40) ----
   function renderTabellone(){
     if (!TORNEO_DATA || !TORNEO_DATA.tabellone) return;
     TORNEO_DATA.tabellone.forEach(riga => {
@@ -1407,9 +1392,6 @@
     });
   }
 
-  // ---- SPONSOR: elenco dati da compilare man mano che arrivano loghi/link ----
-  // Per ogni sponsor: { name, logo (percorso file), link (url sito), caption (solo per Title) }
-  // Finché logo/link non ci sono, lascia stringa vuota "": la card mostra il segnaposto.
   const sponsorsData = {
     title: [
       { name: "Effedi Salotti", logo: "assets/sponsor/effedi-salotti.png", link: "https://www.effedisalotti.it/", caption: "" }
@@ -1482,7 +1464,6 @@
   document.getElementById('tierSponsor').innerHTML = sponsorsData.sponsor.map(s => sponsorCard(s, 'mini')).join('');
   document.getElementById('tierMedia').innerHTML = sponsorsData.media.map(s => sponsorCard(s, 'normal')).join('');
 
-  // ---- Striscia Title Sponsor in home (riusa lo stesso logo definito sopra) ----
   const homeTitle = sponsorsData.title[0];
   if (homeTitle && homeTitle.logo){
     document.getElementById('homeTitleSponsor').innerHTML = `<img src="${homeTitle.logo}" alt="${homeTitle.name}">`;
@@ -1494,7 +1475,6 @@
     banner.style.cursor = 'pointer';
     banner.addEventListener('click', () => window.open(homeTitle.link, '_blank', 'noopener'));
   }
-  // ---- Strisce Main Sponsor distribuite tra le sezioni ----
   function renderSponsorStrip(containerId, indices){
     const el = document.getElementById(containerId);
     if (!el) return;
@@ -1514,9 +1494,6 @@
   renderSponsorStrip('stripU15', [9,10,11]);
   renderSponsorStrip('stripGalleria', [12,13,0]);
 
-  // ==========================================================================
-  // AVVIO: primo caricamento dati + refresh periodico
-  // ==========================================================================
   fetchTorneoData();
   setInterval(fetchTorneoData, REFRESH_MS);
   fetchUnderData();
