@@ -1041,7 +1041,7 @@
 
   const galleryConfig = {
     lunedi:    { label:'Lun 13/07',  folder:'assets/gallery/Lunedì',    count:56, ext:'jpeg', prefix:'Foto_' },
-    martedi:   { label:'Mar 14/07',  folder:'assets/gallery/martedi',   count:0,  ext:'jpg', prefix:'Foto_' },
+    martedi:   { label:'Mar 14/07',  folder:'assets/gallery/Martedì',   count:61, ext:'jpeg', prefix:'Foto (', suffix:')' },
     mercoledi: { label:'Mer 15/07',  folder:'assets/gallery/mercoledi', count:0,  ext:'jpg', prefix:'Foto_' },
     giovedi:   { label:'Gio 16/07',  folder:'assets/gallery/giovedi',   count:0,  ext:'jpg', prefix:'Foto_' },
     venerdi:   { label:'Ven 17/07',  folder:'assets/gallery/venerdi',   count:0,  ext:'jpg', prefix:'Foto_' }
@@ -1052,7 +1052,7 @@
     const cfg = galleryConfig[dayKey];
     if (!cfg || !cfg.count) return [];
     const arr = [];
-    for (let i = 1; i <= cfg.count; i++) arr.push(`${cfg.folder}/${cfg.prefix}${i}.${cfg.ext}`);
+    for (let i = 1; i <= cfg.count; i++) arr.push(`${cfg.folder}/${cfg.prefix}${i}${cfg.suffix || ''}.${cfg.ext}`);
     return arr;
   }
 
