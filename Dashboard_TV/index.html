@@ -98,13 +98,14 @@
   .class-block td.num{ text-align:center; color:var(--muted); }
   .class-block tr:last-child td{ border-bottom:none; }
   .class-block td.squadra{ font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .class-block tr.qualified{ background: rgba(95,211,141,0.10); }
-  .class-block tr.qualified td.num.pos{ color:var(--qual); font-weight:800; }
-  .class-block tr.qualified td.squadra::after{ content:' ✓'; color:var(--qual); }
+  .class-block tr.qualified,
+  .class-block tr.qualified-lakers{ background: rgba(227,178,60,0.14); box-shadow: inset 3px 0 0 var(--purple); }
+  .class-block tr.qualified td.num.pos,
+  .class-block tr.qualified-lakers td.num.pos{ color:var(--gold); font-weight:800; }
   .class-block.compact th{ padding: 9px 16px; font-size:12px; }
   .class-block.compact td{ padding: 9px 16px; font-size:17px; }
   .class-legend{ margin-top: 12px; font-size:13px; color:var(--muted); display:flex; align-items:center; gap:8px; flex-shrink:0; }
-  .class-legend .sw{ width:12px; height:12px; border-radius:3px; background: rgba(95,211,141,0.35); border:1px solid var(--qual); }
+  .class-legend .sw{ width:12px; height:12px; border-radius:3px; background: rgba(227,178,60,0.35); border:1px solid var(--gold); box-shadow: inset 2px 0 0 var(--purple); }
   .tv-nav{
     display:flex; align-items:center; gap: 12px;
     padding: 14px 30px;
@@ -217,6 +218,7 @@
   const DATA_REFRESH_MS = 60000;
   const PANEL_DURATION_MS = 10000;
   const QUALIFY_TOP_N = 5;
+  const OVER40_SEMIFINAL_TOP_N = 4;
 
   const DAY_LABELS = { lunedi:'Lun 13/07', martedi:'Mar 14/07', mercoledi:'Mer 15/07', giovedi:'Gio 16/07', venerdi:'Ven 17/07 — Finale' };
   const DATE_TO_DAY = {
@@ -608,7 +610,8 @@
   // Ordina sempre le righe per posizione (numero in colonna "Pos"/"Posizione") prima
   // di disegnare la tabella: i dati arrivano dal foglio nell'ordine fisso degli slot
   // (1A, 2A, 3A...), non nell'ordine di classifica, quindi va riordinato qui.
-  function classTableHTML(righe, keySquadra, highlightTop){
+  function classTableHTML(righe, keySquadra, highlightTop, highlightClass){
+    const cls = highlightClass || 'qualified';
     const righeOrdinate = righe
       .map((r, i) => ({ r, pos: Number(r['Pos'] ?? r['Posizione'] ?? (i + 1)) }))
       .sort((a, b) => a.pos - b.pos);
@@ -616,7 +619,7 @@
     const rows = righeOrdinate.map(({ r, pos }) => {
       const qualified = highlightTop && pos <= highlightTop;
       return `
-      <tr class="${qualified ? 'qualified' : ''}">
+      <tr class="${qualified ? cls : ''}">
         <td class="num pos">${pos}</td>
         <td class="squadra">${r[keySquadra] || '—'}</td>
         <td class="num">${r['PG'] ?? ''}</td>
@@ -656,7 +659,7 @@
         ${body}`;
     }
 
-    let title = '', righe = [], highlightTop = 0;
+    let title = '', righe = [], highlightTop = 0, highlightClass = 'qualified', legendText = '', legendSwClass = 'sw';
 
     if (def.variant === 'girone'){
       const titolo = `GIRONE ${def.girone} — Main`;
@@ -664,10 +667,13 @@
       righe = b ? b.righe : [];
       title = 'Girone ' + def.girone;
       highlightTop = QUALIFY_TOP_N;
+      legendText = `Le prime ${QUALIFY_TOP_N} si qualificano ai Triangolari del venerdì`;
     } else if (def.variant === 'girone-unico'){
       const b = findBlocco('OVER40 — GIRONE UNICO');
       righe = b ? b.righe : [];
       title = 'Girone (tutte contro tutte)';
+      highlightTop = OVER40_SEMIFINAL_TOP_N;
+      legendText = `Le prime ${OVER40_SEMIFINAL_TOP_N} si qualificano alle Semifinali di venerdì`;
     } else if (def.variant === 'triangolare'){
       const b = findBlocco('TRIANGOLARE ' + def.n);
       righe = b ? b.righe : [];
@@ -685,8 +691,8 @@
     const compactCls = righe.length > 6 ? ' compact' : '';
     const body = righe.length
       ? `<div class="class-wrap">
-          <div class="class-block${compactCls}">${classTableHTML(righe, 'Squadra', highlightTop)}</div>
-          ${highlightTop ? `<div class="class-legend"><span class="sw"></span> Le prime ${highlightTop} si qualificano ai Triangolari del venerdì</div>` : ''}
+          <div class="class-block${compactCls}">${classTableHTML(righe, 'Squadra', highlightTop, highlightClass)}</div>
+          ${highlightTop ? `<div class="class-legend"><span class="${legendSwClass}"></span> ${legendText}</div>` : ''}
         </div>`
       : `<div class="empty-msg">Classifica non ancora disponibile</div>`;
 
