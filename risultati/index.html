@@ -390,8 +390,7 @@
       </div>
 
       <div class="cta-row">
-        <a class="btn btn-gold" href="#" id="iscrizioniLink">Iscriviti</a>
-        <a class="btn btn-outline" data-target="risultati">Vai ai risultati</a>
+        <a class="btn btn-gold" data-target="risultati">Vai ai risultati</a>
       </div>
     </div>
 
@@ -1071,8 +1070,6 @@
     const c2 = trovaPartitaPerCampo(2);
     grid.innerHTML = partitaCardHTML(c1.match, c1.status) + partitaCardHTML(c2.match, c2.status);
   }
-
-  document.getElementById('iscrizioniLink').href = 'https://risorto91.github.io/Roncacity_Playgroud/';
 
   const galleryConfig = {
     lunedi:    { label:'Lun 13/07',  folder:'assets/gallery/Lunedì',    count:56, ext:'jpeg', prefix:'Foto_' },
