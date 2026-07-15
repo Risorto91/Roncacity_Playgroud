@@ -247,7 +247,6 @@
   let isPaused = false;
   let panelTimer = null;
   let currentDayKey = null;
-  let currentMode = null; // 'normal' | 'under'
   let lastWindowState = null;
 
   const sponsorsMarquee = [
@@ -397,8 +396,10 @@
     }
   }
 
-  // Punto unico che decide, ad ogni aggiornamento dati o cambio fascia oraria,
-  // se mostrare il ciclo Senior/Over40 normale oppure quello Under (U19/U15).
+  // Punto unico che ricostruisce sequenza e badge ad ogni aggiornamento dati o
+  // cambio fascia oraria. I pulsanti U19/U15 restano SEMPRE nella barra in
+  // basso (dopo il gruppo OVER40): la finestra Under decide solo quali pannelli
+  // l'autoplay include nel giro automatico (skipAuto), non quali sono cliccabili.
   function applyContext(){
     if (!TORNEO_DATA) return; // aspetta almeno i dati Senior prima di costruire qualsiasi sequenza
     const dayKey = getCurrentDayKey();
@@ -406,26 +407,16 @@
     currentDayKey = dayKey;
     document.getElementById('dayBadge').textContent = DAY_LABELS[dayKey] || dayKey;
 
-    lastWindowState = isUnderWindow(dayKey);
-    const wantUnder = lastWindowState && !!UNDER_DATA;
-    const mode = wantUnder ? 'under' : 'normal';
-    const modeChanged = mode !== currentMode;
-    currentMode = mode;
-
-    const modeBadge = document.getElementById('modeBadge');
-    modeBadge.classList.toggle('active', mode === 'under');
+    const underWindowNow = isUnderWindow(dayKey);
+    lastWindowState = underWindowNow;
+    document.getElementById('modeBadge').classList.toggle('active', underWindowNow);
 
     const prevId = SEQUENCE[seqIndex] ? SEQUENCE[seqIndex].id : null;
 
-    if (mode === 'under'){
-      SEQUENCE = buildSequenceUnder(dayKey);
-      markEmptinessUnder(SEQUENCE, dayKey);
-    } else {
-      SEQUENCE = buildSequence(dayKey);
-      markEmptiness(SEQUENCE, dayKey);
-    }
+    SEQUENCE = buildSequence(dayKey);
+    markEmptiness(SEQUENCE, dayKey);
 
-    if (dayChanged || modeChanged || !prevId){
+    if (dayChanged || !prevId){
       seqIndex = 0;
     } else {
       const found = SEQUENCE.findIndex(p => p.id === prevId);
@@ -563,6 +554,15 @@
     }
     seq.push({ id:'o40-pro', cat:'over40', type:'prossime', navLabel:'Prossime', group:'OVER40' });
 
+    // Gruppo Under: sempre presente in nav (cliccabile a mano in qualsiasi
+    // momento); l'autoplay lo include solo dentro la finestra oraria Under
+    // (vedi skipAuto impostato in markEmptiness).
+    seq.push({ id:'und-campi', type:'und-campi', navLabel:'Prossime per campo', group:'UNDER' });
+    seq.push({ id:'u15-cal', catU:'U15', type:'und-calendario', navLabel:'U15 Calendario', group:'UNDER' });
+    seq.push({ id:'u15-cl', catU:'U15', type:'und-classifiche', navLabel:'U15 Classifica', group:'UNDER' });
+    seq.push({ id:'u19-cal', catU:'U19', type:'und-calendario', navLabel:'U19 Calendario', group:'UNDER' });
+    seq.push({ id:'u19-cl', catU:'U19', type:'und-classifiche', navLabel:'U19 Classifica', group:'UNDER' });
+
     return seq;
   }
 
@@ -600,9 +600,26 @@
           const b = findBlocco('OVER40 — MINI-GIRONE');
           def.empty = !b || !b.righe.length;
         }
+      } else if (def.type === 'und-campi'){
+        def.empty = nextByCourtForDayUnder(dayKey).length === 0;
+      } else if (def.type === 'und-calendario'){
+        const m = underMatchesForDay(def.catU, dayKey);
+        const f = dayKey === 'venerdi' ? underFinaleMatches(def.catU) : [];
+        def.empty = (m.length + f.length) === 0;
+      } else if (def.type === 'und-classifiche'){
+        def.empty = !UNDER_DATA || !UNDER_DATA[def.catU] || !(UNDER_DATA[def.catU].classifica || []).length;
       }
     });
     markDayRelevance(seq, dayKey);
+
+    // Fuori dalla finestra Under, l'autoplay salta i pannelli Under (restano
+    // comunque cliccabili a mano dai pulsanti in basso in qualsiasi momento).
+    const underWindowNow = isUnderWindow(dayKey);
+    seq.forEach(def => {
+      if (def.type === 'und-campi' || def.type === 'und-calendario' || def.type === 'und-classifiche'){
+        def.skipAuto = !underWindowNow;
+      }
+    });
   }
 
   function activeGironiSenior(dayKey){
@@ -918,30 +935,6 @@
       </div>`;
   }
 
-  function buildSequenceUnder(dayKey){
-    return [
-      { id:'und-campi', type:'und-campi', navLabel:'Prossime per campo', group:'UNDER' },
-      { id:'u15-cal', catU:'U15', type:'und-calendario', navLabel:'U15 Calendario', group:'UNDER' },
-      { id:'u15-cl', catU:'U15', type:'und-classifiche', navLabel:'U15 Classifica', group:'UNDER' },
-      { id:'u19-cal', catU:'U19', type:'und-calendario', navLabel:'U19 Calendario', group:'UNDER' },
-      { id:'u19-cl', catU:'U19', type:'und-classifiche', navLabel:'U19 Classifica', group:'UNDER' }
-    ];
-  }
-
-  function markEmptinessUnder(seq, dayKey){
-    seq.forEach(def => {
-      def.skipAuto = false;
-      if (def.type === 'und-campi'){
-        def.empty = nextByCourtForDayUnder(dayKey).length === 0;
-      } else if (def.type === 'und-calendario'){
-        const m = underMatchesForDay(def.catU, dayKey);
-        const f = dayKey === 'venerdi' ? underFinaleMatches(def.catU) : [];
-        def.empty = (m.length + f.length) === 0;
-      } else if (def.type === 'und-classifiche'){
-        def.empty = !UNDER_DATA || !UNDER_DATA[def.catU] || !(UNDER_DATA[def.catU].classifica || []).length;
-      }
-    });
-  }
   // ===================== fine sezione Under =====================
 
   function renderPanelHTML(def, dayKey){
