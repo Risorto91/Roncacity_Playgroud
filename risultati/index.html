@@ -391,6 +391,7 @@
 
       <div class="cta-row">
         <a class="btn btn-gold" data-target="risultati">Vai ai risultati</a>
+        <a class="btn btn-outline" data-target="galleria">Galleria</a>
       </div>
     </div>
 
@@ -1011,7 +1012,7 @@
   updateCountdown();
   setInterval(updateCountdown, 60000);
 
-  function partitaCardHTML(m, status){
+  function partitaCardHTML(m, status, categoriaLabel){
     if (!m){
       return `<div class="live-card"><div class="lc-campo">Campo</div><div class="lc-empty">Nessuna partita in programma</div></div>`;
     }
@@ -1020,6 +1021,7 @@
     const campoLbl = m['Campo'] ? `Campo ${m['Campo']}` : 'Campo';
     const meta = m['Meta'] ? ` · metà ${m['Meta']}` : '';
     const girone = m['Girone'] ? `Girone ${m['Girone']} · ` : '';
+    const cat = categoriaLabel ? `${categoriaLabel} · ` : '';
     const orario = m['Orario'] || '';
     const statusHTML = status === 'now'
       ? `<span class="lc-status now">ORA</span>`
@@ -1028,27 +1030,68 @@
       <div class="live-card${status === 'next' ? ' upcoming' : ''}">
         <div class="lc-campo">${campoLbl}${meta} ${statusHTML}</div>
         <div class="lc-teams">${casa}<br>vs ${trasferta}</div>
-        <div class="lc-meta">${girone}${status === 'now' ? 'iniziata alle ' + orario : ''}</div>
+        <div class="lc-meta">${cat}${girone}${status === 'now' ? 'iniziata alle ' + orario : ''}</div>
       </div>`;
   }
 
-  function trovaPartitaPerCampo(campoNum){
+  // Raccoglie tutte le partite di oggi (Senior/Over40 e, se pertinente,
+  // U19/U15) etichettate con la categoria di provenienza, cosi' da poter
+  // individuare ogni campo realmente in uso in quel momento, non solo i
+  // primi due.
+  function partiteDiOggiConCategoria(){
     const key = dayKeyOggi();
-    if (!TORNEO_DATA || !key || key === 'venerdi' || !TORNEO_DATA.calendario) return { match:null, status:null };
-    const partite = (TORNEO_DATA.calendario[key] || []).filter(m => String(m['Campo']) === String(campoNum));
+    if (!key || key === 'venerdi') return [];
+    let tutte = [];
+    if (TORNEO_DATA && TORNEO_DATA.calendario && TORNEO_DATA.calendario[key]){
+      TORNEO_DATA.calendario[key].forEach(m => tutte.push(Object.assign({ _cat: (m['Torneo'] || '').indexOf('Over40') !== -1 ? 'Over40' : 'Senior' }, m)));
+    }
+    if (key === 'giovedi' && UNDER_DATA){
+      if (UNDER_DATA.U19 && UNDER_DATA.U19.calendario && UNDER_DATA.U19.calendario[key]){
+        UNDER_DATA.U19.calendario[key].forEach(m => tutte.push(Object.assign({ _cat: 'U19' }, m)));
+      }
+      if (UNDER_DATA.U15 && UNDER_DATA.U15.calendario && UNDER_DATA.U15.calendario[key]){
+        UNDER_DATA.U15.calendario[key].forEach(m => tutte.push(Object.assign({ _cat: 'U15' }, m)));
+      }
+    }
+    return tutte;
+  }
+
+  // Individua i "campi" realmente distinti in uso oggi (combinazione
+  // Campo + Metà, quando presente) a partire dalle partite del giorno,
+  // cosi' la vista "in corso ora" mostra tutti gli spazi occupati e non
+  // solo due fissi.
+  function campiInUsoOggi(){
+    const tutte = partiteDiOggiConCategoria();
+    const mappa = new Map();
+    tutte.forEach(m => {
+      const campo = m['Campo'];
+      if (!campo && campo !== 0) return;
+      const meta = m['Meta'] || '';
+      const chiave = campo + '|' + meta;
+      if (!mappa.has(chiave)) mappa.set(chiave, { campo, meta });
+    });
+    return Array.from(mappa.values()).sort((a,b) => {
+      if (String(a.campo) !== String(b.campo)) return String(a.campo).localeCompare(String(b.campo), 'it', {numeric:true});
+      return String(a.meta).localeCompare(String(b.meta), 'it', {numeric:true});
+    });
+  }
+
+  function trovaPartitaPerCampo(campo, meta){
+    const tutte = partiteDiOggiConCategoria();
     const now = new Date();
+    const partite = tutte.filter(m => String(m['Campo']) === String(campo) && String(m['Meta'] || '') === String(meta || ''));
 
     const iniziate = partite
       .filter(m => !m.giocata && orarioToDate(m['Orario']) && orarioToDate(m['Orario']) <= now)
       .sort((a,b) => orarioToDate(b['Orario']) - orarioToDate(a['Orario']));
-    if (iniziate.length) return { match: iniziate[0], status: 'now' };
+    if (iniziate.length) return { match: iniziate[0], status: 'now', cat: iniziate[0]._cat };
 
     const future = partite
       .filter(m => !m.giocata && orarioToDate(m['Orario']) && orarioToDate(m['Orario']) > now)
       .sort((a,b) => orarioToDate(a['Orario']) - orarioToDate(b['Orario']));
-    if (future.length) return { match: future[0], status: 'next' };
+    if (future.length) return { match: future[0], status: 'next', cat: future[0]._cat };
 
-    return { match:null, status:null };
+    return { match:null, status:null, cat:null };
   }
 
   function renderLiveNow(){
@@ -1066,9 +1109,15 @@
       grid.innerHTML = `<div class="live-card"><div class="lc-empty">Oggi: fase finale — vedi il Tabellone per i risultati live.</div></div>`;
       return;
     }
-    const c1 = trovaPartitaPerCampo(1);
-    const c2 = trovaPartitaPerCampo(2);
-    grid.innerHTML = partitaCardHTML(c1.match, c1.status) + partitaCardHTML(c2.match, c2.status);
+    const campi = campiInUsoOggi();
+    if (!campi.length){
+      grid.innerHTML = `<div class="live-card"><div class="lc-empty">Nessun campo in uso al momento.</div></div>`;
+      return;
+    }
+    grid.innerHTML = campi.map(c => {
+      const r = trovaPartitaPerCampo(c.campo, c.meta);
+      return partitaCardHTML(r.match, r.status, r.cat);
+    }).join('');
   }
 
   const galleryConfig = {
@@ -1190,6 +1239,9 @@
         el.querySelector('.txt').textContent = 'Dati aggiornati alle ' + stamp;
       });
       renderUnderAll();
+      if (document.getElementById('liveNow').style.display !== 'none'){
+        renderLiveNow();
+      }
     } catch (err) {
       statusEls.forEach(el => {
         el.classList.add('err');
