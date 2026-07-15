@@ -45,6 +45,12 @@
     border:1px solid var(--gold-dim); border-radius:20px; padding:5px 14px;
     background: rgba(227,178,60,0.08);
   }
+  .tv-header .mode-badge{
+    font-family:'Anton',sans-serif; font-size:14px; color:#c9a8ff;
+    border:1px solid var(--purple); border-radius:20px; padding:5px 14px;
+    background: rgba(74,35,132,0.25); display:none;
+  }
+  .tv-header .mode-badge.active{ display:inline-block; }
   .tv-header .clock{ font-family:'Anton',sans-serif; font-size:28px; color:var(--white); min-width:2.2em; text-align:right; }
   .tv-header .status{ display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); }
   .tv-header .status .dot{ width:8px; height:8px; border-radius:50%; background:var(--green); }
@@ -199,6 +205,7 @@
     </div>
     <div class="right">
       <div class="status" id="dataStatus"><span class="dot"></span><span class="txt">—</span></div>
+      <div class="mode-badge" id="modeBadge">TORNEO UNDER LIVE</div>
       <div class="day-badge" id="dayBadge">—</div>
       <div class="clock" id="clock">--:--</div>
     </div>
@@ -220,6 +227,13 @@
   const QUALIFY_TOP_N = 5;
   const OVER40_SEMIFINAL_TOP_N = 4;
 
+  // ---- Torneo Under (U19/U15): stessa dashboard, si attiva da sola ----
+  const APPS_SCRIPT_URL_UNDER = "https://script.google.com/macros/s/AKfycbzEsgaAFUXJF7SfJOSvlGXYIoeJvz9aju26bJyH3iyhA6aBRFonlvNqVfJkfEgr5_5uOA/exec";
+  const UNDER_REFRESH_MS = 60000;
+  const UNDER_DAYS = ['giovedi', 'venerdi'];
+  const UNDER_WINDOW = { start: '17:00', end: '19:45' }; // stessa fascia per entrambi i giorni
+  const U19_QUALIFY_TOP_N = 4; // l'U15 non evidenzia nessuno: tutte le 8 passano ai quarti
+
   const DAY_LABELS = { lunedi:'Lun 13/07', martedi:'Mar 14/07', mercoledi:'Mer 15/07', giovedi:'Gio 16/07', venerdi:'Ven 17/07 — Finale' };
   const DATE_TO_DAY = {
     '2026-07-13':'lunedi', '2026-07-14':'martedi', '2026-07-15':'mercoledi',
@@ -227,11 +241,14 @@
   };
 
   let TORNEO_DATA = null;
+  let UNDER_DATA = null;
   let SEQUENCE = [];
   let seqIndex = 0;
   let isPaused = false;
   let panelTimer = null;
   let currentDayKey = null;
+  let currentMode = null; // 'normal' | 'under'
+  let lastWindowState = null;
 
   const sponsorsMarquee = [
     { name:"Effedi Salotti", logo:"https://risorto91.github.io/Roncacity_Playgroud/risultati/assets/sponsor/effedi-salotti.png" },
@@ -298,12 +315,38 @@
     return DATE_TO_DAY[iso] || 'lunedi';
   }
 
+  // ---- Finestra oraria Under: gioved\u00ec/venerd\u00ec 17:00\u219219:45 ----
+  function timeStrToMinutes(t){
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  }
+  function isUnderWindow(dayKey){
+    if (!UNDER_DAYS.includes(dayKey)) return false;
+    const params = new URLSearchParams(location.search);
+    if (params.get('under') === '1') return true;
+    if (params.get('under') === '0') return false;
+    const now = new Date();
+    const mins = now.getHours() * 60 + now.getMinutes();
+    return mins >= timeStrToMinutes(UNDER_WINDOW.start) && mins <= timeStrToMinutes(UNDER_WINDOW.end);
+  }
+
   function updateClock(){
     document.getElementById('clock').textContent =
       new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
   }
   updateClock();
   setInterval(updateClock, 1000);
+
+  // Controllo leggero (ogni secondo) del cambio di fascia oraria Under: scatta
+  // solo quando lo stato entra/esce dalla finestra, non ad ogni tick.
+  function checkWindowTransition(){
+    if (!currentDayKey) return;
+    const state = isUnderWindow(currentDayKey);
+    if (state !== lastWindowState){
+      applyContext();
+    }
+  }
+  setInterval(checkWindowTransition, 1000);
 
   function fitToScreen(){
     const root = document.getElementById('tvRoot');
@@ -333,28 +376,64 @@
       statusEl.querySelector('.txt').textContent = 'Aggiornato ' + stamp;
       loading.style.display = 'none';
 
-      const dayKey = getCurrentDayKey();
-      const dayChanged = dayKey !== currentDayKey;
-      currentDayKey = dayKey;
-      document.getElementById('dayBadge').textContent = DAY_LABELS[dayKey] || dayKey;
-
-      const prevId = SEQUENCE[seqIndex] ? SEQUENCE[seqIndex].id : null;
-      SEQUENCE = buildSequence(dayKey);
-      markEmptiness(SEQUENCE, dayKey);
-      if (dayChanged || !prevId){
-        seqIndex = 0;
-      } else {
-        const found = SEQUENCE.findIndex(p => p.id === prevId);
-        seqIndex = found !== -1 ? found : 0;
-      }
-      renderNav();
-      renderCurrentPanel();
-      if (!panelTimer && !isPaused) startCycle();
+      applyContext();
     } catch (err) {
       statusEl.classList.add('err');
       statusEl.querySelector('.txt').textContent = 'Errore dati: ' + err.message;
       console.error('Errore fetch dati torneo (TV):', err);
     }
+  }
+
+  async function fetchUnderData(){
+    if (!APPS_SCRIPT_URL_UNDER || APPS_SCRIPT_URL_UNDER.indexOf('INCOLLA_QUI') !== -1) return;
+    try {
+      const res = await fetch(APPS_SCRIPT_URL_UNDER, { cache:'no-store' });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || 'Errore sconosciuto');
+      UNDER_DATA = json.under;
+      applyContext();
+    } catch (err) {
+      console.error('Errore fetch dati Under (TV):', err);
+    }
+  }
+
+  // Punto unico che decide, ad ogni aggiornamento dati o cambio fascia oraria,
+  // se mostrare il ciclo Senior/Over40 normale oppure quello Under (U19/U15).
+  function applyContext(){
+    if (!TORNEO_DATA) return; // aspetta almeno i dati Senior prima di costruire qualsiasi sequenza
+    const dayKey = getCurrentDayKey();
+    const dayChanged = dayKey !== currentDayKey;
+    currentDayKey = dayKey;
+    document.getElementById('dayBadge').textContent = DAY_LABELS[dayKey] || dayKey;
+
+    lastWindowState = isUnderWindow(dayKey);
+    const wantUnder = lastWindowState && !!UNDER_DATA;
+    const mode = wantUnder ? 'under' : 'normal';
+    const modeChanged = mode !== currentMode;
+    currentMode = mode;
+
+    const modeBadge = document.getElementById('modeBadge');
+    modeBadge.classList.toggle('active', mode === 'under');
+
+    const prevId = SEQUENCE[seqIndex] ? SEQUENCE[seqIndex].id : null;
+
+    if (mode === 'under'){
+      SEQUENCE = buildSequenceUnder(dayKey);
+      markEmptinessUnder(SEQUENCE, dayKey);
+    } else {
+      SEQUENCE = buildSequence(dayKey);
+      markEmptiness(SEQUENCE, dayKey);
+    }
+
+    if (dayChanged || modeChanged || !prevId){
+      seqIndex = 0;
+    } else {
+      const found = SEQUENCE.findIndex(p => p.id === prevId);
+      seqIndex = found !== -1 ? found : 0;
+    }
+    renderNav();
+    renderCurrentPanel();
+    if (!panelTimer && !isPaused) startCycle();
   }
 
   function findBlocco(titoloParziale){
@@ -395,12 +474,8 @@
 
   function allDaysInOrder(){ return ['lunedi','martedi','mercoledi','giovedi','venerdi']; }
 
-  function nextByCourtForDay(dayKey){
-    if (!TORNEO_DATA) return [];
-    const all = [
-      ...matchesForDay(dayKey, 'senior').map(m => Object.assign({ label:'Senior' }, m)),
-      ...matchesForDay(dayKey, 'over40').map(m => Object.assign({ label:'Over40' }, m))
-    ];
+  // ---- Helper condiviso: raggruppa una lista di partite per campo/met\u00e0 ----
+  function buildCourtGroups(all){
     const groups = {};
     all.forEach(m => {
       if (!m.campo || !m.meta) return;
@@ -415,6 +490,38 @@
     });
   }
 
+  function courtCardHTML(c){
+    const m = c.next || c.last;
+    const statusLabel = c.next ? 'In arrivo' : 'Ultima giocata';
+    const teams = m ? `${m.casa || '—'}<span class="vs">vs</span>${m.trasferta || '—'}` : '—';
+    const metaBits = [];
+    if (m){
+      metaBits.push(m.label);
+      if (m.girone) metaBits.push('Girone ' + m.girone);
+      if (m.fase) metaBits.push(m.fase);
+    }
+    const timeOrScore = c.next
+      ? (m.orario || '')
+      : (m ? `${m.puntiCasa} - ${m.puntiTrasferta}` : '');
+    return `
+      <div class="court-card">
+        <div class="court-head">Campo ${c.campo} · metà ${c.meta}</div>
+        <div class="court-status">${statusLabel}</div>
+        <div class="court-teams">${teams}</div>
+        <div class="court-meta">${metaBits.join(' · ')}</div>
+        <div class="court-time">${timeOrScore}</div>
+      </div>`;
+  }
+
+  function nextByCourtForDay(dayKey){
+    if (!TORNEO_DATA) return [];
+    const all = [
+      ...matchesForDay(dayKey, 'senior').map(m => Object.assign({ label:'Senior' }, m)),
+      ...matchesForDay(dayKey, 'over40').map(m => Object.assign({ label:'Over40' }, m))
+    ];
+    return buildCourtGroups(all);
+  }
+
   function renderCampiPanel(dayKey){
     const cards = nextByCourtForDay(dayKey);
     if (!cards.length){
@@ -422,31 +529,9 @@
         <div class="panel-title"><span class="cat">Live</span><h1>Prossime partite per campo</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
         <div class="empty-msg">Nessuna partita in programma oggi</div>`;
     }
-    const cardHTML = c => {
-      const m = c.next || c.last;
-      const statusLabel = c.next ? 'In arrivo' : 'Ultima giocata';
-      const teams = m ? `${m.casa || '—'}<span class="vs">vs</span>${m.trasferta || '—'}` : '—';
-      const metaBits = [];
-      if (m){
-        metaBits.push(m.label);
-        if (m.girone) metaBits.push('Girone ' + m.girone);
-        if (m.fase) metaBits.push(m.fase);
-      }
-      const timeOrScore = c.next
-        ? (m.orario || '')
-        : (m ? `${m.puntiCasa} - ${m.puntiTrasferta}` : '');
-      return `
-        <div class="court-card">
-          <div class="court-head">Campo ${c.campo} · metà ${c.meta}</div>
-          <div class="court-status">${statusLabel}</div>
-          <div class="court-teams">${teams}</div>
-          <div class="court-meta">${metaBits.join(' · ')}</div>
-          <div class="court-time">${timeOrScore}</div>
-        </div>`;
-    };
     return `
       <div class="panel-title"><span class="cat">Live</span><h1>Prossime partite per campo</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
-      <div class="court-grid">${cards.map(cardHTML).join('')}</div>`;
+      <div class="court-grid">${cards.map(courtCardHTML).join('')}</div>`;
   }
 
   function buildSequence(dayKey){
@@ -719,16 +804,159 @@
       ${body}`;
   }
 
+  // ===================== TORNEO UNDER (U19/U15) =====================
+  // Attivo solo gioved\u00ec/venerd\u00ec 17:00\u219219:45 (vedi isUnderWindow).
+  // Riusa lo stesso formato dati del sito (index.html): UNDER_DATA[cat] con
+  // .classifica, .calendario[giorno], .finale (quarti/semifinali/finali).
+
+  function underMatchesForDay(cat, dayKey){
+    if (!UNDER_DATA || !UNDER_DATA[cat]) return [];
+    const arr = (UNDER_DATA[cat].calendario || {})[dayKey] || [];
+    return arr.map(m => ({
+      orario: m['Orario'], campo: m['Campo'], meta: m['Meta'], girone: m['Girone'],
+      casa: m['Squadra Casa'], trasferta: m['Squadra Trasferta'],
+      puntiCasa: m['Punti Casa'], puntiTrasferta: m['Punti Trasferta'], giocata: m.giocata
+    }));
+  }
+
+  // Le partite di fase finale (quarti/semifinali/finali) partono con slot
+  // placeholder (es. "1G1U15", "VincQF1_U15") finch\u00e9 non vengono sostituiti a
+  // mano con le squadre reali classificate: fino ad allora le nascondiamo,
+  // altrimenti in TV apparirebbero codici incomprensibili invece di nomi squadra.
+  function underFinaleMatches(cat){
+    if (!UNDER_DATA || !UNDER_DATA[cat]) return [];
+    return (UNDER_DATA[cat].finale || [])
+      .map(m => ({
+        fase: m['Fase'], campo: m['Campo'], meta: m['Meta'], orario: m['Orario'],
+        casa: m['Squadra Casa'], trasferta: m['Squadra Trasferta'],
+        puntiCasa: m['Punti Casa'], puntiTrasferta: m['Punti Trasferta'], giocata: m.giocata
+      }))
+      .filter(m => m.casa && m.trasferta && !String(m.casa).match(/^(\d)G1U|^(Vinc|Perd)(SF|QF)/) && !String(m.trasferta).match(/^(\d)G1U|^(Vinc|Perd)(SF|QF)/));
+  }
+
+  function nextByCourtForDayUnder(dayKey){
+    if (!UNDER_DATA) return [];
+    let all = [
+      ...underMatchesForDay('U15', dayKey).map(m => Object.assign({ label:'U15' }, m)),
+      ...underMatchesForDay('U19', dayKey).map(m => Object.assign({ label:'U19' }, m))
+    ];
+    if (dayKey === 'venerdi'){
+      all = all.concat(
+        underFinaleMatches('U15').map(m => Object.assign({ label:'U15' }, m)),
+        underFinaleMatches('U19').map(m => Object.assign({ label:'U19' }, m))
+      );
+    }
+    return buildCourtGroups(all);
+  }
+
+  function renderCampiPanelUnder(dayKey){
+    const cards = nextByCourtForDayUnder(dayKey);
+    if (!cards.length){
+      return `
+        <div class="panel-title"><span class="cat">Under</span><h1>Prossime partite per campo</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
+        <div class="empty-msg">Nessuna partita in programma</div>`;
+    }
+    return `
+      <div class="panel-title"><span class="cat">Under</span><h1>Prossime partite per campo</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
+      <div class="court-grid">${cards.map(courtCardHTML).join('')}</div>`;
+  }
+
+  function renderUnderCalendarioPanel(cat, dayKey){
+    const label = cat === 'U15' ? 'U15/U14' : 'U19/U17';
+    const matches = underMatchesForDay(cat, dayKey);
+    const finaleMatches = dayKey === 'venerdi' ? underFinaleMatches(cat) : [];
+    const titleText = dayKey === 'venerdi' ? 'Programma di giornata' : 'Calendario di oggi';
+
+    if (!matches.length && !finaleMatches.length){
+      return `
+        <div class="panel-title"><span class="cat">${label}</span><h1>${titleText}</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
+        <div class="empty-msg">Nessuna partita in programma oggi per ${label}</div>`;
+    }
+
+    if (dayKey === 'venerdi'){
+      const groups = [];
+      if (matches.length) groups.push({ fase: 'Girone', items: matches });
+      finaleMatches.forEach(m => {
+        const faseName = m.fase || 'Fase finale';
+        let g = groups.find(x => x.fase === faseName);
+        if (!g){ g = { fase: faseName, items: [] }; groups.push(g); }
+        g.items.push(m);
+      });
+      const html = groups.map(g => `
+        <div class="agenda-fase">${g.fase}</div>
+        <div class="match-grid compact">${g.items.map(matchCardHTML).join('')}</div>
+      `).join('');
+      return `
+        <div class="panel-title"><span class="cat">${label}</span><h1>${titleText}</h1><span class="sub">${DAY_LABELS[dayKey]}</span></div>
+        <div class="agenda-scroll">${html}</div>`;
+    }
+
+    return `
+      <div class="panel-title"><span class="cat">${label}</span><h1>${titleText}</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
+      <div class="match-grid">${matches.map(matchCardHTML).join('')}</div>`;
+  }
+
+  function renderUnderClassifichePanel(cat){
+    const label = cat === 'U15' ? 'U15/U14' : 'U19/U17';
+    const righe = (UNDER_DATA && UNDER_DATA[cat] && UNDER_DATA[cat].classifica) || [];
+    const highlightTop = cat === 'U19' ? U19_QUALIFY_TOP_N : 0;
+    const legendText = cat === 'U19'
+      ? `Le prime ${U19_QUALIFY_TOP_N} accedono alle semifinali incrociate del venerdì`
+      : 'Tutte le squadre passano ai Quarti di finale del venerdì';
+
+    if (!righe.length){
+      return `
+        <div class="panel-title"><span class="cat">${label}</span><h1>Classifica — Girone Unico</h1></div>
+        <div class="empty-msg">Classifica non ancora disponibile</div>`;
+    }
+    const compactCls = righe.length > 6 ? ' compact' : '';
+    return `
+      <div class="panel-title"><span class="cat">${label}</span><h1>Classifica — Girone Unico</h1></div>
+      <div class="class-wrap">
+        <div class="class-block${compactCls}">${classTableHTML(righe, 'Squadra', highlightTop)}</div>
+        <div class="class-legend"><span class="sw"></span> ${legendText}</div>
+      </div>`;
+  }
+
+  function buildSequenceUnder(dayKey){
+    return [
+      { id:'und-campi', type:'und-campi', navLabel:'Prossime per campo', group:'UNDER' },
+      { id:'u15-cal', catU:'U15', type:'und-calendario', navLabel:'U15 Calendario', group:'UNDER' },
+      { id:'u15-cl', catU:'U15', type:'und-classifiche', navLabel:'U15 Classifica', group:'UNDER' },
+      { id:'u19-cal', catU:'U19', type:'und-calendario', navLabel:'U19 Calendario', group:'UNDER' },
+      { id:'u19-cl', catU:'U19', type:'und-classifiche', navLabel:'U19 Classifica', group:'UNDER' }
+    ];
+  }
+
+  function markEmptinessUnder(seq, dayKey){
+    seq.forEach(def => {
+      def.skipAuto = false;
+      if (def.type === 'und-campi'){
+        def.empty = nextByCourtForDayUnder(dayKey).length === 0;
+      } else if (def.type === 'und-calendario'){
+        const m = underMatchesForDay(def.catU, dayKey);
+        const f = dayKey === 'venerdi' ? underFinaleMatches(def.catU) : [];
+        def.empty = (m.length + f.length) === 0;
+      } else if (def.type === 'und-classifiche'){
+        def.empty = !UNDER_DATA || !UNDER_DATA[def.catU] || !(UNDER_DATA[def.catU].classifica || []).length;
+      }
+    });
+  }
+  // ===================== fine sezione Under =====================
+
   function renderPanelHTML(def, dayKey){
     if (def.type === 'campi') return renderCampiPanel(dayKey);
     if (def.type === 'calendario') return renderCalendarioPanel(def, dayKey);
     if (def.type === 'classifiche') return renderClassifichePanel(def);
     if (def.type === 'prossime') return renderProssimePanel(def, dayKey);
+    if (def.type === 'und-campi') return renderCampiPanelUnder(dayKey);
+    if (def.type === 'und-calendario') return renderUnderCalendarioPanel(def.catU, dayKey);
+    if (def.type === 'und-classifiche') return renderUnderClassifichePanel(def.catU);
     return '';
   }
 
   function renderCurrentPanel(){
-    if (!TORNEO_DATA || !SEQUENCE.length) return;
+    if (!SEQUENCE.length) return;
     const def = SEQUENCE[seqIndex];
     const stage = document.getElementById('stage');
     const html = renderPanelHTML(def, currentDayKey);
@@ -806,6 +1034,8 @@
   renderSponsorMarquee();
   fetchTorneoData();
   setInterval(fetchTorneoData, DATA_REFRESH_MS);
+  fetchUnderData();
+  setInterval(fetchUnderData, UNDER_REFRESH_MS);
 </script>
 
 </body>
