@@ -593,7 +593,7 @@
   <!-- ============ U19/U17 ============ -->
   <section class="section" id="u19">
     <div class="section-heading"><span class="num">04</span><h2>U19 / U17</h2></div>
-    <div class="section-sub">Girone unico — Giovedì e Venerdì (Campo 2) · Fase finale venerdì sera</div>
+    <div class="section-sub">Girone unico (triplo giro) — Giovedì e Venerdì (Campo 2) · Fase finale venerdì sera</div>
     <div class="sponsor-strip-wrap"><div class="sponsor-strip-label">Un grazie ai nostri sponsor</div><div class="sponsor-strip" id="stripU19"></div></div>
 
     <div class="tabs-inline" id="dayPillsU19">
@@ -614,6 +614,9 @@
 
     <div class="card">
       <div class="card-head">Calendario</div>
+      <div class="filter-bar">
+        <input type="text" id="filterU19" placeholder="🔍 Cerca squadra…">
+      </div>
       <div id="calendarioU19Body">
         <div class="match-row"><div class="match-teams"><span>Caricamento calendario…</span></div></div>
       </div>
@@ -660,24 +663,34 @@
           <tbody id="classificaU15Body"><tr><td colspan="7">Caricamento classifica…</td></tr></tbody>
         </table>
       </div>
-      <div class="qualify-legend"><span class="sw"></span>Le prime 4 accedono alle semifinali incrociate del venerdì</div>
+      <div class="qualify-legend"><span class="sw"></span>Tutte le squadre passano ai Quarti di finale del venerdì</div>
     </div>
 
     <div class="card">
       <div class="card-head">Calendario</div>
+      <div class="filter-bar">
+        <input type="text" id="filterU15" placeholder="🔍 Cerca squadra…">
+      </div>
       <div id="calendarioU15Body">
         <div class="match-row"><div class="match-teams"><span>Caricamento calendario…</span></div></div>
       </div>
     </div>
 
     <div class="section-heading"><span class="num">—</span><h2 style="font-size:16px;">Fase Finale</h2></div>
-    <div class="section-sub">Venerdì — semifinali incrociate 1°vs4° e 2°vs3° del girone unico</div>
+    <div class="section-sub">Venerdì — quarti di finale (incrocio 1°-8°, 4°-5°, 2°-7°, 3°-6° del girone unico), poi semifinali e finali</div>
     <div class="bracket-scroll">
       <div class="bracket">
         <div class="bracket-round">
+          <div class="rlabel">Quarti</div>
+          <div class="bracket-match" data-partita="QF1_U15"><div class="t"><span class="tn">1° Girone</span></div><div class="t"><span class="tn">8° Girone</span></div></div>
+          <div class="bracket-match" data-partita="QF2_U15"><div class="t"><span class="tn">4° Girone</span></div><div class="t"><span class="tn">5° Girone</span></div></div>
+          <div class="bracket-match" data-partita="QF3_U15"><div class="t"><span class="tn">2° Girone</span></div><div class="t"><span class="tn">7° Girone</span></div></div>
+          <div class="bracket-match" data-partita="QF4_U15"><div class="t"><span class="tn">3° Girone</span></div><div class="t"><span class="tn">6° Girone</span></div></div>
+        </div>
+        <div class="bracket-round">
           <div class="rlabel">Semifinali</div>
-          <div class="bracket-match" data-partita="SF1_U15"><div class="t"><span class="tn">1°</span></div><div class="t"><span class="tn">4°</span></div></div>
-          <div class="bracket-match" data-partita="SF2_U15"><div class="t"><span class="tn">2°</span></div><div class="t"><span class="tn">3°</span></div></div>
+          <div class="bracket-match" data-partita="SF1_U15"><div class="t"><span class="tn">Vinc. Quarto 1</span></div><div class="t"><span class="tn">Vinc. Quarto 2</span></div></div>
+          <div class="bracket-match" data-partita="SF2_U15"><div class="t"><span class="tn">Vinc. Quarto 3</span></div><div class="t"><span class="tn">Vinc. Quarto 4</span></div></div>
         </div>
         <div class="bracket-round">
           <div class="rlabel">Finale 3°/4°</div>
@@ -782,6 +795,8 @@
   let currentDayU15 = 'giovedi';
   let filtroSquadra = '';
   let filtroGirone = '';
+  let filtroSquadraU19 = '';
+  let filtroSquadraU15 = '';
 
   const links = document.querySelectorAll('[data-target]');
   const sections = document.querySelectorAll('.section');
@@ -897,6 +912,16 @@
     renderCalendarioGiorno();
   });
 
+  // ---- Filtro squadra — U19 / U15 ----
+  document.getElementById('filterU19').addEventListener('input', (e) => {
+    filtroSquadraU19 = e.target.value.trim();
+    renderCalendarioUnder('U19');
+  });
+  document.getElementById('filterU15').addEventListener('input', (e) => {
+    filtroSquadraU15 = e.target.value.trim();
+    renderCalendarioUnder('U15');
+  });
+
   function popolaFiltroGirone(){
     const sel = filterGironeEl;
     const valorePrecedente = sel.value;
@@ -927,6 +952,16 @@
         if (casa.indexOf(q) === -1 && trasferta.indexOf(q) === -1) return false;
       }
       return true;
+    });
+  }
+
+  function applicaFiltroSquadra(righe, testo){
+    if (!testo) return righe;
+    const q = testo.toLowerCase();
+    return righe.filter(m => {
+      const casa = String(m['Squadra Casa'] || m['Squadra/Slot Casa'] || '').toLowerCase();
+      const trasferta = String(m['Squadra Trasferta'] || m['Squadra/Slot Trasferta'] || '').toLowerCase();
+      return casa.indexOf(q) !== -1 || trasferta.indexOf(q) !== -1;
     });
   }
 
@@ -1194,17 +1229,20 @@
     });
   }
 
+  // soglia: quante posizioni evidenziare come "qualificate" (4 per U19,
+  // 0 per U15 dato che ora tutte le 8 squadre passano ai quarti)
   function renderClassificaUnder(cat){
     const body = document.getElementById(cat === 'U19' ? 'classificaU19Body' : 'classificaU15Body');
     if (!UNDER_DATA || !UNDER_DATA[cat]) return;
     const righe = ordinaClassifica(UNDER_DATA[cat].classifica || []);
+    const soglia = cat === 'U19' ? 4 : 0;
     if (!righe.length){
       body.innerHTML = '<tr><td colspan="7">Nessuna partita del girone ancora giocata.</td></tr>';
       return;
     }
     body.innerHTML = righe.map((r, i) => {
       const pos = Number(r['Pos'] ?? r['Posizione'] ?? (i + 1));
-      const qualified = pos <= 4;
+      const qualified = soglia > 0 && pos <= soglia;
       return `
       <tr class="${qualified ? 'qualified' : ''}">
         <td class="squadra-cell">${r['Squadra']}</td>
@@ -1221,10 +1259,12 @@
   function renderCalendarioUnder(cat){
     const body = document.getElementById(cat === 'U19' ? 'calendarioU19Body' : 'calendarioU15Body');
     const giornoCorrente = cat === 'U19' ? currentDayU19 : currentDayU15;
+    const filtroTesto = cat === 'U19' ? filtroSquadraU19 : filtroSquadraU15;
     if (!UNDER_DATA || !UNDER_DATA[cat]) return;
-    const partite = (UNDER_DATA[cat].calendario || {})[giornoCorrente] || [];
+    let partite = (UNDER_DATA[cat].calendario || {})[giornoCorrente] || [];
+    partite = applicaFiltroSquadra(partite, filtroTesto);
     if (!partite.length){
-      body.innerHTML = '<div class="match-row"><div class="match-teams"><span>Nessuna partita in programma per questo giorno.</span></div></div>';
+      body.innerHTML = '<div class="match-row"><div class="match-teams"><span>Nessuna partita trovata per questo giorno.</span></div></div>';
       return;
     }
     body.innerHTML = partite.map(matchRowHTML).join('');
@@ -1242,8 +1282,8 @@
       const p1 = riga['Punti Casa'], p2 = riga['Punti Trasferta'];
       const vincitore = riga['Vincitore'];
       const hasScore = riga.giocata;
-      const nome1 = (s1 && !String(s1).match(/^(\d)G1U|^(Vinc|Perd)SF/)) ? s1 : box.children[0].querySelector('.tn').textContent;
-      const nome2 = (s2 && !String(s2).match(/^(\d)G1U|^(Vinc|Perd)SF/)) ? s2 : box.children[1].querySelector('.tn').textContent;
+      const nome1 = (s1 && !String(s1).match(/^(\d)G1U|^(Vinc|Perd)(SF|QF)/)) ? s1 : box.children[0].querySelector('.tn').textContent;
+      const nome2 = (s2 && !String(s2).match(/^(\d)G1U|^(Vinc|Perd)(SF|QF)/)) ? s2 : box.children[1].querySelector('.tn').textContent;
       const win1 = vincitore && s1 && vincitore === s1;
       const win2 = vincitore && s2 && vincitore === s2;
       box.innerHTML = `
