@@ -151,19 +151,8 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--green);flex-shrin
     </a>
   </div>
 
-  <div class="alert alert-warn">
-    ⚠️ <strong>Categorie Senior e Over 40:</strong> iscrizioni chiuse, numero massimo di squadre raggiunto.
-  </div>
-
-  <!-- COUNTDOWN ISCRIZIONI UNDER -->
-  <div class="countdown-box" id="countdownBox">
-    <div class="countdown-label" id="countdownLabel">⏳ Iscrizioni U19/U15 chiudono tra:</div>
-    <div class="countdown-timer" id="countdownTimer">
-      <div class="countdown-unit"><div class="num" id="cdDays">--</div><div class="lbl">giorni</div></div>
-      <div class="countdown-unit"><div class="num" id="cdHours">--</div><div class="lbl">ore</div></div>
-      <div class="countdown-unit"><div class="num" id="cdMin">--</div><div class="lbl">min</div></div>
-      <div class="countdown-unit"><div class="num" id="cdSec">--</div><div class="lbl">sec</div></div>
-    </div>
+  <div class="alert alert-danger">
+    ⛔ <strong>Iscrizioni chiuse per tutte le categorie</strong> (Senior, Over 40, U19/U17, U15/U14). Il torneo è al completo, non è più possibile registrare nuove squadre.
   </div>
 
   <!-- SELEZIONE CATEGORIA -->
@@ -180,20 +169,19 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--green);flex-shrin
         Over 40
         <span class="cat-sub" style="color:var(--danger);font-weight:600;">Iscrizioni chiuse</span>
       </button>
-      <button class="cat-btn" onclick="selectCat('u19',this)">
+      <button class="cat-btn cat-btn-disabled" id="btnU19" onclick="return false;">
         <span class="cat-icon">⚡</span>
         U19 / U17
-        <span class="cat-sub">Nati dal 2007 in poi</span>
+        <span class="cat-sub" style="color:var(--danger);font-weight:600;">Iscrizioni chiuse</span>
       </button>
-      <button class="cat-btn" onclick="selectCat('u15',this)">
+      <button class="cat-btn cat-btn-disabled" id="btnU15" onclick="return false;">
         <span class="cat-icon">🌟</span>
         U15 / U14
-        <span class="cat-sub">Nati dal 2011 in poi</span>
+        <span class="cat-sub" style="color:var(--danger);font-weight:600;">Iscrizioni chiuse</span>
       </button>
     </div>
-    <div id="alertCat" style="margin-top:12px;"></div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="nextFromCat()" ontouchend="event.preventDefault();nextFromCat();">Avanti →</button>
+    <div id="alertCat" style="margin-top:12px;">
+      <div class="alert alert-danger">Le iscrizioni al torneo Ronca City Playground 2026 sono chiuse per tutte le categorie.</div>
     </div>
   </div>
 
@@ -304,56 +292,10 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKPoIyUK9N1vD-
 const taglie = ['','M','L','XL','XXL','XXXL'];
 let players = [], nextId = 0;
 let categoria = '';
-const SENIOR_CHIUSO = true;  // 24/24 squadre raggiunte
-const OVER40_CHIUSO = true;  // iscrizioni Over 40 chiuse
-
-// Deadline iscrizioni categorie U19/U15: 14/07/2026 ore 23:00
-const UNDER_DEADLINE = new Date('2026-07-14T23:00:00');
-let underScadute = false;
-
-function updateCountdown() {
-  const now = new Date();
-  const diff = UNDER_DEADLINE - now;
-  const box = document.getElementById('countdownBox');
-  const label = document.getElementById('countdownLabel');
-  const timer = document.getElementById('countdownTimer');
-
-  if (diff <= 0) {
-    underScadute = true;
-    box.classList.add('expired');
-    label.textContent = '⛔ Iscrizioni U19/U15 chiuse';
-    timer.style.display = 'none';
-    lockUnderCategories();
-    return;
-  }
-
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
-  const mins = Math.floor((diff % 3600000) / 60000);
-  const secs = Math.floor((diff % 60000) / 1000);
-
-  document.getElementById('cdDays').textContent = days;
-  document.getElementById('cdHours').textContent = String(hours).padStart(2,'0');
-  document.getElementById('cdMin').textContent = String(mins).padStart(2,'0');
-  document.getElementById('cdSec').textContent = String(secs).padStart(2,'0');
-}
-
-function lockUnderCategories() {
-  ['u19','u15'].forEach(cat => {
-    const btn = document.querySelector(`.cat-btn[onclick*="'${cat}'"]`);
-    if (!btn) return;
-    btn.classList.add('cat-btn-disabled');
-    btn.setAttribute('onclick', 'return false;');
-    const sub = btn.querySelector('.cat-sub');
-    if (sub) { sub.textContent = 'Iscrizioni chiuse'; sub.style.color = 'var(--danger)'; sub.style.fontWeight = '600'; }
-  });
-  if (categoria === 'u19' || categoria === 'u15') {
-    document.getElementById('alertCat').innerHTML = '<div class="alert alert-warn">Le iscrizioni per questa categoria si sono chiuse.</div>';
-  }
-}
-
-updateCountdown();
-setInterval(updateCountdown, 1000);
+// Iscrizioni chiuse per tutte le categorie: torneo al completo
+const SENIOR_CHIUSO = true;
+const OVER40_CHIUSO = true;
+const UNDER_CHIUSO = true;
 
 // Quota d'iscrizione per atleta in base alla categoria
 const QUOTA_PER_ATLETA = {
@@ -366,7 +308,7 @@ const QUOTA_PER_ATLETA = {
 function selectCat(cat, el) {
   if (cat === 'senior' && SENIOR_CHIUSO) return;
   if (cat === 'over40' && OVER40_CHIUSO) return;
-  if ((cat === 'u19' || cat === 'u15') && underScadute) return;
+  if ((cat === 'u19' || cat === 'u15') && UNDER_CHIUSO) return;
   categoria = cat;
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
