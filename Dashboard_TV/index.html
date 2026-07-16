@@ -228,6 +228,12 @@
   const OVER40_SEMIFINAL_TOP_N = 4;
 
   // ---- Torneo Under (U19/U15): stessa dashboard, si attiva da sola ----
+  // ---- Interruttori manuali: quando serve solo il torneo Senior, spegni
+  // qui Over40 e Under (niente pannelli, niente pulsanti in nav). Per
+  // riaccenderli in futuro basta rimettere questi due a true.
+  const SHOW_OVER40 = false;
+  const SHOW_UNDER = false;
+
   const APPS_SCRIPT_URL_UNDER = "https://script.google.com/macros/s/AKfycbzEsgaAFUXJF7SfJOSvlGXYIoeJvz9aju26bJyH3iyhA6aBRFonlvNqVfJkfEgr5_5uOA/exec";
   const UNDER_REFRESH_MS = 60000;
   const UNDER_DAYS = ['giovedi', 'venerdi'];
@@ -416,7 +422,7 @@
     currentDayKey = dayKey;
     document.getElementById('dayBadge').textContent = DAY_LABELS[dayKey] || dayKey;
 
-    const underWindowNow = isUnderWindow(dayKey) || isOnlyUnderMode();
+    const underWindowNow = SHOW_UNDER && (isUnderWindow(dayKey) || isOnlyUnderMode());
     lastWindowState = underWindowNow;
     document.getElementById('modeBadge').classList.toggle('active', underWindowNow);
 
@@ -554,28 +560,35 @@
     }
     seq.push({ id:'sen-pro', cat:'senior', type:'prossime', navLabel:'Prossime', group:'SENIOR' });
 
-    seq.push({ id:'o40-cal', cat:'over40', type:'calendario', navLabel:'Calendario', group:'OVER40' });
-    if (dayKey === 'venerdi'){
-      seq.push({ id:'o40-gen', cat:'over40', type:'classifiche', variant:'generale', navLabel:'Generale', group:'OVER40' });
-      seq.push({ id:'o40-mini', cat:'over40', type:'classifiche', variant:'mini-girone', navLabel:'5°-6°-7°', group:'OVER40' });
-    } else {
-      seq.push({ id:'o40-cl', cat:'over40', type:'classifiche', variant:'girone-unico', navLabel:'Girone', group:'OVER40' });
+    if (SHOW_OVER40){
+      seq.push({ id:'o40-cal', cat:'over40', type:'calendario', navLabel:'Calendario', group:'OVER40' });
+      if (dayKey === 'venerdi'){
+        seq.push({ id:'o40-gen', cat:'over40', type:'classifiche', variant:'generale', navLabel:'Generale', group:'OVER40' });
+        seq.push({ id:'o40-mini', cat:'over40', type:'classifiche', variant:'mini-girone', navLabel:'5°-6°-7°', group:'OVER40' });
+      } else {
+        seq.push({ id:'o40-cl', cat:'over40', type:'classifiche', variant:'girone-unico', navLabel:'Girone', group:'OVER40' });
+      }
+      seq.push({ id:'o40-pro', cat:'over40', type:'prossime', navLabel:'Prossime', group:'OVER40' });
     }
-    seq.push({ id:'o40-pro', cat:'over40', type:'prossime', navLabel:'Prossime', group:'OVER40' });
 
     // Gruppo Under: sempre presente in nav (cliccabile a mano in qualsiasi
     // momento); l'autoplay lo include solo dentro la finestra oraria Under
-    // (vedi skipAuto impostato in markEmptiness).
-    seq.push({ id:'und-campi', type:'und-campi', navLabel:'Prossime per campo', group:'UNDER' });
-    seq.push({ id:'u15-cal', catU:'U15', type:'und-calendario', navLabel:'U15 Calendario', group:'UNDER' });
-    seq.push({ id:'u15-cl', catU:'U15', type:'und-classifiche', navLabel:'U15 Classifica', group:'UNDER' });
-    seq.push({ id:'u19-cal', catU:'U19', type:'und-calendario', navLabel:'U19 Calendario', group:'UNDER' });
-    seq.push({ id:'u19-cl', catU:'U19', type:'und-classifiche', navLabel:'U19 Classifica', group:'UNDER' });
+    // (vedi skipAuto impostato in markEmptiness). Disattivabile del tutto
+    // con SHOW_UNDER = false qui sopra.
+    if (SHOW_UNDER){
+      seq.push({ id:'und-campi', type:'und-campi', navLabel:'Prossime per campo', group:'UNDER' });
+      seq.push({ id:'u15-cal', catU:'U15', type:'und-calendario', navLabel:'U15 Calendario', group:'UNDER' });
+      seq.push({ id:'u15-cl', catU:'U15', type:'und-classifiche', navLabel:'U15 Classifica', group:'UNDER' });
+      seq.push({ id:'u19-cal', catU:'U19', type:'und-calendario', navLabel:'U19 Calendario', group:'UNDER' });
+      seq.push({ id:'u19-cl', catU:'U19', type:'und-classifiche', navLabel:'U19 Classifica', group:'UNDER' });
+    }
 
     // Modalit\u00e0 "solo Under": la dashboard mostra e ruota SOLO tra i
     // pannelli del gruppo UNDER (calendario/classifiche/campi), senza
-    // Senior/Over40. Attivata da ?under=1 o ?onlyUnder=1 in URL.
-    if (isOnlyUnderMode()){
+    // Senior/Over40. Attivata da ?under=1 o ?onlyUnder=1 in URL (resta
+    // senza effetto se SHOW_UNDER = false, dato che non ci sono pannelli
+    // Under da isolare).
+    if (SHOW_UNDER && isOnlyUnderMode()){
       return seq.filter(def => def.group === 'UNDER');
     }
 
@@ -632,7 +645,7 @@
     // comunque cliccabili a mano dai pulsanti in basso in qualsiasi momento).
     // In modalit\u00e0 "solo Under" (isOnlyUnderMode) la finestra \u00e8 sempre
     // considerata attiva, quindi qui non si salta mai nulla.
-    const underWindowNow = isUnderWindow(dayKey) || isOnlyUnderMode();
+    const underWindowNow = SHOW_UNDER && (isUnderWindow(dayKey) || isOnlyUnderMode());
     seq.forEach(def => {
       if (def.type === 'und-campi' || def.type === 'und-calendario' || def.type === 'und-classifiche'){
         def.skipAuto = !underWindowNow;
