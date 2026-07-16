@@ -231,7 +231,7 @@
   // ---- Interruttori manuali: quando serve solo il torneo Senior, spegni
   // qui Over40 e Under (niente pannelli, niente pulsanti in nav). Per
   // riaccenderli in futuro basta rimettere questi due a true.
-  const SHOW_OVER40 = false;
+  const SHOW_OVER40 = true;
   const SHOW_UNDER = false;
 
   const APPS_SCRIPT_URL_UNDER = "https://script.google.com/macros/s/AKfycbzEsgaAFUXJF7SfJOSvlGXYIoeJvz9aju26bJyH3iyhA6aBRFonlvNqVfJkfEgr5_5uOA/exec";
@@ -546,27 +546,17 @@
     seq.push({ id:'home-campi', type:'campi', navLabel:'Prossime per campo', group:'LIVE' });
 
     if (dayKey === 'venerdi'){
-      seq.push({ id:'sen-cal-tri', cat:'senior', type:'calendario', calFilter:'triangolare', navLabel:'Triangolari', group:'SENIOR' });
-      seq.push({ id:'sen-recap', cat:'senior', type:'classifiche', variant:'recap-gironi', navLabel:'Riepilogo Gironi', group:'SENIOR' });
-      for (let i = 1; i <= 5; i++){
-        seq.push({ id:'sen-tri-'+i, cat:'senior', type:'classifiche', variant:'triangolare', n:i, navLabel:'Triang. '+i, group:'SENIOR' });
-      }
-      seq.push({ id:'sen-cal-elim', cat:'senior', type:'calendario', calFilter:'eliminazione', navLabel:'Fase Eliminazione', group:'SENIOR' });
+      seq.push({ id:'sen-combo-ven', cat:'senior', type:'combinato-finale', navLabel:'Venerdì — Classifiche e Programma', group:'SENIOR' });
     } else {
-      seq.push({ id:'sen-cal', cat:'senior', type:'calendario', navLabel:'Calendario', group:'SENIOR' });
-      ['A','B','C'].forEach(g => {
-        seq.push({ id:'sen-cl-'+g, cat:'senior', type:'classifiche', variant:'girone', girone:g, navLabel:'Girone '+g, group:'SENIOR' });
-      });
+      seq.push({ id:'sen-combo', cat:'senior', type:'combinato', navLabel:'Calendario e Classifiche', group:'SENIOR' });
     }
     seq.push({ id:'sen-pro', cat:'senior', type:'prossime', navLabel:'Prossime', group:'SENIOR' });
 
     if (SHOW_OVER40){
-      seq.push({ id:'o40-cal', cat:'over40', type:'calendario', navLabel:'Calendario', group:'OVER40' });
       if (dayKey === 'venerdi'){
-        seq.push({ id:'o40-gen', cat:'over40', type:'classifiche', variant:'generale', navLabel:'Generale', group:'OVER40' });
-        seq.push({ id:'o40-mini', cat:'over40', type:'classifiche', variant:'mini-girone', navLabel:'5°-6°-7°', group:'OVER40' });
+        seq.push({ id:'o40-combo-ven', cat:'over40', type:'combinato-finale', navLabel:'Venerdì — Classifiche e Programma', group:'OVER40' });
       } else {
-        seq.push({ id:'o40-cl', cat:'over40', type:'classifiche', variant:'girone-unico', navLabel:'Girone', group:'OVER40' });
+        seq.push({ id:'o40-combo', cat:'over40', type:'combinato', navLabel:'Calendario e Classifica', group:'OVER40' });
       }
       seq.push({ id:'o40-pro', cat:'over40', type:'prossime', navLabel:'Prossime', group:'OVER40' });
     }
@@ -599,8 +589,6 @@
     seq.forEach(def => {
       if (def.type === 'campi'){
         def.empty = nextByCourtForDay(dayKey).length === 0;
-      } else if (def.type === 'calendario'){
-        def.empty = matchesForDay(dayKey, def.cat, def.calFilter).length === 0;
       } else if (def.type === 'prossime'){
         const days = allDaysInOrder();
         const startIdx = days.indexOf(dayKey);
@@ -609,26 +597,26 @@
           found += matchesForDay(days[i], def.cat).filter(m => !m.giocata).length;
         }
         def.empty = found === 0;
-      } else if (def.type === 'classifiche'){
-        if (def.variant === 'recap-gironi'){
-          def.empty = !['A','B','C'].some(g => { const b = findBlocco(`GIRONE ${g} — Main`); return b && b.righe.length; });
-        } else if (def.variant === 'girone'){
-          const t = `GIRONE ${def.girone} — Main`;
-          const b = findBlocco(t);
-          def.empty = !b || !b.righe.length;
-        } else if (def.variant === 'girone-unico'){
+      } else if (def.type === 'combinato'){
+        const hasCal = matchesForDay(dayKey, def.cat).length > 0;
+        let hasClass = false;
+        if (def.cat === 'senior'){
+          hasClass = ['A','B','C'].some(g => { const b = findBlocco(`GIRONE ${g} — Main`); return b && b.righe.length; });
+        } else {
           const b = findBlocco('OVER40 — GIRONE UNICO');
-          def.empty = !b || !b.righe.length;
-        } else if (def.variant === 'triangolare'){
-          const b = findBlocco('TRIANGOLARE ' + def.n);
-          def.empty = !b || !b.righe.length;
-        } else if (def.variant === 'generale'){
-          const b = findBlocco('OVER40 — CLASSIFICA FINALE');
-          def.empty = !b || !b.righe.length;
-        } else if (def.variant === 'mini-girone'){
-          const b = findBlocco('OVER40 — MINI-GIRONE');
-          def.empty = !b || !b.righe.length;
+          hasClass = !!(b && b.righe.length);
         }
+        def.empty = !hasCal && !hasClass;
+      } else if (def.type === 'combinato-finale'){
+        const hasCal = matchesForDay('venerdi', def.cat).length > 0;
+        let hasClass = false;
+        if (def.cat === 'senior'){
+          hasClass = [1,2,3,4,5].some(n => { const b = findBlocco('TRIANGOLARE ' + n); return b && b.righe.length; });
+        } else {
+          const b = findBlocco('OVER40 — CLASSIFICA FINALE');
+          hasClass = !!(b && b.righe.length);
+        }
+        def.empty = !hasCal && !hasClass;
       } else if (def.type === 'und-campi'){
         def.empty = nextByCourtForDayUnder(dayKey).length === 0;
       } else if (def.type === 'und-calendario'){
@@ -653,27 +641,12 @@
     });
   }
 
-  function activeGironiSenior(dayKey){
-    const set = new Set();
-    matchesForDay(dayKey, 'senior').forEach(m => { if (m.girone) set.add(m.girone); });
-    return set;
-  }
-  function over40PlaysDay(dayKey){
-    return matchesForDay(dayKey, 'over40').length > 0;
-  }
-
+  // Con le schermate combinate, ogni pannello Senior/Over40 rappresenta gi\u00e0
+  // "la" schermata di quella categoria per il giorno corrente: l'autoplay non
+  // deve pi\u00f9 saltarne nessuno in base a gironi/orari attivi (ci pensa .empty,
+  // impostato sopra, a nascondere una categoria che quel giorno non gioca).
   function markDayRelevance(seq, dayKey){
-    if (dayKey === 'venerdi'){ seq.forEach(def => { def.skipAuto = false; }); return; }
-    const activeSenior = activeGironiSenior(dayKey);
-    const over40Today = over40PlaysDay(dayKey);
-    seq.forEach(def => {
-      def.skipAuto = false;
-      if (def.type === 'classifiche' && def.variant === 'girone' && def.cat === 'senior'){
-        def.skipAuto = activeSenior.size > 0 && !activeSenior.has(def.girone);
-      } else if (def.cat === 'over40' && (def.type === 'calendario' || (def.type === 'classifiche' && def.variant === 'girone-unico'))){
-        def.skipAuto = !over40Today;
-      }
-    });
+    seq.forEach(def => { def.skipAuto = false; });
   }
 
   function matchCardHTML(m){
@@ -852,6 +825,111 @@
       ${body}`;
   }
 
+  // ---- Schermata combinata (Lun-Gio): calendario del giorno + tutte le
+  // classifiche della categoria in un'unica schermata (invece di pannelli
+  // separati per girone). Per Senior: gironi A/B/C affiancati. Per Over40:
+  // girone unico.
+  function renderCombinatoPanel(def, dayKey){
+    const label = def.cat === 'senior' ? 'Senior' : 'Over40';
+    const matches = matchesForDay(dayKey, def.cat);
+    const calendarioHTML = matches.length
+      ? `<div class="match-grid compact">${matches.map(matchCardHTML).join('')}</div>`
+      : `<div class="empty-msg" style="font-size:20px;">Nessuna partita in programma oggi per ${label}</div>`;
+
+    let classificaHTML;
+    if (def.cat === 'senior'){
+      const blocks = ['A','B','C'].map(g => {
+        const b = findBlocco(`GIRONE ${g} — Main`);
+        return { head: 'Girone ' + g, righe: b ? b.righe : [] };
+      }).filter(b => b.righe.length);
+      classificaHTML = blocks.length
+        ? `<div class="class-grid-3">${blocks.map(b => `
+            <div class="class-block compact">
+              <div class="cb-head">${b.head}</div>
+              ${classTableHTML(b.righe, 'Squadra', QUALIFY_TOP_N)}
+            </div>`).join('')}</div>`
+        : `<div class="empty-msg">Classifiche non ancora disponibili</div>`;
+    } else {
+      const b = findBlocco('OVER40 — GIRONE UNICO');
+      const righe = b ? b.righe : [];
+      classificaHTML = righe.length
+        ? `<div class="class-block${righe.length > 6 ? ' compact' : ''}">${classTableHTML(righe, 'Squadra', OVER40_SEMIFINAL_TOP_N)}</div>`
+        : `<div class="empty-msg">Classifica non ancora disponibile</div>`;
+    }
+
+    return `
+      <div class="panel-title"><span class="cat">${label}</span><h1>Calendario e Classifiche</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
+      <div style="flex:1; display:flex; flex-direction:column; gap:18px; min-height:0; overflow:hidden;">
+        <div style="flex:0 0 36%; min-height:0; overflow-y:auto;">${calendarioHTML}</div>
+        <div style="flex:1; min-height:0; overflow:hidden; display:flex; flex-direction:column;">${classificaHTML}</div>
+      </div>`;
+  }
+
+  // Tabella semplice Pos/Squadra/Riferimento, usata per la classifica finale
+  // Over40 (post-venerdì): non ha le colonne PG/V/S/PF/PS/DIFF standard.
+  function classTableFinaleOver40HTML(righe){
+    const righeOrdinate = righe.slice().sort((a,b) => Number(a['Posizione']||0) - Number(b['Posizione']||0));
+    const rows = righeOrdinate.map(r => `
+      <tr>
+        <td class="num pos">${r['Posizione'] ?? ''}</td>
+        <td class="squadra">${r['Squadra'] || r['Riferimento'] || '—'}</td>
+      </tr>`).join('');
+    return `<table>
+      <thead><tr><th>#</th><th>Squadra</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+
+  // ---- Schermata combinata di venerdì: classifiche (triangolari per il
+  // Main, classifica finale per l'Over40) + programma completo della
+  // giornata, raggruppato per fase, tutto in un'unica schermata scorrevole.
+  function renderCombinatoFinalePanel(def){
+    const label = def.cat === 'senior' ? 'Senior' : 'Over40';
+
+    let classificaHTML;
+    if (def.cat === 'senior'){
+      const blocks = [1,2,3,4,5].map(n => {
+        const b = findBlocco('TRIANGOLARE ' + n);
+        return { head: 'Triangolare ' + n, righe: b ? b.righe : [] };
+      }).filter(b => b.righe.length);
+      classificaHTML = blocks.length
+        ? `<div class="class-grid-3">${blocks.map(b => `
+            <div class="class-block compact">
+              <div class="cb-head">${b.head}</div>
+              ${classTableHTML(b.righe, 'Squadra', 1)}
+            </div>`).join('')}</div>`
+        : `<div class="empty-msg">Classifiche triangolari non ancora disponibili</div>`;
+    } else {
+      const b = findBlocco('OVER40 — CLASSIFICA FINALE');
+      const righe = b ? b.righe : [];
+      classificaHTML = righe.length
+        ? `<div class="class-block">${classTableFinaleOver40HTML(righe)}</div>`
+        : `<div class="empty-msg">Classifica finale non ancora disponibile</div>`;
+    }
+
+    const matches = matchesForDay('venerdi', def.cat);
+    const gruppi = [];
+    matches.forEach(m => {
+      const faseName = m.fase || 'Programma';
+      let g = gruppi.find(x => x.fase === faseName);
+      if (!g){ g = { fase: faseName, items: [] }; gruppi.push(g); }
+      g.items.push(m);
+    });
+    const programmaHTML = gruppi.length
+      ? gruppi.map(g => `
+          <div class="agenda-fase">${g.fase}</div>
+          <div class="match-grid compact">${g.items.map(matchCardHTML).join('')}</div>
+        `).join('')
+      : `<div class="empty-msg">Programma non ancora disponibile</div>`;
+
+    return `
+      <div class="panel-title"><span class="cat">${label}</span><h1>Venerdì — Classifiche e Programma</h1></div>
+      <div style="flex:1; display:flex; flex-direction:column; gap:18px; min-height:0; overflow:hidden;">
+        <div style="flex:0 0 40%; min-height:0; overflow:hidden; display:flex; flex-direction:column;">${classificaHTML}</div>
+        <div class="agenda-scroll" style="flex:1; min-height:0;">${programmaHTML}</div>
+      </div>`;
+  }
+
   // ===================== TORNEO UNDER (U19/U15) =====================
   // Attivo solo gioved\u00ec/venerd\u00ec 17:00\u219219:45 (vedi isUnderWindow),
   // oppure sempre attivo in modalit\u00e0 "solo Under" (isOnlyUnderMode).
@@ -974,6 +1052,8 @@
     if (def.type === 'calendario') return renderCalendarioPanel(def, dayKey);
     if (def.type === 'classifiche') return renderClassifichePanel(def);
     if (def.type === 'prossime') return renderProssimePanel(def, dayKey);
+    if (def.type === 'combinato') return renderCombinatoPanel(def, dayKey);
+    if (def.type === 'combinato-finale') return renderCombinatoFinalePanel(def);
     if (def.type === 'und-campi') return renderCampiPanelUnder(dayKey);
     if (def.type === 'und-calendario') return renderUnderCalendarioPanel(def.catU, dayKey);
     if (def.type === 'und-classifiche') return renderUnderClassifichePanel(def.catU);
