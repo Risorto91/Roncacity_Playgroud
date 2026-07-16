@@ -1439,22 +1439,58 @@
     return `<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
   }
 
+  // Tabella di un singolo triangolare: evidenzia sempre la 1a classificata,
+  // e la 2a solo se risulta tra le 3 migliori seconde (noto solo a fine
+  // triangolari, quando il blocco "MIGLIORI 3 SECONDE" ha dati reali).
+  function triangolareTableHTML(righe, secondaQualificata){
+    const righeOrdinate = ordinaClassifica(righe);
+    const head = '<tr><th>#</th><th>Squadra</th><th>PG</th><th>V</th><th>P</th><th>PF</th><th>PS</th><th>Diff</th></tr>';
+    const body = righeOrdinate.map((r, i) => {
+      const squadra = r['Squadra'] || '—';
+      const pos = Number(r['Pos'] ?? r['Posizione'] ?? (i + 1));
+      const qualified = pos === 1 || (pos === 2 && secondaQualificata);
+      return `<tr class="${qualified ? 'qualified' : ''}"><td>${pos}</td><td class="squadra-cell">${squadra}</td><td>${r['PG'] ?? 0}</td><td>${r['V'] ?? 0}</td><td>${r['S'] ?? 0}</td><td>${r['PF'] ?? 0}</td><td>${r['PS'] ?? 0}</td><td>${r['DIFF'] ?? 0}</td></tr>`;
+    }).join('');
+    return `<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
+  }
+
   function renderGironiSenior(){
     const container = document.getElementById('gironiContainerSenior');
     if (!TORNEO_DATA){ container.innerHTML = ''; return; }
     let cards = [];
+
+    if (triangolariDisponibili()){
+      // Il blocco "MIGLIORI 3 SECONDE" ha dati reali (squadra valorizzata)
+      // solo a fine triangolari: fino ad allora si sa solo chi vince ogni
+      // triangolare, non quali seconde passeranno.
+      const miglioriSeconde = findBlocco('MIGLIORI 3 SECONDE');
+      const secondeDisponibili = !!(miglioriSeconde && miglioriSeconde.righe.some(r => r['Squadra (2ª classificata)']));
+      const triangolariSecondaQualificata = new Set();
+      if (secondeDisponibili){
+        miglioriSeconde.righe.forEach(r => {
+          if (Number(r['RankSeconde']) <= 3) triangolariSecondaQualificata.add(Number(r['Triangolare']));
+        });
+      }
+      for (let n = 1; n <= 5; n++){
+        const b = findBlocco('TRIANGOLARE ' + n);
+        if (b && b.righe.length){
+          const secondaQualificata = triangolariSecondaQualificata.has(n);
+          cards.push({
+            head: 'Triangolare ' + n,
+            html: triangolareTableHTML(b.righe, secondaQualificata),
+            legend: secondeDisponibili
+              ? 'Evidenziate: 1ª classificata (qualificata) e 2ª se tra le 3 migliori seconde'
+              : 'La 1ª classificata accede ai Quarti — le 3 migliori seconde si sapranno a fine triangolari'
+          });
+        }
+      }
+    }
+
     ['GIRONE A — Main', 'GIRONE B — Main', 'GIRONE C — Main'].forEach(titolo => {
       const b = findBlocco(titolo);
       if (b) cards.push({ head: titolo.replace(' — Main',''), html: classificaTableHTML(b.righe, [], 5), legend: 'Le prime 5 si qualificano ai Triangolari del venerdì' });
     });
-    if (triangolariDisponibili()){
-      for (let n = 1; n <= 5; n++){
-        const b = findBlocco('TRIANGOLARE ' + n);
-        if (b && b.righe.length){
-          cards.push({ head: 'Triangolare ' + n, html: classificaTableHTML(b.righe, [], 1), legend: 'La prima classificata accede ai Quarti' });
-        }
-      }
-    }
+
     container.innerHTML = cards.map(c => `
       <div class="card">
         <div class="card-head">${c.head}</div>
