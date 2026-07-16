@@ -1447,6 +1447,14 @@
       const b = findBlocco(titolo);
       if (b) cards.push({ head: titolo.replace(' — Main',''), html: classificaTableHTML(b.righe, [], 5), legend: 'Le prime 5 si qualificano ai Triangolari del venerdì' });
     });
+    if (triangolariDisponibili()){
+      for (let n = 1; n <= 5; n++){
+        const b = findBlocco('TRIANGOLARE ' + n);
+        if (b && b.righe.length){
+          cards.push({ head: 'Triangolare ' + n, html: classificaTableHTML(b.righe, [], 1), legend: 'La prima classificata accede ai Quarti' });
+        }
+      }
+    }
     container.innerHTML = cards.map(c => `
       <div class="card">
         <div class="card-head">${c.head}</div>
