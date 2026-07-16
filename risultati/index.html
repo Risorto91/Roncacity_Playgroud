@@ -491,7 +491,7 @@
     </div>
 
     <div id="gironiContainer" style="display:none;">
-      <!-- Le card dei gironi (A/B/C per Senior, Girone Unico/Mini-girone/Finale per Over40) vengono generate da JS -->
+      <!-- Le card dei gironi (A/B/C per Senior, Girone Unico/Classifica Finale per Over40) vengono generate da JS -->
     </div>
 
     <div id="giornoCardsWrap">
@@ -566,14 +566,18 @@
     <div class="bracket-scroll" id="bracketOver40" style="display:none;">
       <div class="bracket">
         <div class="bracket-round">
-          <div class="rlabel">Mini-girone 5°-6°-7°</div>
-          <div class="bracket-match" data-partita="Mini-girone 5v6"><div class="t"><span class="tn">5° Girone</span></div><div class="t"><span class="tn">6° Girone</span></div></div>
-          <div class="bracket-match" data-partita="Mini-girone 6v7"><div class="t"><span class="tn">6° Girone</span></div><div class="t"><span class="tn">7° Girone</span></div></div>
-          <div class="bracket-match" data-partita="Mini-girone 5v7"><div class="t"><span class="tn">5° Girone</span></div><div class="t"><span class="tn">7° Girone</span></div></div>
+          <div class="rlabel">Play-in — Turno 1</div>
+          <div class="bracket-match" data-partita="Play-in 4v7"><div class="t"><span class="tn">4° Girone</span></div><div class="t"><span class="tn">7° Girone</span></div></div>
+          <div class="bracket-match" data-partita="Play-in 5v6"><div class="t"><span class="tn">5° Girone</span></div><div class="t"><span class="tn">6° Girone</span></div></div>
+        </div>
+        <div class="bracket-round">
+          <div class="rlabel">Play-in — Turno 2</div>
+          <div class="bracket-match" data-partita="Spareggio Semifinale"><div class="t"><span class="tn">Vinc. 4v7</span></div><div class="t"><span class="tn">Vinc. 5v6</span></div></div>
+          <div class="bracket-match" data-partita="Spareggio Piazzamento"><div class="t"><span class="tn">Perd. 4v7</span></div><div class="t"><span class="tn">Perd. 5v6</span></div></div>
         </div>
         <div class="bracket-round">
           <div class="rlabel">Semifinali</div>
-          <div class="bracket-match" data-partita="Semifinale 1 (1v4)"><div class="t"><span class="tn">1° Girone</span></div><div class="t"><span class="tn">4° Girone</span></div></div>
+          <div class="bracket-match" data-partita="Semifinale 1 (1° vs Play-in)"><div class="t"><span class="tn">1° Girone</span></div><div class="t"><span class="tn">Vinc. Play-in</span></div></div>
           <div class="bracket-match" data-partita="Semifinale 2 (2v3)"><div class="t"><span class="tn">2° Girone</span></div><div class="t"><span class="tn">3° Girone</span></div></div>
         </div>
         <div class="bracket-round">
@@ -585,7 +589,7 @@
     </div>
 
     <div class="note-box" id="tabelloneNote">
-      <b>Come si formano i Quarti (Senior):</b> le 8 qualificate arrivano dai 5 triangolari del venerdì (le 5 vincenti + le 3 migliori seconde). <b>Over40:</b> girone unico da 7 squadre (tutte contro tutte) il martedì; il venerdì le prime 4 giocano Semifinali e Finali, mentre 5ª-6ª-7ª si giocano il piazzamento in un mini-girone, tutto in sequenza su una metà campo dalle 20:15 alle 22:15.
+      <b>Come si formano i Quarti (Senior):</b> le 8 qualificate arrivano dai 5 triangolari del venerdì (le 5 vincenti + le 3 migliori seconde). <b>Over40:</b> girone unico da 7 squadre (tutte contro tutte) il martedì; il venerdì 1ª-2ª-3ª vanno dirette in Semifinale, mentre 4ª-5ª-6ª-7ª disputano un Play-in (Turno 1: 4v7 e 5v6; Turno 2: le vincenti si giocano il 4° posto in Semifinale, le perdenti si rigiocano una partita garantita che assegna il 6° e 7° posto — la 5ª va alla perdente dello spareggio Semifinale).
     </div>
     <div class="data-status" id="statusTabellone"><span class="dot"></span><span class="txt">In attesa di connessione ai dati…</span></div>
   </section>
@@ -1373,10 +1377,8 @@
       });
     } else {
       const g = findBlocco('OVER40 — GIRONE UNICO');
-      const mini = findBlocco('OVER40 — MINI-GIRONE');
       const fin = findBlocco('OVER40 — CLASSIFICA FINALE');
-      if (g) cards.push({ head: 'Over40 · Girone (tutte contro tutte)', html: classificaTableHTML(g.righe, [], 4), legend: 'Le prime 4 giocano direttamente Semifinali e Finali' });
-      if (mini) cards.push({ head: 'Over40 · Mini-girone 5°-6°-7° (venerdì)', html: classificaTableHTML(mini.righe) });
+      if (g) cards.push({ head: 'Over40 · Girone (tutte contro tutte)', html: classificaTableHTML(g.righe, [], 3), legend: 'Le prime 3 vanno dirette in Semifinale; 4ª-7ª si giocano un posto nel Play-in di venerdì (vedi Tabellone)' });
       if (fin){
         const righeFin = fin.righe.slice().sort((a,b) => Number(a['Posizione']||0) - Number(b['Posizione']||0));
         const rows = righeFin.map(r => `<tr><td>${r['Posizione']}</td><td>${r['Squadra'] || '—'}</td><td>${r['Riferimento'] || ''}</td></tr>`).join('');
