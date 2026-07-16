@@ -329,6 +329,15 @@
     return mins >= timeStrToMinutes(UNDER_WINDOW.start) && mins <= timeStrToMinutes(UNDER_WINDOW.end);
   }
 
+  // ---- Modalit\u00e0 "solo Under": forza la finestra Under attiva e mostra
+  // esclusivamente i pannelli Under (calendario/classifiche/campi), saltando
+  // Senior e Over40. Si attiva con ?under=1 in URL (stesso parametro gi\u00e0
+  // usato per forzare la finestra oraria), oppure con ?onlyUnder=1.
+  function isOnlyUnderMode(){
+    const params = new URLSearchParams(location.search);
+    return params.get('under') === '1' || params.get('onlyUnder') === '1';
+  }
+
   function updateClock(){
     document.getElementById('clock').textContent =
       new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
@@ -407,7 +416,7 @@
     currentDayKey = dayKey;
     document.getElementById('dayBadge').textContent = DAY_LABELS[dayKey] || dayKey;
 
-    const underWindowNow = isUnderWindow(dayKey);
+    const underWindowNow = isUnderWindow(dayKey) || isOnlyUnderMode();
     lastWindowState = underWindowNow;
     document.getElementById('modeBadge').classList.toggle('active', underWindowNow);
 
@@ -563,6 +572,13 @@
     seq.push({ id:'u19-cal', catU:'U19', type:'und-calendario', navLabel:'U19 Calendario', group:'UNDER' });
     seq.push({ id:'u19-cl', catU:'U19', type:'und-classifiche', navLabel:'U19 Classifica', group:'UNDER' });
 
+    // Modalit\u00e0 "solo Under": la dashboard mostra e ruota SOLO tra i
+    // pannelli del gruppo UNDER (calendario/classifiche/campi), senza
+    // Senior/Over40. Attivata da ?under=1 o ?onlyUnder=1 in URL.
+    if (isOnlyUnderMode()){
+      return seq.filter(def => def.group === 'UNDER');
+    }
+
     return seq;
   }
 
@@ -614,7 +630,9 @@
 
     // Fuori dalla finestra Under, l'autoplay salta i pannelli Under (restano
     // comunque cliccabili a mano dai pulsanti in basso in qualsiasi momento).
-    const underWindowNow = isUnderWindow(dayKey);
+    // In modalit\u00e0 "solo Under" (isOnlyUnderMode) la finestra \u00e8 sempre
+    // considerata attiva, quindi qui non si salta mai nulla.
+    const underWindowNow = isUnderWindow(dayKey) || isOnlyUnderMode();
     seq.forEach(def => {
       if (def.type === 'und-campi' || def.type === 'und-calendario' || def.type === 'und-classifiche'){
         def.skipAuto = !underWindowNow;
@@ -822,7 +840,8 @@
   }
 
   // ===================== TORNEO UNDER (U19/U15) =====================
-  // Attivo solo gioved\u00ec/venerd\u00ec 17:00\u219219:45 (vedi isUnderWindow).
+  // Attivo solo gioved\u00ec/venerd\u00ec 17:00\u219219:45 (vedi isUnderWindow),
+  // oppure sempre attivo in modalit\u00e0 "solo Under" (isOnlyUnderMode).
   // Riusa lo stesso formato dati del sito (index.html): UNDER_DATA[cat] con
   // .classifica, .calendario[giorno], .finale (quarti/semifinali/finali).
 
