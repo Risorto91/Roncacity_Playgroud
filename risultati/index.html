@@ -485,6 +485,7 @@
         <div class="pill" data-day="martedi">Mar 14/07</div>
         <div class="pill" data-day="mercoledi">Mer 15/07</div>
         <div class="pill" data-day="giovedi">Gio 16/07</div>
+        <div class="pill" data-day="venerdi">Ven 17/07</div>
       </div>
 
       <div class="filter-bar" id="filterBarSenior">
@@ -578,6 +579,7 @@
         <div class="pill" data-day="martedi">Mar 14/07</div>
         <div class="pill" data-day="mercoledi">Mer 15/07</div>
         <div class="pill" data-day="giovedi">Gio 16/07</div>
+        <div class="pill" data-day="venerdi">Ven 17/07</div>
       </div>
 
       <div class="filter-bar" id="filterBarOver40">
@@ -1505,9 +1507,56 @@
       </div>`;
   }
 
+  // ---- Programma di venerdì (calendarioFinale): stessa forma dati usata
+  // dalla dashboard TV. Preferisce i nomi squadra "risolti" quando presenti,
+  // e calcola "giocata" dai punteggi (il foglio non lo fornisce già pronto
+  // per queste righe, a differenza del calendario dei giorni normali).
+  function normalizzaRigaFinale(m){
+    const casa = m['Squadra Casa (risolta)'] || m['Squadra Casa'] || m['Squadra/Slot Casa'];
+    const trasferta = m['Squadra Trasferta (risolta)'] || m['Squadra Trasferta'] || m['Squadra/Slot Trasferta'];
+    const pc = m['Punti Casa'], pt = m['Punti Trasferta'];
+    const giocata = pc !== null && pc !== '' && pc !== undefined && pt !== null && pt !== '' && pt !== undefined;
+    return {
+      'Squadra Casa': casa, 'Squadra Trasferta': trasferta,
+      'Punti Casa': pc, 'Punti Trasferta': pt,
+      'Campo': m['Campo'], 'Meta': m['Meta'], 'Orario': m['Orario'],
+      'Fase': m['Fase'], giocata
+    };
+  }
+
+  function renderCalendarioFinaleGiorno(elId, torneoFiltro, filtroTesto){
+    const el = document.getElementById(elId);
+    if (!TORNEO_DATA || !TORNEO_DATA.calendarioFinale){
+      el.innerHTML = '<div class="match-row"><div class="match-teams"><span>Programma di venerdì non ancora disponibile.</span></div></div>';
+      return;
+    }
+    let rows = TORNEO_DATA.calendarioFinale.filter(m => (m['Torneo'] || '').indexOf(torneoFiltro) !== -1);
+    rows = rows.map(normalizzaRigaFinale);
+    rows = applicaFiltroSquadra(rows, filtroTesto);
+    if (!rows.length){
+      el.innerHTML = '<div class="match-row"><div class="match-teams"><span>Nessuna partita trovata con questi filtri.</span></div></div>';
+      return;
+    }
+    const gruppi = [];
+    rows.forEach(m => {
+      const faseName = m['Fase'] || 'Programma';
+      let g = gruppi.find(x => x.fase === faseName);
+      if (!g){ g = { fase: faseName, items: [] }; gruppi.push(g); }
+      g.items.push(m);
+    });
+    el.innerHTML = gruppi.map(g => `
+      <div style="padding:10px 16px; font-size:12px; color:var(--gold); font-weight:700;">${g.fase}</div>
+      ${g.items.map(matchRowHTML).join('')}
+    `).join('');
+  }
+
   function renderCalendarioGiornoSenior(){
     const el = document.getElementById('calendarioGiornoBodySenior');
     if (!TORNEO_DATA){ return; }
+    if (currentDaySenior === 'venerdi'){
+      renderCalendarioFinaleGiorno('calendarioGiornoBodySenior', 'Main', filtroSquadraSenior);
+      return;
+    }
     const giorno = TORNEO_DATA.calendario ? TORNEO_DATA.calendario[currentDaySenior] : null;
     if (!giorno || !giorno.length){
       el.innerHTML = '<div class="match-row"><div class="match-teams"><span>Nessuna partita in programma per questo giorno.</span></div></div>';
@@ -1525,6 +1574,10 @@
   function renderCalendarioGiornoOver40(){
     const el = document.getElementById('calendarioGiornoBodyOver40');
     if (!TORNEO_DATA){ return; }
+    if (currentDayOver40 === 'venerdi'){
+      renderCalendarioFinaleGiorno('calendarioGiornoBodyOver40', 'Over40', filtroSquadraOver40);
+      return;
+    }
     const giorno = TORNEO_DATA.calendario ? TORNEO_DATA.calendario[currentDayOver40] : null;
     if (!giorno || !giorno.length){
       el.innerHTML = '<div class="match-row"><div class="match-teams"><span>Nessuna partita in programma per questo giorno.</span></div></div>';
