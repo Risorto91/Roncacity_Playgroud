@@ -527,33 +527,38 @@
 
     <!-- SENIOR — TABELLONE -->
     <div id="seniorViewTabellone" style="display:none;">
-      <div class="bracket-hint">👉 scorri lateralmente per vedere tutto il tabellone</div>
-      <div class="bracket-scroll">
-        <div class="bracket">
-          <div class="bracket-round">
-            <div class="rlabel">Quarti</div>
-            <div class="bracket-match" data-partita="Quarto 1"><div class="t"><span class="tn">Qualificata 1</span></div><div class="t"><span class="tn">Qualificata 2</span></div></div>
-            <div class="bracket-match" data-partita="Quarto 2"><div class="t"><span class="tn">Qualificata 3</span></div><div class="t"><span class="tn">Qualificata 4</span></div></div>
-            <div class="bracket-match" data-partita="Quarto 3"><div class="t"><span class="tn">Qualificata 5</span></div><div class="t"><span class="tn">Qualificata 6</span></div></div>
-            <div class="bracket-match" data-partita="Quarto 4"><div class="t"><span class="tn">Qualificata 7</span></div><div class="t"><span class="tn">Qualificata 8</span></div></div>
-          </div>
-          <div class="bracket-round">
-            <div class="rlabel">Semifinali</div>
-            <div class="bracket-match" data-partita="Semifinale 1"><div class="t"><span class="tn">Vinc. Q1</span></div><div class="t"><span class="tn">Vinc. Q2</span></div></div>
-            <div class="bracket-match" data-partita="Semifinale 2"><div class="t"><span class="tn">Vinc. Q3</span></div><div class="t"><span class="tn">Vinc. Q4</span></div></div>
-          </div>
-          <div class="bracket-round">
-            <div class="rlabel">Finale 3°/4°</div>
-            <div class="bracket-match" data-partita="Finale 3°/4°"><div class="t"><span class="tn">Perd. SF1</span></div><div class="t"><span class="tn">Perd. SF2</span></div></div>
-          </div>
-          <div class="bracket-round">
-            <div class="rlabel">Finale 1°/2°</div>
-            <div class="bracket-match" data-partita="Finale 1°/2°"><div class="t"><span class="tn">Vinc. SF1</span></div><div class="t"><span class="tn">Vinc. SF2</span></div></div>
+      <div class="note-box" id="seniorBracketPending" style="display:none;">
+        Il tabellone dei Quarti/Semifinali/Finale sarà visibile qui non appena l'organizzazione avrà completato la composizione dei triangolari e il seeding dei Quarti. Grazie per la pazienza! 🙏
+      </div>
+      <div id="seniorBracketContent">
+        <div class="bracket-hint">👉 scorri lateralmente per vedere tutto il tabellone</div>
+        <div class="bracket-scroll">
+          <div class="bracket">
+            <div class="bracket-round">
+              <div class="rlabel">Quarti</div>
+              <div class="bracket-match" data-partita="Quarto 1"><div class="t"><span class="tn">Qualificata 1</span></div><div class="t"><span class="tn">Qualificata 2</span></div></div>
+              <div class="bracket-match" data-partita="Quarto 2"><div class="t"><span class="tn">Qualificata 3</span></div><div class="t"><span class="tn">Qualificata 4</span></div></div>
+              <div class="bracket-match" data-partita="Quarto 3"><div class="t"><span class="tn">Qualificata 5</span></div><div class="t"><span class="tn">Qualificata 6</span></div></div>
+              <div class="bracket-match" data-partita="Quarto 4"><div class="t"><span class="tn">Qualificata 7</span></div><div class="t"><span class="tn">Qualificata 8</span></div></div>
+            </div>
+            <div class="bracket-round">
+              <div class="rlabel">Semifinali</div>
+              <div class="bracket-match" data-partita="Semifinale 1"><div class="t"><span class="tn">Vinc. Q1</span></div><div class="t"><span class="tn">Vinc. Q2</span></div></div>
+              <div class="bracket-match" data-partita="Semifinale 2"><div class="t"><span class="tn">Vinc. Q3</span></div><div class="t"><span class="tn">Vinc. Q4</span></div></div>
+            </div>
+            <div class="bracket-round">
+              <div class="rlabel">Finale 3°/4°</div>
+              <div class="bracket-match" data-partita="Finale 3°/4°"><div class="t"><span class="tn">Perd. SF1</span></div><div class="t"><span class="tn">Perd. SF2</span></div></div>
+            </div>
+            <div class="bracket-round">
+              <div class="rlabel">Finale 1°/2°</div>
+              <div class="bracket-match" data-partita="Finale 1°/2°"><div class="t"><span class="tn">Vinc. SF1</span></div><div class="t"><span class="tn">Vinc. SF2</span></div></div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="note-box">
-        <b>Come si formano i Quarti:</b> le 8 qualificate arrivano dai 5 triangolari del venerdì (le 5 vincenti + le 3 migliori seconde).
+        <div class="note-box">
+          <b>Come si formano i Quarti:</b> le 8 qualificate arrivano dai 5 triangolari del venerdì (le 5 vincenti + le 3 migliori seconde).
+        </div>
       </div>
     </div>
 
@@ -609,33 +614,38 @@
 
     <!-- OVER40 — TABELLONE -->
     <div id="over40ViewTabellone" style="display:none;">
-      <div class="bracket-hint">👉 scorri lateralmente per vedere tutto il tabellone</div>
-      <div class="bracket-scroll">
-        <div class="bracket">
-          <div class="bracket-round">
-            <div class="rlabel">Play-in — Turno 1</div>
-            <div class="bracket-match" data-partita="Play-in 4v7"><div class="t"><span class="tn">4° Girone</span></div><div class="t"><span class="tn">7° Girone</span></div></div>
-            <div class="bracket-match" data-partita="Play-in 5v6"><div class="t"><span class="tn">5° Girone</span></div><div class="t"><span class="tn">6° Girone</span></div></div>
-          </div>
-          <div class="bracket-round">
-            <div class="rlabel">Play-in — Turno 2</div>
-            <div class="bracket-match" data-partita="Spareggio Semifinale"><div class="t"><span class="tn">Vinc. 4v7</span></div><div class="t"><span class="tn">Vinc. 5v6</span></div></div>
-            <div class="bracket-match" data-partita="Spareggio Piazzamento"><div class="t"><span class="tn">Perd. 4v7</span></div><div class="t"><span class="tn">Perd. 5v6</span></div></div>
-          </div>
-          <div class="bracket-round">
-            <div class="rlabel">Semifinali</div>
-            <div class="bracket-match" data-partita="Semifinale 1 (1° vs Play-in)"><div class="t"><span class="tn">1° Girone</span></div><div class="t"><span class="tn">Vinc. Play-in</span></div></div>
-            <div class="bracket-match" data-partita="Semifinale 2 (2v3)"><div class="t"><span class="tn">2° Girone</span></div><div class="t"><span class="tn">3° Girone</span></div></div>
-          </div>
-          <div class="bracket-round">
-            <div class="rlabel">Finali</div>
-            <div class="bracket-match" data-partita="Finale 3°/4°"><div class="t"><span class="tn">Perd. SF1</span></div><div class="t"><span class="tn">Perd. SF2</span></div></div>
-            <div class="bracket-match" data-partita="Finale 1°/2°"><div class="t"><span class="tn">Vinc. SF1</span></div><div class="t"><span class="tn">Vinc. SF2</span></div></div>
+      <div class="note-box" id="over40BracketPending" style="display:none;">
+        Il tabellone di venerdì (Play-in, Semifinali e Finali) sarà visibile qui non appena l'organizzazione avrà completato il seeding sulla base della classifica del girone. Grazie per la pazienza! 🙏
+      </div>
+      <div id="over40BracketContent">
+        <div class="bracket-hint">👉 scorri lateralmente per vedere tutto il tabellone</div>
+        <div class="bracket-scroll">
+          <div class="bracket">
+            <div class="bracket-round">
+              <div class="rlabel">Play-in — Turno 1</div>
+              <div class="bracket-match" data-partita="Play-in 4v7"><div class="t"><span class="tn">4° Girone</span></div><div class="t"><span class="tn">7° Girone</span></div></div>
+              <div class="bracket-match" data-partita="Play-in 5v6"><div class="t"><span class="tn">5° Girone</span></div><div class="t"><span class="tn">6° Girone</span></div></div>
+            </div>
+            <div class="bracket-round">
+              <div class="rlabel">Play-in — Turno 2</div>
+              <div class="bracket-match" data-partita="Spareggio Semifinale"><div class="t"><span class="tn">Vinc. 4v7</span></div><div class="t"><span class="tn">Vinc. 5v6</span></div></div>
+              <div class="bracket-match" data-partita="Spareggio Piazzamento"><div class="t"><span class="tn">Perd. 4v7</span></div><div class="t"><span class="tn">Perd. 5v6</span></div></div>
+            </div>
+            <div class="bracket-round">
+              <div class="rlabel">Semifinali</div>
+              <div class="bracket-match" data-partita="Semifinale 1 (1° vs Play-in)"><div class="t"><span class="tn">1° Girone</span></div><div class="t"><span class="tn">Vinc. Play-in</span></div></div>
+              <div class="bracket-match" data-partita="Semifinale 2 (2v3)"><div class="t"><span class="tn">2° Girone</span></div><div class="t"><span class="tn">3° Girone</span></div></div>
+            </div>
+            <div class="bracket-round">
+              <div class="rlabel">Finali</div>
+              <div class="bracket-match" data-partita="Finale 3°/4°"><div class="t"><span class="tn">Perd. SF1</span></div><div class="t"><span class="tn">Perd. SF2</span></div></div>
+              <div class="bracket-match" data-partita="Finale 1°/2°"><div class="t"><span class="tn">Vinc. SF1</span></div><div class="t"><span class="tn">Vinc. SF2</span></div></div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="note-box">
-        <b>Formato:</b> girone unico da 7 squadre (tutte contro tutte) il martedì; il venerdì 1ª-2ª-3ª vanno dirette in Semifinale, mentre 4ª-5ª-6ª-7ª disputano un Play-in (Turno 1: 4v7 e 5v6; Turno 2: le vincenti si giocano il 4° posto in Semifinale, le perdenti si rigiocano una partita garantita che assegna il 6° e 7° posto — la 5ª va alla perdente dello spareggio Semifinale).
+        <div class="note-box">
+          <b>Formato:</b> girone unico da 7 squadre (tutte contro tutte) il martedì; il venerdì 1ª-2ª-3ª vanno dirette in Semifinale, mentre 4ª-5ª-6ª-7ª disputano un Play-in (Turno 1: 4v7 e 5v6; Turno 2: le vincenti si giocano il 4° posto in Semifinale, le perdenti si rigiocano una partita garantita che assegna il 6° e 7° posto — la 5ª va alla perdente dello spareggio Semifinale).
+        </div>
       </div>
     </div>
 
@@ -677,20 +687,25 @@
 
     <div class="section-heading"><span class="num">—</span><h2 style="font-size:16px;">Fase Finale</h2></div>
     <div class="section-sub">Venerdì — semifinali incrociate 1°vs4° e 2°vs3° del girone unico</div>
-    <div class="bracket-scroll">
-      <div class="bracket">
-        <div class="bracket-round">
-          <div class="rlabel">Semifinali</div>
-          <div class="bracket-match" data-partita="SF1_U19"><div class="t"><span class="tn">1°</span></div><div class="t"><span class="tn">4°</span></div></div>
-          <div class="bracket-match" data-partita="SF2_U19"><div class="t"><span class="tn">2°</span></div><div class="t"><span class="tn">3°</span></div></div>
-        </div>
-        <div class="bracket-round">
-          <div class="rlabel">Finale 3°/4°</div>
-          <div class="bracket-match" data-partita="F34_U19"><div class="t"><span class="tn">Perd. SF1</span></div><div class="t"><span class="tn">Perd. SF2</span></div></div>
-        </div>
-        <div class="bracket-round">
-          <div class="rlabel">Finale 1°/2°</div>
-          <div class="bracket-match" data-partita="F12_U19"><div class="t"><span class="tn">Vinc. SF1</span></div><div class="t"><span class="tn">Vinc. SF2</span></div></div>
+    <div class="note-box" id="u19BracketPending" style="display:none;">
+      Il tabellone della fase finale sarà visibile qui non appena l'organizzazione avrà completato la classifica del girone. Grazie per la pazienza! 🙏
+    </div>
+    <div id="u19BracketContent">
+      <div class="bracket-scroll">
+        <div class="bracket">
+          <div class="bracket-round">
+            <div class="rlabel">Semifinali</div>
+            <div class="bracket-match" data-partita="SF1_U19"><div class="t"><span class="tn">1°</span></div><div class="t"><span class="tn">4°</span></div></div>
+            <div class="bracket-match" data-partita="SF2_U19"><div class="t"><span class="tn">2°</span></div><div class="t"><span class="tn">3°</span></div></div>
+          </div>
+          <div class="bracket-round">
+            <div class="rlabel">Finale 3°/4°</div>
+            <div class="bracket-match" data-partita="F34_U19"><div class="t"><span class="tn">Perd. SF1</span></div><div class="t"><span class="tn">Perd. SF2</span></div></div>
+          </div>
+          <div class="bracket-round">
+            <div class="rlabel">Finale 1°/2°</div>
+            <div class="bracket-match" data-partita="F12_U19"><div class="t"><span class="tn">Vinc. SF1</span></div><div class="t"><span class="tn">Vinc. SF2</span></div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -731,27 +746,32 @@
 
     <div class="section-heading"><span class="num">—</span><h2 style="font-size:16px;">Fase Finale</h2></div>
     <div class="section-sub">Venerdì — quarti di finale (incrocio 1°-8°, 4°-5°, 2°-7°, 3°-6° del girone unico), poi semifinali e finali</div>
-    <div class="bracket-scroll">
-      <div class="bracket">
-        <div class="bracket-round">
-          <div class="rlabel">Quarti</div>
-          <div class="bracket-match" data-partita="QF1_U15"><div class="t"><span class="tn">1° Girone</span></div><div class="t"><span class="tn">8° Girone</span></div></div>
-          <div class="bracket-match" data-partita="QF2_U15"><div class="t"><span class="tn">4° Girone</span></div><div class="t"><span class="tn">5° Girone</span></div></div>
-          <div class="bracket-match" data-partita="QF3_U15"><div class="t"><span class="tn">2° Girone</span></div><div class="t"><span class="tn">7° Girone</span></div></div>
-          <div class="bracket-match" data-partita="QF4_U15"><div class="t"><span class="tn">3° Girone</span></div><div class="t"><span class="tn">6° Girone</span></div></div>
-        </div>
-        <div class="bracket-round">
-          <div class="rlabel">Semifinali</div>
-          <div class="bracket-match" data-partita="SF1_U15"><div class="t"><span class="tn">Vinc. Quarto 1</span></div><div class="t"><span class="tn">Vinc. Quarto 2</span></div></div>
-          <div class="bracket-match" data-partita="SF2_U15"><div class="t"><span class="tn">Vinc. Quarto 3</span></div><div class="t"><span class="tn">Vinc. Quarto 4</span></div></div>
-        </div>
-        <div class="bracket-round">
-          <div class="rlabel">Finale 3°/4°</div>
-          <div class="bracket-match" data-partita="F34_U15"><div class="t"><span class="tn">Perd. SF1</span></div><div class="t"><span class="tn">Perd. SF2</span></div></div>
-        </div>
-        <div class="bracket-round">
-          <div class="rlabel">Finale 1°/2°</div>
-          <div class="bracket-match" data-partita="F12_U15"><div class="t"><span class="tn">Vinc. SF1</span></div><div class="t"><span class="tn">Vinc. SF2</span></div></div>
+    <div class="note-box" id="u15BracketPending" style="display:none;">
+      Il tabellone della fase finale sarà visibile qui non appena l'organizzazione avrà completato la classifica del girone. Grazie per la pazienza! 🙏
+    </div>
+    <div id="u15BracketContent">
+      <div class="bracket-scroll">
+        <div class="bracket">
+          <div class="bracket-round">
+            <div class="rlabel">Quarti</div>
+            <div class="bracket-match" data-partita="QF1_U15"><div class="t"><span class="tn">1° Girone</span></div><div class="t"><span class="tn">8° Girone</span></div></div>
+            <div class="bracket-match" data-partita="QF2_U15"><div class="t"><span class="tn">4° Girone</span></div><div class="t"><span class="tn">5° Girone</span></div></div>
+            <div class="bracket-match" data-partita="QF3_U15"><div class="t"><span class="tn">2° Girone</span></div><div class="t"><span class="tn">7° Girone</span></div></div>
+            <div class="bracket-match" data-partita="QF4_U15"><div class="t"><span class="tn">3° Girone</span></div><div class="t"><span class="tn">6° Girone</span></div></div>
+          </div>
+          <div class="bracket-round">
+            <div class="rlabel">Semifinali</div>
+            <div class="bracket-match" data-partita="SF1_U15"><div class="t"><span class="tn">Vinc. Quarto 1</span></div><div class="t"><span class="tn">Vinc. Quarto 2</span></div></div>
+            <div class="bracket-match" data-partita="SF2_U15"><div class="t"><span class="tn">Vinc. Quarto 3</span></div><div class="t"><span class="tn">Vinc. Quarto 4</span></div></div>
+          </div>
+          <div class="bracket-round">
+            <div class="rlabel">Finale 3°/4°</div>
+            <div class="bracket-match" data-partita="F34_U15"><div class="t"><span class="tn">Perd. SF1</span></div><div class="t"><span class="tn">Perd. SF2</span></div></div>
+          </div>
+          <div class="bracket-round">
+            <div class="rlabel">Finale 1°/2°</div>
+            <div class="bracket-match" data-partita="F12_U15"><div class="t"><span class="tn">Vinc. SF1</span></div><div class="t"><span class="tn">Vinc. SF2</span></div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -832,6 +852,31 @@
 </main>
 
 <script>
+  // ---- Interruttore manuale "tabelloni in attesa" ----
+  // Finché una voce qui sotto è false, la relativa scheda "Tabellone"/"Fase
+  // Finale" mostra un messaggio di attesa al posto degli abbinamenti (che
+  // altrimenti apparirebbero con nomi placeholder tipo "Qualificata 1" o
+  // "4° Girone", generando domande dai giocatori prima che l'organizzazione
+  // abbia davvero composto triangolari/seeding). Rimetti a true la singola
+  // categoria appena i dati sono pronti da mostrare.
+  const BRACKET_VISIBILE = {
+    senior: false,
+    over40: false,
+    u19: false,
+    u15: false
+  };
+  function applyBracketVisibility(){
+    Object.keys(BRACKET_VISIBILE).forEach(cat => {
+      const contentEl = document.getElementById(cat + 'BracketContent');
+      const pendingEl = document.getElementById(cat + 'BracketPending');
+      if (!contentEl || !pendingEl) return;
+      const visibile = BRACKET_VISIBILE[cat];
+      contentEl.style.display = visibile ? '' : 'none';
+      pendingEl.style.display = visibile ? 'none' : '';
+    });
+  }
+  applyBracketVisibility();
+
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMITp1YFm2Ws_1Q_4txk1qIN0pG-KDQceY79ptLx3PxiqezuLs4VzBhwEbZ8iij5B5uA/exec";
   const REFRESH_MS = 60000;
 
