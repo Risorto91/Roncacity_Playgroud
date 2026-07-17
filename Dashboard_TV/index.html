@@ -196,6 +196,32 @@
   .stack-wrap::-webkit-scrollbar{ width:5px; }
   .stack-wrap::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
   .class-block.stacked{ flex:none; min-height:auto; overflow-y:visible; }
+  .bracket-scroll{ flex:1; overflow:auto; display:flex; }
+  .bracket-scroll::-webkit-scrollbar{ height:6px; width:6px; }
+  .bracket-scroll::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
+  .bracket{ display:flex; align-items:stretch; min-height:100%; padding-bottom:10px; }
+  .bracket-round{ display:flex; flex-direction:column; padding:0 34px; min-width:260px; flex-shrink:0; }
+  .bracket-round-title{
+    font-family:'Anton',sans-serif; font-size:15px; letter-spacing:0.1em; color:var(--gold);
+    text-transform:uppercase; text-align:center; margin-bottom:18px;
+  }
+  .bracket-round-matches{ flex:1; display:flex; flex-direction:column; justify-content:space-around; }
+  .bracket-match{
+    background: var(--bg-card); border:1px solid var(--line); border-radius:8px;
+    padding: 12px 18px; margin: 12px 0; position:relative;
+  }
+  .bracket-match::after{
+    content:''; position:absolute; top:50%; right:-34px; width:34px; height:2px;
+    background: var(--gold-dim); opacity:0.55;
+  }
+  .bracket-round:last-child .bracket-match::after{ display:none; }
+  .bracket-team{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:18px; font-weight:700; padding:4px 0; }
+  .bracket-team span:first-child{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bracket-team .pts{ font-family:'Anton',sans-serif; color:var(--muted); font-size:17px; flex-shrink:0; }
+  .bracket-team.winner{ color:var(--gold); }
+  .bracket-team.winner .pts{ color:var(--gold); }
+  .bracket-vs-sep{ height:1px; background:var(--line); margin:4px 0; }
+  .bracket-match-meta{ font-size:11px; color:var(--muted); margin-top:6px; text-align:center; }
 </style>
 </head>
 <body>
@@ -606,12 +632,12 @@
       seq.push({ id:'sen-cl-12', cat:'senior', type:'senior-classifiche-stack', triIdx:[1,2], navLabel:'Classifiche Triang. 1-2', group:'SENIOR' });
       seq.push({ id:'sen-cl-34', cat:'senior', type:'senior-classifiche-stack', triIdx:[3,4], navLabel:'Classifiche Triang. 3-4', group:'SENIOR' });
       seq.push({ id:'sen-cl-5', cat:'senior', type:'senior-classifiche-stack', triIdx:[5], navLabel:'Classifica Triang. 5', group:'SENIOR' });
-      seq.push({ id:'sen-cal-full', cat:'senior', type:'calendario-completo', navLabel:'Calendario completo', group:'SENIOR' });
+      seq.push({ id:'sen-cal-full', cat:'senior', type:'calendario-venerdi', navLabel:'Calendario', group:'SENIOR' });
       seq.push({ id:'sen-tab', cat:'senior', type:'tabellone', navLabel:'Tabellone', group:'SENIOR' });
 
       if (SHOW_OVER40){
         seq.push({ id:'o40-tab', cat:'over40', type:'tabellone', navLabel:'Tabellone', group:'OVER40' });
-        seq.push({ id:'o40-cal-full', cat:'over40', type:'calendario-completo', navLabel:'Calendario completo', group:'OVER40' });
+        seq.push({ id:'o40-cal-full', cat:'over40', type:'calendario-venerdi', navLabel:'Calendario', group:'OVER40' });
       }
     } else {
       seq.push({ id:'sen-combo', cat:'senior', type:'combinato', navLabel:'Calendario e Classifiche', group:'SENIOR' });
@@ -650,8 +676,8 @@
         def.empty = !hasCal && !hasClass;
       } else if (def.type === 'senior-classifiche-stack'){
         def.empty = def.triIdx.every(n => { const b = findBlocco('TRIANGOLARE ' + n); return !b || !b.righe.length; });
-      } else if (def.type === 'calendario-completo'){
-        def.empty = allDaysInOrder().every(d => matchesForDay(d, def.cat).length === 0);
+      } else if (def.type === 'calendario-venerdi'){
+        def.empty = matchesForDay('venerdi', def.cat).length === 0;
       } else if (def.type === 'tabellone'){
         def.empty = tabelloneRowsForCat(def.cat).length === 0;
       } else if (def.type === 'und-campi'){
@@ -905,27 +931,25 @@
       <div class="stack-wrap">${blocksHTML}</div>`;
   }
 
-  // ---- Calendario completo (tutte le giornate) per Senior/Over40 ----
-  function renderCalendarioCompletoPanel(def){
+  // ---- Calendario di venerdì per Senior/Over40: solo la giornata di
+  // venerdì (non interessa lo storico, c'è il sito per quello), in un'unica
+  // sequenza cronologica senza divisioni per fase — la fase resta comunque
+  // visibile nella riga di dettaglio di ogni partita (via matchCardHTML). ----
+  function renderCalendarioVenerdiPanel(def){
     const label = def.cat === 'senior' ? 'Senior' : 'Over40';
-    const groups = allDaysInOrder()
-      .map(d => ({ day: d, items: matchesForDay(d, def.cat) }))
-      .filter(g => g.items.length);
+    const matches = matchesForDay('venerdi', def.cat)
+      .slice()
+      .sort((a, b) => (a.orario || '').localeCompare(b.orario || ''));
 
-    if (!groups.length){
+    if (!matches.length){
       return `
-        <div class="panel-title"><span class="cat">${label}</span><h1>Calendario completo</h1></div>
-        <div class="empty-msg">Nessuna partita disponibile per ${label}</div>`;
+        <div class="panel-title"><span class="cat">${label}</span><h1>Calendario</h1><span class="sub">${DAY_LABELS['venerdi']}</span></div>
+        <div class="empty-msg">Nessuna partita in programma per ${label}</div>`;
     }
 
-    const html = groups.map(g => `
-      <div class="agenda-fase">${DAY_LABELS[g.day] || g.day}</div>
-      <div class="match-grid compact">${g.items.map(matchCardHTML).join('')}</div>
-    `).join('');
-
     return `
-      <div class="panel-title"><span class="cat">${label}</span><h1>Calendario completo</h1></div>
-      <div class="agenda-scroll">${html}</div>`;
+      <div class="panel-title"><span class="cat">${label}</span><h1>Calendario</h1><span class="sub">${DAY_LABELS['venerdi']}</span></div>
+      <div class="match-grid">${matches.map(matchCardHTML).join('')}</div>`;
   }
 
   // ---- Tabellone (bracket) — legge TORNEO_DATA.tabellone, un array con le
@@ -938,51 +962,74 @@
     return (TORNEO_DATA.tabellone || []).filter(r => (r['Torneo'] || '').indexOf(torneoName) !== -1);
   }
 
-  function tabelloneCardHTML(r){
-    const s1 = r['Squadra 1'] || 'TBD';
-    const s2 = r['Squadra 2'] || 'TBD';
-    const p1 = r['Punti 1'], p2 = r['Punti 2'];
+  // ---- Rendering condiviso "a tabellone tennistico": colonne per turno
+  // (Quarti/Semifinali/Finale ecc.), partite impilate e distanziate in
+  // verticale (si allargano ai turni successivi, come in un bracket vero),
+  // con una linea di collegamento verso il turno successivo. ----
+  function bracketMatchHTML(m){
+    const s1 = m.s1 || 'TBD';
+    const s2 = m.s2 || 'TBD';
+    const p1 = m.p1, p2 = m.p2;
     const played = p1 !== null && p1 !== '' && p1 !== undefined && p2 !== null && p2 !== '' && p2 !== undefined;
-    const vinc = r['Vincitore'];
-    const win1 = played && vinc && vinc === s1;
-    const win2 = played && vinc && vinc === s2;
-    const scoreHTML = played
-      ? `<div class="match-score">${p1} - ${p2}</div>`
-      : `<div class="match-score time">${r['Partita'] || ''}</div>`;
+    let win1 = false, win2 = false;
+    if (played){
+      const n1 = Number(p1), n2 = Number(p2);
+      if (!isNaN(n1) && !isNaN(n2)){
+        if (n1 > n2) win1 = true; else if (n2 > n1) win2 = true;
+      }
+    }
     return `
-      <div class="match-card${played ? ' done' : ''}">
-        <div class="match-teams">
-          <div class="mt-line">
-            <span class="team${win1 ? ' winner' : ''}">${s1}</span><span class="vs">vs</span><span class="team${win2 ? ' winner' : ''}">${s2}</span>
-          </div>
-          <div class="mt-meta">${r['Partita'] || ''}</div>
-        </div>
-        ${scoreHTML}
+      <div class="bracket-match">
+        <div class="bracket-team${win1 ? ' winner' : ''}"><span>${s1}</span>${played ? `<span class="pts">${p1}</span>` : ''}</div>
+        <div class="bracket-vs-sep"></div>
+        <div class="bracket-team${win2 ? ' winner' : ''}"><span>${s2}</span>${played ? `<span class="pts">${p2}</span>` : ''}</div>
+        ${m.meta ? `<div class="bracket-match-meta">${m.meta}</div>` : ''}
       </div>`;
   }
 
-  function renderTabellonePanel(cat){
-    const label = cat === 'senior' ? 'Senior' : 'Over40';
-    const rows = tabelloneRowsForCat(cat);
-    if (!rows.length){
+  function renderBracketPanel(label, rounds){
+    const hasAny = rounds.some(r => r.matches.length);
+    if (!hasAny){
       return `
         <div class="panel-title"><span class="cat">${label}</span><h1>Tabellone</h1></div>
         <div class="empty-msg">Tabellone non ancora disponibile</div>`;
     }
-    const groups = [];
-    rows.forEach(r => {
-      const fase = r['Fase'] || 'Fase';
-      let g = groups.find(x => x.fase === fase);
-      if (!g){ g = { fase, items: [] }; groups.push(g); }
-      g.items.push(r);
-    });
-    const html = groups.map(g => `
-      <div class="agenda-fase">${g.fase}</div>
-      <div class="match-grid compact">${g.items.map(tabelloneCardHTML).join('')}</div>
+    const html = rounds.filter(r => r.matches.length).map(r => `
+      <div class="bracket-round">
+        <div class="bracket-round-title">${r.title}</div>
+        <div class="bracket-round-matches">${r.matches.map(bracketMatchHTML).join('')}</div>
+      </div>
     `).join('');
     return `
       <div class="panel-title"><span class="cat">${label}</span><h1>Tabellone</h1></div>
-      <div class="agenda-scroll">${html}</div>`;
+      <div class="bracket-scroll"><div class="bracket">${html}</div></div>`;
+  }
+
+  // ---- Tabellone Main (Senior/Over40) — legge TORNEO_DATA.tabellone, un
+  // array con le stesse intestazioni del foglio Google "Tabellone": Torneo,
+  // Fase, Partita, "Squadra 1", "Punti 1", "Punti 2", "Squadra 2", Vincitore.
+  // Se l'Apps Script usa chiavi diverse, basta adattare i nomi qui sotto. ----
+  function tabelloneRowsForCat(cat){
+    if (!TORNEO_DATA) return [];
+    const torneoName = cat === 'senior' ? 'Main' : 'Over40';
+    return (TORNEO_DATA.tabellone || []).filter(r => (r['Torneo'] || '').indexOf(torneoName) !== -1);
+  }
+
+  function tabelloneRoundsForCat(cat){
+    const rows = tabelloneRowsForCat(cat);
+    const rounds = [];
+    rows.forEach(r => {
+      const fase = r['Fase'] || 'Fase';
+      let g = rounds.find(x => x.title === fase);
+      if (!g){ g = { title: fase, matches: [] }; rounds.push(g); }
+      g.matches.push({ s1: r['Squadra 1'], s2: r['Squadra 2'], p1: r['Punti 1'], p2: r['Punti 2'], meta: r['Partita'] });
+    });
+    return rounds;
+  }
+
+  function renderTabellonePanel(cat){
+    const label = cat === 'senior' ? 'Senior' : 'Over40';
+    return renderBracketPanel(label, tabelloneRoundsForCat(cat));
   }
 
   // ===================== TORNEO UNDER (U19/U15) =====================
@@ -1052,34 +1099,17 @@
     const matches = underMatchesForDay(cat, dayKey);
     const finaleMatches = dayKey === 'venerdi' ? underFinaleMatches(cat) : [];
     const titleText = dayKey === 'venerdi' ? 'Programma di giornata' : 'Calendario di oggi';
+    const all = matches.concat(finaleMatches).sort((a, b) => (a.orario || '').localeCompare(b.orario || ''));
 
-    if (!matches.length && !finaleMatches.length){
+    if (!all.length){
       return `
         <div class="panel-title"><span class="cat">${label}</span><h1>${titleText}</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
         <div class="empty-msg">Nessuna partita in programma oggi per ${label}</div>`;
     }
 
-    if (dayKey === 'venerdi'){
-      const groups = [];
-      if (matches.length) groups.push({ fase: 'Girone', items: matches });
-      finaleMatches.forEach(m => {
-        const faseName = m.fase || 'Fase finale';
-        let g = groups.find(x => x.fase === faseName);
-        if (!g){ g = { fase: faseName, items: [] }; groups.push(g); }
-        g.items.push(m);
-      });
-      const html = groups.map(g => `
-        <div class="agenda-fase">${g.fase}</div>
-        <div class="match-grid compact">${g.items.map(matchCardHTML).join('')}</div>
-      `).join('');
-      return `
-        <div class="panel-title"><span class="cat">${label}</span><h1>${titleText}</h1><span class="sub">${DAY_LABELS[dayKey]}</span></div>
-        <div class="agenda-scroll">${html}</div>`;
-    }
-
     return `
       <div class="panel-title"><span class="cat">${label}</span><h1>${titleText}</h1><span class="sub">${DAY_LABELS[dayKey] || dayKey}</span></div>
-      <div class="match-grid">${matches.map(matchCardHTML).join('')}</div>`;
+      <div class="match-grid">${all.map(matchCardHTML).join('')}</div>`;
   }
 
   function renderUnderClassifichePanel(cat){
@@ -1120,28 +1150,21 @@
     }));
   }
 
-  function renderUnderTabellonePanel(cat){
-    const label = cat === 'U15' ? 'U15/U14' : 'U19/U17';
+  function underTabelloneRounds(cat){
     const rows = underTabelloneRows(cat);
-    if (!rows.length){
-      return `
-        <div class="panel-title"><span class="cat">${label}</span><h1>Tabellone</h1></div>
-        <div class="empty-msg">Tabellone non ancora disponibile</div>`;
-    }
-    const groups = [];
+    const rounds = [];
     rows.forEach(r => {
       const fase = r.fase || 'Fase';
-      let g = groups.find(x => x.fase === fase);
-      if (!g){ g = { fase, items: [] }; groups.push(g); }
-      g.items.push(r);
+      let g = rounds.find(x => x.title === fase);
+      if (!g){ g = { title: fase, matches: [] }; rounds.push(g); }
+      g.matches.push({ s1: r.casa, s2: r.trasferta, p1: r.puntiCasa, p2: r.puntiTrasferta, meta: r.orario ? ('Ore ' + r.orario) : '' });
     });
-    const html = groups.map(g => `
-      <div class="agenda-fase">${g.fase}</div>
-      <div class="match-grid compact">${g.items.map(matchCardHTML).join('')}</div>
-    `).join('');
-    return `
-      <div class="panel-title"><span class="cat">${label}</span><h1>Tabellone</h1></div>
-      <div class="agenda-scroll">${html}</div>`;
+    return rounds;
+  }
+
+  function renderUnderTabellonePanel(cat){
+    const label = cat === 'U15' ? 'U15/U14' : 'U19/U17';
+    return renderBracketPanel(label, underTabelloneRounds(cat));
   }
 
   // ===================== fine sezione Under =====================
@@ -1153,7 +1176,7 @@
     if (def.type === 'prossime') return renderProssimePanel(def, dayKey);
     if (def.type === 'combinato') return renderCombinatoPanel(def, dayKey);
     if (def.type === 'senior-classifiche-stack') return renderSeniorClassificheStack(def);
-    if (def.type === 'calendario-completo') return renderCalendarioCompletoPanel(def);
+    if (def.type === 'calendario-venerdi') return renderCalendarioVenerdiPanel(def);
     if (def.type === 'tabellone') return renderTabellonePanel(def.cat);
     if (def.type === 'und-campi') return renderCampiPanelUnder(dayKey);
     if (def.type === 'und-calendario') return renderUnderCalendarioPanel(def.catU, dayKey);
