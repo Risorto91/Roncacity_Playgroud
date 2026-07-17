@@ -185,6 +185,17 @@
   }
   .loading-screen h2{ font-family:'Anton',sans-serif; font-size:36px; color:var(--gold); text-align:center; padding:0 20px;}
   .loading-screen p{ color:var(--muted); font-size:14px; text-align:center; padding: 0 30px; max-width:640px; }
+  .view-toggle-btn{
+    display:none;
+    font-family:'Anton',sans-serif; font-size:13px; color:var(--white);
+    border:1px solid var(--gold-dim); border-radius:20px; padding:6px 14px;
+    background: rgba(227,178,60,0.12); cursor:pointer; white-space:nowrap;
+  }
+  .view-toggle-btn:hover{ background: rgba(227,178,60,0.22); }
+  .stack-wrap{ flex:1; display:flex; flex-direction:column; gap:18px; overflow-y:auto; min-height:0; }
+  .stack-wrap::-webkit-scrollbar{ width:5px; }
+  .stack-wrap::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
+  .class-block.stacked{ flex:none; min-height:auto; overflow-y:visible; }
 </style>
 </head>
 <body>
@@ -205,6 +216,7 @@
     </div>
     <div class="right">
       <div class="status" id="dataStatus"><span class="dot"></span><span class="txt">—</span></div>
+      <div class="view-toggle-btn" id="viewToggleBtn">Vedi Senior/Over40</div>
       <div class="mode-badge" id="modeBadge">TORNEO UNDER LIVE</div>
       <div class="day-badge" id="dayBadge">—</div>
       <div class="clock" id="clock">--:--</div>
@@ -228,11 +240,8 @@
   const OVER40_SEMIFINAL_TOP_N = 4;
 
   // ---- Torneo Under (U19/U15): stessa dashboard, si attiva da sola ----
-  // ---- Interruttori manuali: quando serve solo il torneo Senior, spegni
-  // qui Over40 e Under (niente pannelli, niente pulsanti in nav). Per
-  // riaccenderli in futuro basta rimettere questi due a true.
   const SHOW_OVER40 = true;
-  const SHOW_UNDER = false;
+  const SHOW_UNDER = true;
 
   const APPS_SCRIPT_URL_UNDER = "https://script.google.com/macros/s/AKfycbzEsgaAFUXJF7SfJOSvlGXYIoeJvz9aju26bJyH3iyhA6aBRFonlvNqVfJkfEgr5_5uOA/exec";
   const UNDER_REFRESH_MS = 60000;
@@ -254,6 +263,7 @@
   let panelTimer = null;
   let currentDayKey = null;
   let lastWindowState = null;
+  let manualViewMode = null; // null = automatico (segue orario/URL); 'under' | 'main' = forzato dal pulsante
 
   const sponsorsMarquee = [
     { name:"Effedi Salotti", logo:"https://risorto91.github.io/Roncacity_Playgroud/risultati/assets/sponsor/effedi-salotti.png" },
@@ -320,7 +330,7 @@
     return DATE_TO_DAY[iso] || 'lunedi';
   }
 
-  // ---- Finestra oraria Under: gioved\u00ec/venerd\u00ec 17:00\u219219:45 ----
+  // ---- Finestra oraria Under: giovedì/venerdì 17:00→19:45 ----
   function timeStrToMinutes(t){
     const [h, m] = t.split(':').map(Number);
     return h * 60 + m;
@@ -335,13 +345,42 @@
     return mins >= timeStrToMinutes(UNDER_WINDOW.start) && mins <= timeStrToMinutes(UNDER_WINDOW.end);
   }
 
-  // ---- Modalit\u00e0 "solo Under": forza la finestra Under attiva e mostra
-  // esclusivamente i pannelli Under (calendario/classifiche/campi), saltando
-  // Senior e Over40. Si attiva con ?under=1 in URL (stesso parametro gi\u00e0
-  // usato per forzare la finestra oraria), oppure con ?onlyUnder=1.
   function isOnlyUnderMode(){
     const params = new URLSearchParams(location.search);
     return params.get('under') === '1' || params.get('onlyUnder') === '1';
+  }
+
+  // ---- Modalità di visualizzazione: 'under' (solo U19/U15) oppure 'main'
+  // (solo Senior+Over40). Di default segue l'orario (finestra Under =
+  // giovedì/venerdì 17:00-19:45), ma può essere forzata a mano col pulsante
+  // in alto (resta "incollata" alla scelta manuale finché non cambia giorno).
+  function computeAutoViewMode(dayKey){
+    if (!SHOW_UNDER) return 'main';
+    if (isOnlyUnderMode()) return 'under';
+    return isUnderWindow(dayKey) ? 'under' : 'main';
+  }
+  function getViewMode(dayKey){
+    return manualViewMode || computeAutoViewMode(dayKey);
+  }
+  function toggleViewMode(){
+    const dayKey = currentDayKey || getCurrentDayKey();
+    const current = getViewMode(dayKey);
+    manualViewMode = current === 'under' ? 'main' : 'under';
+    applyContext();
+  }
+  function updateModeUI(viewMode){
+    const modeBadge = document.getElementById('modeBadge');
+    const btn = document.getElementById('viewToggleBtn');
+    if (!modeBadge || !btn) return;
+    modeBadge.classList.toggle('active', viewMode === 'under');
+    modeBadge.textContent = viewMode === 'under' ? 'TORNEO UNDER LIVE' : 'SENIOR / OVER40';
+    const relevantDay = SHOW_UNDER && UNDER_DAYS.includes(currentDayKey);
+    if (relevantDay){
+      btn.style.display = 'inline-block';
+      btn.textContent = viewMode === 'under' ? 'Vedi Senior/Over40 →' : '← Torna a Under';
+    } else {
+      btn.style.display = 'none';
+    }
   }
 
   function updateClock(){
@@ -351,12 +390,14 @@
   updateClock();
   setInterval(updateClock, 1000);
 
-  // Controllo leggero (ogni secondo) del cambio di fascia oraria Under: scatta
-  // solo quando lo stato entra/esce dalla finestra, non ad ogni tick.
+  // Controllo leggero (ogni secondo) del cambio di fascia oraria: scatta solo
+  // quando la modalità automatica cambia stato, e solo se non c'è una scelta
+  // manuale attiva (il pulsante ha sempre la precedenza finché non cambia giorno).
   function checkWindowTransition(){
     if (!currentDayKey) return;
-    const state = isUnderWindow(currentDayKey);
-    if (state !== lastWindowState){
+    if (manualViewMode !== null) return;
+    const mode = computeAutoViewMode(currentDayKey);
+    if (mode !== lastWindowState){
       applyContext();
     }
   }
@@ -370,6 +411,9 @@
   }
   fitToScreen();
   window.addEventListener('resize', fitToScreen);
+
+  const viewToggleBtnEl = document.getElementById('viewToggleBtn');
+  if (viewToggleBtnEl) viewToggleBtnEl.addEventListener('click', toggleViewMode);
 
   async function fetchTorneoData(){
     const statusEl = document.getElementById('dataStatus');
@@ -411,24 +455,23 @@
     }
   }
 
-  // Punto unico che ricostruisce sequenza e badge ad ogni aggiornamento dati o
-  // cambio fascia oraria. I pulsanti U19/U15 restano SEMPRE nella barra in
-  // basso (dopo il gruppo OVER40): la finestra Under decide solo quali pannelli
-  // l'autoplay include nel giro automatico (skipAuto), non quali sono cliccabili.
+  // Punto unico che ricostruisce sequenza e badge ad ogni aggiornamento dati,
+  // cambio fascia oraria o click sul pulsante di modalità.
   function applyContext(){
     if (!TORNEO_DATA) return; // aspetta almeno i dati Senior prima di costruire qualsiasi sequenza
     const dayKey = getCurrentDayKey();
     const dayChanged = dayKey !== currentDayKey;
+    if (dayChanged) manualViewMode = null; // la scelta manuale non sopravvive al cambio giorno
     currentDayKey = dayKey;
     document.getElementById('dayBadge').textContent = DAY_LABELS[dayKey] || dayKey;
 
-    const underWindowNow = SHOW_UNDER && (isUnderWindow(dayKey) || isOnlyUnderMode());
-    lastWindowState = underWindowNow;
-    document.getElementById('modeBadge').classList.toggle('active', underWindowNow);
+    const viewMode = getViewMode(dayKey);
+    lastWindowState = computeAutoViewMode(dayKey);
+    updateModeUI(viewMode);
 
     const prevId = SEQUENCE[seqIndex] ? SEQUENCE[seqIndex].id : null;
 
-    SEQUENCE = buildSequence(dayKey);
+    SEQUENCE = buildSequence(dayKey, viewMode);
     markEmptiness(SEQUENCE, dayKey);
 
     if (dayChanged || !prevId){
@@ -480,7 +523,7 @@
 
   function allDaysInOrder(){ return ['lunedi','martedi','mercoledi','giovedi','venerdi']; }
 
-  // ---- Helper condiviso: raggruppa una lista di partite per campo/met\u00e0 ----
+  // ---- Helper condiviso: raggruppa una lista di partite per campo/metà ----
   function buildCourtGroups(all){
     const groups = {};
     all.forEach(m => {
@@ -540,46 +583,44 @@
       <div class="court-grid">${cards.map(courtCardHTML).join('')}</div>`;
   }
 
-  function buildSequence(dayKey){
+  // ---- Costruzione sequenza pannelli in base alla modalità di visualizzazione ----
+  function buildSequence(dayKey, viewMode){
     const seq = [];
 
+    if (viewMode === 'under'){
+      seq.push({ id:'und-campi', type:'und-campi', navLabel:'Prossime per campo', group:'UNDER' });
+      ['U19','U15'].forEach(catU => {
+        seq.push({ id:catU.toLowerCase()+'-cal', catU, type:'und-calendario', navLabel:catU+' Calendario', group:'UNDER' });
+        seq.push({ id:catU.toLowerCase()+'-cl', catU, type:'und-classifiche', navLabel:catU+' Classifica', group:'UNDER' });
+        seq.push({ id:catU.toLowerCase()+'-tab', catU, type:'und-tabellone', navLabel:catU+' Tabellone', group:'UNDER' });
+      });
+      return seq;
+    }
+
+    // viewMode === 'main': solo Senior + Over40
     seq.push({ id:'home-campi', type:'campi', navLabel:'Prossime per campo', group:'LIVE' });
 
     if (dayKey === 'venerdi'){
-      seq.push({ id:'sen-combo-ven', cat:'senior', type:'combinato-finale', navLabel:'Venerdì — Classifiche e Programma', group:'SENIOR' });
+      // Classifiche Triangolari: 5 in tutto, mostrate una sotto l'altra,
+      // raggruppate in 3 schede (2 + 2 + 1)
+      seq.push({ id:'sen-cl-12', cat:'senior', type:'senior-classifiche-stack', triIdx:[1,2], navLabel:'Classifiche Triang. 1-2', group:'SENIOR' });
+      seq.push({ id:'sen-cl-34', cat:'senior', type:'senior-classifiche-stack', triIdx:[3,4], navLabel:'Classifiche Triang. 3-4', group:'SENIOR' });
+      seq.push({ id:'sen-cl-5', cat:'senior', type:'senior-classifiche-stack', triIdx:[5], navLabel:'Classifica Triang. 5', group:'SENIOR' });
+      seq.push({ id:'sen-cal-full', cat:'senior', type:'calendario-completo', navLabel:'Calendario completo', group:'SENIOR' });
+      seq.push({ id:'sen-tab', cat:'senior', type:'tabellone', navLabel:'Tabellone', group:'SENIOR' });
+
+      if (SHOW_OVER40){
+        seq.push({ id:'o40-tab', cat:'over40', type:'tabellone', navLabel:'Tabellone', group:'OVER40' });
+        seq.push({ id:'o40-cal-full', cat:'over40', type:'calendario-completo', navLabel:'Calendario completo', group:'OVER40' });
+      }
     } else {
       seq.push({ id:'sen-combo', cat:'senior', type:'combinato', navLabel:'Calendario e Classifiche', group:'SENIOR' });
-    }
-    seq.push({ id:'sen-pro', cat:'senior', type:'prossime', navLabel:'Prossime', group:'SENIOR' });
+      seq.push({ id:'sen-pro', cat:'senior', type:'prossime', navLabel:'Prossime', group:'SENIOR' });
 
-    if (SHOW_OVER40){
-      if (dayKey === 'venerdi'){
-        seq.push({ id:'o40-combo-ven', cat:'over40', type:'combinato-finale', navLabel:'Venerdì — Classifiche e Programma', group:'OVER40' });
-      } else {
+      if (SHOW_OVER40){
         seq.push({ id:'o40-combo', cat:'over40', type:'combinato', navLabel:'Calendario e Classifica', group:'OVER40' });
+        seq.push({ id:'o40-pro', cat:'over40', type:'prossime', navLabel:'Prossime', group:'OVER40' });
       }
-      seq.push({ id:'o40-pro', cat:'over40', type:'prossime', navLabel:'Prossime', group:'OVER40' });
-    }
-
-    // Gruppo Under: sempre presente in nav (cliccabile a mano in qualsiasi
-    // momento); l'autoplay lo include solo dentro la finestra oraria Under
-    // (vedi skipAuto impostato in markEmptiness). Disattivabile del tutto
-    // con SHOW_UNDER = false qui sopra.
-    if (SHOW_UNDER){
-      seq.push({ id:'und-campi', type:'und-campi', navLabel:'Prossime per campo', group:'UNDER' });
-      seq.push({ id:'u15-cal', catU:'U15', type:'und-calendario', navLabel:'U15 Calendario', group:'UNDER' });
-      seq.push({ id:'u15-cl', catU:'U15', type:'und-classifiche', navLabel:'U15 Classifica', group:'UNDER' });
-      seq.push({ id:'u19-cal', catU:'U19', type:'und-calendario', navLabel:'U19 Calendario', group:'UNDER' });
-      seq.push({ id:'u19-cl', catU:'U19', type:'und-classifiche', navLabel:'U19 Classifica', group:'UNDER' });
-    }
-
-    // Modalit\u00e0 "solo Under": la dashboard mostra e ruota SOLO tra i
-    // pannelli del gruppo UNDER (calendario/classifiche/campi), senza
-    // Senior/Over40. Attivata da ?under=1 o ?onlyUnder=1 in URL (resta
-    // senza effetto se SHOW_UNDER = false, dato che non ci sono pannelli
-    // Under da isolare).
-    if (SHOW_UNDER && isOnlyUnderMode()){
-      return seq.filter(def => def.group === 'UNDER');
     }
 
     return seq;
@@ -607,16 +648,12 @@
           hasClass = !!(b && b.righe.length);
         }
         def.empty = !hasCal && !hasClass;
-      } else if (def.type === 'combinato-finale'){
-        const hasCal = matchesForDay('venerdi', def.cat).length > 0;
-        let hasClass = false;
-        if (def.cat === 'senior'){
-          hasClass = [1,2,3,4,5].some(n => { const b = findBlocco('TRIANGOLARE ' + n); return b && b.righe.length; });
-        } else {
-          const b = findBlocco('OVER40 — CLASSIFICA FINALE');
-          hasClass = !!(b && b.righe.length);
-        }
-        def.empty = !hasCal && !hasClass;
+      } else if (def.type === 'senior-classifiche-stack'){
+        def.empty = def.triIdx.every(n => { const b = findBlocco('TRIANGOLARE ' + n); return !b || !b.righe.length; });
+      } else if (def.type === 'calendario-completo'){
+        def.empty = allDaysInOrder().every(d => matchesForDay(d, def.cat).length === 0);
+      } else if (def.type === 'tabellone'){
+        def.empty = tabelloneRowsForCat(def.cat).length === 0;
       } else if (def.type === 'und-campi'){
         def.empty = nextByCourtForDayUnder(dayKey).length === 0;
       } else if (def.type === 'und-calendario'){
@@ -625,28 +662,10 @@
         def.empty = (m.length + f.length) === 0;
       } else if (def.type === 'und-classifiche'){
         def.empty = !UNDER_DATA || !UNDER_DATA[def.catU] || !(UNDER_DATA[def.catU].classifica || []).length;
+      } else if (def.type === 'und-tabellone'){
+        def.empty = underTabelloneRows(def.catU).length === 0;
       }
     });
-    markDayRelevance(seq, dayKey);
-
-    // Fuori dalla finestra Under, l'autoplay salta i pannelli Under (restano
-    // comunque cliccabili a mano dai pulsanti in basso in qualsiasi momento).
-    // In modalit\u00e0 "solo Under" (isOnlyUnderMode) la finestra \u00e8 sempre
-    // considerata attiva, quindi qui non si salta mai nulla.
-    const underWindowNow = SHOW_UNDER && (isUnderWindow(dayKey) || isOnlyUnderMode());
-    seq.forEach(def => {
-      if (def.type === 'und-campi' || def.type === 'und-calendario' || def.type === 'und-classifiche'){
-        def.skipAuto = !underWindowNow;
-      }
-    });
-  }
-
-  // Con le schermate combinate, ogni pannello Senior/Over40 rappresenta gi\u00e0
-  // "la" schermata di quella categoria per il giorno corrente: l'autoplay non
-  // deve pi\u00f9 saltarne nessuno in base a gironi/orari attivi (ci pensa .empty,
-  // impostato sopra, a nascondere una categoria che quel giorno non gioca).
-  function markDayRelevance(seq, dayKey){
-    seq.forEach(def => { def.skipAuto = false; });
   }
 
   function matchCardHTML(m){
@@ -865,76 +884,116 @@
       </div>`;
   }
 
-  // Tabella semplice Pos/Squadra/Riferimento, usata per la classifica finale
-  // Over40 (post-venerdì): non ha le colonne PG/V/S/PF/PS/DIFF standard.
-  function classTableFinaleOver40HTML(righe){
-    const righeOrdinate = righe.slice().sort((a,b) => Number(a['Posizione']||0) - Number(b['Posizione']||0));
-    const rows = righeOrdinate.map(r => `
-      <tr>
-        <td class="num pos">${r['Posizione'] ?? ''}</td>
-        <td class="squadra">${r['Squadra'] || r['Riferimento'] || '—'}</td>
-      </tr>`).join('');
-    return `<table>
-      <thead><tr><th>#</th><th>Squadra</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+  // ---- Classifiche Triangolari (venerdì) mostrate una sotto l'altra,
+  // raggruppate in schede da 2 + 2 + 1 (invece della griglia affiancata) ----
+  function renderSeniorClassificheStack(def){
+    const blocksHTML = def.triIdx.map(n => {
+      const b = findBlocco('TRIANGOLARE ' + n);
+      const righe = b ? b.righe : [];
+      const body = righe.length
+        ? classTableHTML(righe, 'Squadra', 1)
+        : `<div class="empty-msg" style="padding:24px; font-size:20px;">Non ancora disponibile</div>`;
+      return `
+        <div class="class-block stacked">
+          <div class="cb-head">Triangolare ${n}</div>
+          ${body}
+        </div>`;
+    }).join('');
+    const title = def.triIdx.length > 1 ? `Classifiche Triangolari ${def.triIdx.join(' e ')}` : `Classifica Triangolare ${def.triIdx[0]}`;
+    return `
+      <div class="panel-title"><span class="cat">Senior</span><h1>${title}</h1></div>
+      <div class="stack-wrap">${blocksHTML}</div>`;
   }
 
-  // ---- Schermata combinata di venerdì: classifiche (triangolari per il
-  // Main, classifica finale per l'Over40) + programma completo della
-  // giornata, raggruppato per fase, tutto in un'unica schermata scorrevole.
-  function renderCombinatoFinalePanel(def){
+  // ---- Calendario completo (tutte le giornate) per Senior/Over40 ----
+  function renderCalendarioCompletoPanel(def){
     const label = def.cat === 'senior' ? 'Senior' : 'Over40';
+    const groups = allDaysInOrder()
+      .map(d => ({ day: d, items: matchesForDay(d, def.cat) }))
+      .filter(g => g.items.length);
 
-    let classificaHTML;
-    if (def.cat === 'senior'){
-      const blocks = [1,2,3,4,5].map(n => {
-        const b = findBlocco('TRIANGOLARE ' + n);
-        return { head: 'Triangolare ' + n, righe: b ? b.righe : [] };
-      }).filter(b => b.righe.length);
-      classificaHTML = blocks.length
-        ? `<div class="class-grid-3">${blocks.map(b => `
-            <div class="class-block compact">
-              <div class="cb-head">${b.head}</div>
-              ${classTableHTML(b.righe, 'Squadra', 1)}
-            </div>`).join('')}</div>`
-        : `<div class="empty-msg">Classifiche triangolari non ancora disponibili</div>`;
-    } else {
-      const b = findBlocco('OVER40 — CLASSIFICA FINALE');
-      const righe = b ? b.righe : [];
-      classificaHTML = righe.length
-        ? `<div class="class-block">${classTableFinaleOver40HTML(righe)}</div>`
-        : `<div class="empty-msg">Classifica finale non ancora disponibile</div>`;
+    if (!groups.length){
+      return `
+        <div class="panel-title"><span class="cat">${label}</span><h1>Calendario completo</h1></div>
+        <div class="empty-msg">Nessuna partita disponibile per ${label}</div>`;
     }
 
-    const matches = matchesForDay('venerdi', def.cat);
-    const gruppi = [];
-    matches.forEach(m => {
-      const faseName = m.fase || 'Programma';
-      let g = gruppi.find(x => x.fase === faseName);
-      if (!g){ g = { fase: faseName, items: [] }; gruppi.push(g); }
-      g.items.push(m);
-    });
-    const programmaHTML = gruppi.length
-      ? gruppi.map(g => `
-          <div class="agenda-fase">${g.fase}</div>
-          <div class="match-grid compact">${g.items.map(matchCardHTML).join('')}</div>
-        `).join('')
-      : `<div class="empty-msg">Programma non ancora disponibile</div>`;
+    const html = groups.map(g => `
+      <div class="agenda-fase">${DAY_LABELS[g.day] || g.day}</div>
+      <div class="match-grid compact">${g.items.map(matchCardHTML).join('')}</div>
+    `).join('');
 
     return `
-      <div class="panel-title"><span class="cat">${label}</span><h1>Venerdì — Classifiche e Programma</h1></div>
-      <div style="flex:1; display:flex; flex-direction:column; gap:18px; min-height:0; overflow:hidden;">
-        <div style="flex:0 0 40%; min-height:0; overflow:hidden; display:flex; flex-direction:column;">${classificaHTML}</div>
-        <div class="agenda-scroll" style="flex:1; min-height:0;">${programmaHTML}</div>
+      <div class="panel-title"><span class="cat">${label}</span><h1>Calendario completo</h1></div>
+      <div class="agenda-scroll">${html}</div>`;
+  }
+
+  // ---- Tabellone (bracket) — legge TORNEO_DATA.tabellone, un array con le
+  // stesse intestazioni del foglio Google "Tabellone": Torneo, Fase, Partita,
+  // "Squadra 1", "Punti 1", "Punti 2", "Squadra 2", Vincitore. Se l'Apps
+  // Script usa chiavi diverse, basta adattare i nomi qui sotto. ----
+  function tabelloneRowsForCat(cat){
+    if (!TORNEO_DATA) return [];
+    const torneoName = cat === 'senior' ? 'Main' : 'Over40';
+    return (TORNEO_DATA.tabellone || []).filter(r => (r['Torneo'] || '').indexOf(torneoName) !== -1);
+  }
+
+  function tabelloneCardHTML(r){
+    const s1 = r['Squadra 1'] || 'TBD';
+    const s2 = r['Squadra 2'] || 'TBD';
+    const p1 = r['Punti 1'], p2 = r['Punti 2'];
+    const played = p1 !== null && p1 !== '' && p1 !== undefined && p2 !== null && p2 !== '' && p2 !== undefined;
+    const vinc = r['Vincitore'];
+    const win1 = played && vinc && vinc === s1;
+    const win2 = played && vinc && vinc === s2;
+    const scoreHTML = played
+      ? `<div class="match-score">${p1} - ${p2}</div>`
+      : `<div class="match-score time">${r['Partita'] || ''}</div>`;
+    return `
+      <div class="match-card${played ? ' done' : ''}">
+        <div class="match-teams">
+          <div class="mt-line">
+            <span class="team${win1 ? ' winner' : ''}">${s1}</span><span class="vs">vs</span><span class="team${win2 ? ' winner' : ''}">${s2}</span>
+          </div>
+          <div class="mt-meta">${r['Partita'] || ''}</div>
+        </div>
+        ${scoreHTML}
       </div>`;
   }
 
+  function renderTabellonePanel(cat){
+    const label = cat === 'senior' ? 'Senior' : 'Over40';
+    const rows = tabelloneRowsForCat(cat);
+    if (!rows.length){
+      return `
+        <div class="panel-title"><span class="cat">${label}</span><h1>Tabellone</h1></div>
+        <div class="empty-msg">Tabellone non ancora disponibile</div>`;
+    }
+    const groups = [];
+    rows.forEach(r => {
+      const fase = r['Fase'] || 'Fase';
+      let g = groups.find(x => x.fase === fase);
+      if (!g){ g = { fase, items: [] }; groups.push(g); }
+      g.items.push(r);
+    });
+    const html = groups.map(g => `
+      <div class="agenda-fase">${g.fase}</div>
+      <div class="match-grid compact">${g.items.map(tabelloneCardHTML).join('')}</div>
+    `).join('');
+    return `
+      <div class="panel-title"><span class="cat">${label}</span><h1>Tabellone</h1></div>
+      <div class="agenda-scroll">${html}</div>`;
+  }
+
   // ===================== TORNEO UNDER (U19/U15) =====================
-  // Attivo solo gioved\u00ec/venerd\u00ec 17:00\u219219:45 (vedi isUnderWindow),
-  // oppure sempre attivo in modalit\u00e0 "solo Under" (isOnlyUnderMode).
+  // Attivo solo giovedì/venerdì 17:00→19:45 (vedi isUnderWindow), oppure
+  // sempre attivo in modalità "solo Under" (isOnlyUnderMode / pulsante).
   // Riusa lo stesso formato dati del sito (index.html): UNDER_DATA[cat] con
   // .classifica, .calendario[giorno], .finale (quarti/semifinali/finali).
+  // Non esiste un foglio "Tabellone" separato per l'Under: il pannello
+  // Tabellone Under riusa direttamente .finale (che ha già gli slot risolti
+  // in nomi reali quando possibile), mostrando "TBD" per quelli non ancora
+  // risolti — vedi underTabelloneRows() più sotto.
 
   function underMatchesForDay(cat, dayKey){
     if (!UNDER_DATA || !UNDER_DATA[cat]) return [];
@@ -947,7 +1006,7 @@
   }
 
   // Le partite di fase finale (quarti/semifinali/finali) partono con slot
-  // placeholder (es. "1G1U15", "VincQF1_U15") finch\u00e9 non vengono sostituiti a
+  // placeholder (es. "1G1U15", "VincQF1_U15") finché non vengono sostituiti a
   // mano con le squadre reali classificate: fino ad allora le nascondiamo,
   // altrimenti in TV apparirebbero codici incomprensibili invece di nomi squadra.
   function underFinaleMatches(cat){
@@ -1045,6 +1104,46 @@
       </div>`;
   }
 
+  // ---- Tabellone Under (U19/U15): non esiste un foglio "Tabellone"
+  // separato, quindi si ricava da UNDER_DATA[cat].finale (già nel formato
+  // {fase, casa, trasferta, puntiCasa, puntiTrasferta, giocata} compatibile
+  // con matchCardHTML). Gli slot non ancora risolti (es. "1G1U15",
+  // "VincSF1_U15") vengono mostrati come "TBD" invece del codice grezzo. ----
+  function underTabelloneRows(cat){
+    if (!UNDER_DATA || !UNDER_DATA[cat]) return [];
+    const isPlaceholder = v => v && /^(\d)G1U|^(Vinc|Perd)SF/.test(String(v));
+    return (UNDER_DATA[cat].finale || []).map(r => ({
+      fase: r['Fase'], campo: r['Campo'], meta: r['Meta'], orario: r['Orario'],
+      casa: isPlaceholder(r['Squadra Casa']) ? 'TBD' : r['Squadra Casa'],
+      trasferta: isPlaceholder(r['Squadra Trasferta']) ? 'TBD' : r['Squadra Trasferta'],
+      puntiCasa: r['Punti Casa'], puntiTrasferta: r['Punti Trasferta'], giocata: r.giocata
+    }));
+  }
+
+  function renderUnderTabellonePanel(cat){
+    const label = cat === 'U15' ? 'U15/U14' : 'U19/U17';
+    const rows = underTabelloneRows(cat);
+    if (!rows.length){
+      return `
+        <div class="panel-title"><span class="cat">${label}</span><h1>Tabellone</h1></div>
+        <div class="empty-msg">Tabellone non ancora disponibile</div>`;
+    }
+    const groups = [];
+    rows.forEach(r => {
+      const fase = r.fase || 'Fase';
+      let g = groups.find(x => x.fase === fase);
+      if (!g){ g = { fase, items: [] }; groups.push(g); }
+      g.items.push(r);
+    });
+    const html = groups.map(g => `
+      <div class="agenda-fase">${g.fase}</div>
+      <div class="match-grid compact">${g.items.map(matchCardHTML).join('')}</div>
+    `).join('');
+    return `
+      <div class="panel-title"><span class="cat">${label}</span><h1>Tabellone</h1></div>
+      <div class="agenda-scroll">${html}</div>`;
+  }
+
   // ===================== fine sezione Under =====================
 
   function renderPanelHTML(def, dayKey){
@@ -1053,10 +1152,13 @@
     if (def.type === 'classifiche') return renderClassifichePanel(def);
     if (def.type === 'prossime') return renderProssimePanel(def, dayKey);
     if (def.type === 'combinato') return renderCombinatoPanel(def, dayKey);
-    if (def.type === 'combinato-finale') return renderCombinatoFinalePanel(def);
+    if (def.type === 'senior-classifiche-stack') return renderSeniorClassificheStack(def);
+    if (def.type === 'calendario-completo') return renderCalendarioCompletoPanel(def);
+    if (def.type === 'tabellone') return renderTabellonePanel(def.cat);
     if (def.type === 'und-campi') return renderCampiPanelUnder(dayKey);
     if (def.type === 'und-calendario') return renderUnderCalendarioPanel(def.catU, dayKey);
     if (def.type === 'und-classifiche') return renderUnderClassifichePanel(def.catU);
+    if (def.type === 'und-tabellone') return renderUnderTabellonePanel(def.catU);
     return '';
   }
 
@@ -1122,7 +1224,7 @@
       do {
         seqIndex = (seqIndex + 1) % SEQUENCE.length;
         attempts++;
-      } while (SEQUENCE[seqIndex] && (SEQUENCE[seqIndex].empty || SEQUENCE[seqIndex].skipAuto) && attempts < SEQUENCE.length);
+      } while (SEQUENCE[seqIndex] && SEQUENCE[seqIndex].empty && attempts < SEQUENCE.length);
       renderCurrentPanel();
     }, PANEL_DURATION_MS);
   }
