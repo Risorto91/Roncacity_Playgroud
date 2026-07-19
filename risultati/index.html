@@ -131,6 +131,13 @@
   }
   .cd-box .n{ font-family:'Anton',sans-serif; font-size:26px; color:var(--gold); }
   .cd-box .u{ font-size:9px; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; margin-top:2px; }
+  .closing-banner{
+    margin: 26px 0 8px; padding: 18px 20px; border-radius: var(--radius);
+    background: linear-gradient(135deg, rgba(227,178,60,0.14), rgba(74,35,132,0.18));
+    border: 1px solid var(--gold-dim); text-align:center;
+  }
+  .closing-banner .cb-title{ font-family:'Anton',sans-serif; font-size:16px; color:var(--gold); letter-spacing:0.03em; }
+  .closing-banner .cb-sub{ font-size:13px; color:var(--muted); margin-top:6px; }
   .live-now{ margin: 26px 0 8px; }
   .live-now-label{
     display:inline-flex; align-items:center; gap:7px; font-family:'Anton',sans-serif;
@@ -375,18 +382,9 @@
       <h1 class="display">RONCA CITY<br><span class="accent">PLAYGROUND</span></h1>
       <p class="loc">📍 Pol. Cimatti, <b>Roncadello — Forlì</b></p>
 
-      <div class="countdown" id="countdown">
-        <div class="cd-box"><div class="n" id="cd-d">--</div><div class="u">Giorni</div></div>
-        <div class="cd-box"><div class="n" id="cd-h">--</div><div class="u">Ore</div></div>
-        <div class="cd-box"><div class="n" id="cd-m">--</div><div class="u">Min</div></div>
-      </div>
-
-      <div class="live-now" id="liveNow" style="display:none;">
-        <div class="live-now-label"><span class="blinkdot"></span> IN CORSO ORA</div>
-        <div class="live-now-grid" id="liveNowGrid">
-          <div class="live-card"><div class="lc-empty">Caricamento…</div></div>
-          <div class="live-card"><div class="lc-empty">Caricamento…</div></div>
-        </div>
+      <div class="closing-banner">
+        <div class="cb-title">GRAZIE PER QUESTA EDIZIONE 🏀</div>
+        <div class="cb-sub">Ci vediamo il prossimo anno!</div>
       </div>
 
       <div class="cta-row">
@@ -808,6 +806,7 @@
       <div class="pill" data-day="giovedi">Gio 16/07</div>
       <div class="pill" data-day="venerdi">Ven 17/07</div>
     </div>
+    <div class="tabs-inline" id="gallerySubPills" style="display:none;"></div>
 
     <div class="gallery-grid" id="galleryGrid" style="grid-template-columns: repeat(3,1fr);">
       <!-- Popolata da JS in base al giorno selezionato -->
@@ -860,10 +859,10 @@
   // abbia davvero composto triangolari/seeding). Rimetti a true la singola
   // categoria appena i dati sono pronti da mostrare.
   const BRACKET_VISIBILE = {
-    senior: false,
-    over40: false,
-    u19: false,
-    u15: false
+    senior: true,
+    over40: true,
+    u19: true,
+    u15: true
   };
   function applyBracketVisibility(){
     Object.keys(BRACKET_VISIBILE).forEach(cat => {
@@ -1136,8 +1135,7 @@
     document.getElementById('cd-h').textContent = h;
     document.getElementById('cd-m').textContent = mnt;
   }
-  updateCountdown();
-  setInterval(updateCountdown, 60000);
+  // Countdown e "in corso ora" disattivati: torneo concluso.
 
   function partitaCardHTML(m, status, categoriaLabel){
     if (!m){
@@ -1247,16 +1245,70 @@
     lunedi:    { label:'Lun 13/07',  folder:'assets/gallery/Lunedì',    count:56, ext:'jpeg', prefix:'Foto_' },
     martedi:   { label:'Mar 14/07',  folder:'assets/gallery/Martedì',   count:61, ext:'jpeg', prefix:'Foto (', suffix:')' },
     giovedi:   { label:'Gio 16/07',  folder:'assets/gallery/Giovedì',   count:84, ext:'jpeg', prefix:'Foto (', suffix:')' },
-    venerdi:   { label:'Ven 17/07',  folder:'assets/gallery/venerdi',   count:22, ext:'jpeg', prefix:'Foto (', suffix:')' }
+    venerdi:   {
+      label:'Ven 17/07',
+      sub: [
+        { key:'under',  label:'Under',  folder:'assets/gallery/Venerdì/Under',  count:22,  ext:'jpeg', prefix:'Foto (', suffix:')' },
+        { key:'serata', label:'Serata', folder:'assets/gallery/Venerdì/Serata', count:132, ext:'jpeg', prefix:'Foto (', suffix:')' },
+        {
+          key:'premiazioni', label:'Premiazioni',
+          folder:'assets/gallery/Venerdì/Premiazioni', ext:'jpeg',
+          files: [
+            { name:'1 Senior',     caption:'1° classificato Senior' },
+            { name:'2 main',       caption:'2° classificato Senior' },
+            { name:'3 Senior',     caption:'3° classificato Senior' },
+            { name:'4 senior',     caption:'4° classificato Senior' },
+            { name:'1 O40',        caption:'1° classificato Over40' },
+            { name:'2 O40',        caption:'2° classificato Over40' },
+            { name:'1 U19',        caption:'1° classificato Under 19/17' },
+            { name:'2 U19',        caption:'2° classificato Under 19/17' },
+            { name:'1 U15',        caption:'1° classificato Under 15/13' },
+            { name:'2 U15',        caption:'2° classificato Under 15/13' },
+            { name:'MVP under',    caption:'MVP Under — Giovanni Ercolani' },
+            { name:'MVP Senior',   caption:'MVP Senior — Nicola Gardini' },
+            { name:'Gara da 3',    caption:'Gara da 3 — Filippo Poni' },
+            { name:'Gara da 3_V2', caption:'Gara da 3 — Filippo Poni' }
+          ]
+        }
+      ]
+    }
   };
   let currentGalleryDay = 'lunedi';
+  let currentGallerySub = 'under';
 
   function galleryPhotosForDay(dayKey){
     const cfg = galleryConfig[dayKey];
-    if (!cfg || !cfg.count) return [];
+    if (!cfg) return [];
+    const source = cfg.sub ? cfg.sub.find(s => s.key === currentGallerySub) : cfg;
+    if (!source) return [];
+    if (source.files){
+      return source.files.map(f => ({ src: `${source.folder}/${f.name}.${source.ext}`, alt: f.caption }));
+    }
+    if (!source.count) return [];
     const arr = [];
-    for (let i = 1; i <= cfg.count; i++) arr.push(`${cfg.folder}/${cfg.prefix}${i}${cfg.suffix || ''}.${cfg.ext}`);
+    for (let i = 1; i <= source.count; i++){
+      arr.push({ src: `${source.folder}/${source.prefix}${i}${source.suffix || ''}.${source.ext}`, alt: '' });
+    }
     return arr;
+  }
+
+  function renderGallerySubPills(){
+    const wrap = document.getElementById('gallerySubPills');
+    const cfg = galleryConfig[currentGalleryDay];
+    if (!cfg || !cfg.sub){
+      wrap.style.display = 'none';
+      wrap.innerHTML = '';
+      return;
+    }
+    wrap.style.display = '';
+    wrap.innerHTML = cfg.sub.map(s => `<div class="pill${s.key === currentGallerySub ? ' active' : ''}" data-sub="${s.key}">${s.label}</div>`).join('');
+    wrap.querySelectorAll('.pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        currentGallerySub = pill.dataset.sub;
+        renderGallerySubPills();
+        renderGallery();
+      });
+    });
   }
 
   function renderGallery(){
@@ -1268,13 +1320,13 @@
       grid.innerHTML = `<div class="gallery-item" style="grid-column: 1 / -1; aspect-ratio: auto; padding: 30px;">Foto di ${dayLabel} in arrivo</div>`;
       return;
     }
-    grid.innerHTML = photos.map((src, i) => `
+    grid.innerHTML = photos.map((p, i) => `
       <div class="gallery-item photo" data-idx="${i}">
-        <img src="${src}" alt="Ronca City Playground 2026 - ${dayLabel} - foto ${i+1}" loading="lazy">
+        <img src="${p.src}" alt="${p.alt || (dayLabel + ' - foto ' + (i+1))}" loading="lazy">
       </div>
     `).join('');
     grid.querySelectorAll('.gallery-item.photo').forEach(el => {
-      el.addEventListener('click', () => openLightbox(photos[Number(el.dataset.idx)]));
+      el.addEventListener('click', () => openLightbox(photos[Number(el.dataset.idx)].src));
     });
   }
 
@@ -1283,6 +1335,9 @@
       document.getElementById('galleryDayPills').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
       currentGalleryDay = pill.dataset.day;
+      const cfg = galleryConfig[currentGalleryDay];
+      if (cfg && cfg.sub) currentGallerySub = cfg.sub[0].key;
+      renderGallerySubPills();
       renderGallery();
     });
   });
@@ -1301,6 +1356,7 @@
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
+  renderGallerySubPills();
   renderGallery();
 
   async function fetchTorneoData(){
@@ -1337,9 +1393,6 @@
     updateSeniorView();
     updateOver40View();
     renderTabellone();
-    if (document.getElementById('liveNow').style.display !== 'none'){
-      renderLiveNow();
-    }
   }
 
   async function fetchUnderData(){
@@ -1362,9 +1415,6 @@
         el.querySelector('.txt').textContent = 'Dati aggiornati alle ' + stamp;
       });
       renderUnderAll();
-      if (document.getElementById('liveNow').style.display !== 'none'){
-        renderLiveNow();
-      }
     } catch (err) {
       statusEls.forEach(el => {
         el.classList.add('err');
